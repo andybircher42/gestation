@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Keyboard,
   Platform,
@@ -7,30 +7,44 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
+} from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
-import { computeGestationalAge } from '../gestationalAge';
+} from "@react-native-community/datetimepicker";
+import { computeGestationalAge } from "../gestationalAge";
 
-type InputMode = 'weeksDays' | 'dueDate';
+type InputMode = "weeksDays" | "dueDate";
 
 interface EntryFormProps {
   onAdd: (entry: { name: string; weeks: number; days: number }) => void;
 }
 
 export function getDateError(text: string): string | null {
-  if (!text) return null;
+  if (!text) {
+    return null;
+  }
   const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-  if (!match) return 'Enter date as MM/DD/YYYY';
+  if (!match) {
+    return "Enter date as MM/DD/YYYY";
+  }
   const month = parseInt(match[1], 10);
-  if (month < 1 || month > 12) return 'Month must be 1\u201312';
+  if (month < 1 || month > 12) {
+    return "Month must be 1\u201312";
+  }
   const day = parseInt(match[2], 10);
-  if (day < 1 || day > 31) return 'Day must be 1\u201331';
+  if (day < 1 || day > 31) {
+    return "Day must be 1\u201331";
+  }
   let year = parseInt(match[3], 10);
-  if (year < 100) year += 2000;
+  if (year < 100) {
+    year += 2000;
+  }
   const date = new Date(year, month - 1, day);
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
     return `${match[1]}/${match[2]} is not a valid date`;
   }
   return null;
@@ -38,15 +52,27 @@ export function getDateError(text: string): string | null {
 
 export function parseDateText(text: string): Date | null {
   const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
   const month = parseInt(match[1], 10);
   const day = parseInt(match[2], 10);
   let year = parseInt(match[3], 10);
-  if (year < 100) year += 2000;
-  if (month < 1 || month > 12) return null;
-  if (day < 1 || day > 31) return null;
+  if (year < 100) {
+    year += 2000;
+  }
+  if (month < 1 || month > 12) {
+    return null;
+  }
+  if (day < 1 || day > 31) {
+    return null;
+  }
   const date = new Date(year, month - 1, day);
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
     return null;
   }
   return date;
@@ -54,12 +80,12 @@ export function parseDateText(text: string): Date | null {
 
 /** Form for adding a new gestation entry with name, weeks, and days fields. */
 export default function EntryForm({ onAdd }: EntryFormProps) {
-  const [name, setName] = useState('');
-  const [weeks, setWeeks] = useState('');
-  const [days, setDays] = useState('');
+  const [name, setName] = useState("");
+  const [weeks, setWeeks] = useState("");
+  const [days, setDays] = useState("");
   const [dueDate, setDueDate] = useState<Date | null>(null);
-  const [dateText, setDateText] = useState('');
-  const [mode, setMode] = useState<InputMode>('dueDate');
+  const [dateText, setDateText] = useState("");
+  const [mode, setMode] = useState<InputMode>("dueDate");
   const [showPicker, setShowPicker] = useState(false);
   const [weeksTouched, setWeeksTouched] = useState(false);
   const [daysTouched, setDaysTouched] = useState(false);
@@ -69,14 +95,14 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   const d = days ? parseInt(days, 10) : 0;
   const weeksValid = !weeks || (!isNaN(w) && w >= 0 && w <= 44);
   const daysValid = !days || (!isNaN(d) && d >= 0 && d <= 6);
-  const weeksError = weeks && !weeksValid ? 'Weeks must be 0\u201342' : null;
-  const daysError = days && !daysValid ? 'Days must be 0\u20136' : null;
+  const weeksError = weeks && !weeksValid ? "Weeks must be 0\u201342" : null;
+  const daysError = days && !daysValid ? "Days must be 0\u20136" : null;
 
   const computed = dueDate ? computeGestationalAge(dueDate) : null;
 
   const canAdd =
     !!name.trim() &&
-    (mode === 'weeksDays'
+    (mode === "weeksDays"
       ? !!weeks && !!days && weeksValid && daysValid
       : dueDate !== null);
 
@@ -87,12 +113,12 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
   const handleDateTextChange = (text: string) => {
     setDateTouched(false);
-    let updated = text.replace(/[^\d/]/g, '/');
+    let updated = text.replace(/[^\d/]/g, "/");
     if (text.length > dateText.length) {
       if (/^\d{2}$/.test(updated)) {
-        updated += '/';
+        updated += "/";
       } else if (/^\d{1,2}\/\d{2}$/.test(updated)) {
-        updated += '/';
+        updated += "/";
       }
     }
     setDateText(updated);
@@ -100,24 +126,30 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   };
 
   const handleAdd = () => {
-    if (!canAdd) return;
-
-    if (mode === 'weeksDays') {
-      onAdd({ name: name.trim(), weeks: w, days: d });
-    } else {
-      onAdd({ name: name.trim(), weeks: computed!.weeks, days: computed!.days });
+    if (!canAdd) {
+      return;
     }
 
-    setName('');
-    setWeeks('');
-    setDays('');
+    if (mode === "weeksDays") {
+      onAdd({ name: name.trim(), weeks: w, days: d });
+    } else {
+      onAdd({
+        name: name.trim(),
+        weeks: computed!.weeks,
+        days: computed!.days,
+      });
+    }
+
+    setName("");
+    setWeeks("");
+    setDays("");
     setDueDate(null);
-    setDateText('');
+    setDateText("");
     Keyboard.dismiss();
   };
 
   const handleDateChange = (_event: DateTimePickerEvent, selected?: Date) => {
-    setShowPicker(Platform.OS === 'ios');
+    setShowPicker(Platform.OS === "ios");
     if (selected) {
       setDueDate(selected);
       setDateText(formatDate(selected));
@@ -142,18 +174,18 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
       {/* Mode toggle */}
       <View style={styles.toggleRow}>
         <Pressable
-            style={[
-              styles.toggleButton,
-              mode === 'dueDate' && styles.toggleButtonActive,
-            ]}
-            onPress={() => setMode('dueDate')}
-            accessibilityRole="button"
+          style={[
+            styles.toggleButton,
+            mode === "dueDate" && styles.toggleButtonActive,
+          ]}
+          onPress={() => setMode("dueDate")}
+          accessibilityRole="button"
         >
           <Text
-              style={[
-                styles.toggleText,
-                mode === 'dueDate' && styles.toggleTextActive,
-              ]}
+            style={[
+              styles.toggleText,
+              mode === "dueDate" && styles.toggleTextActive,
+            ]}
           >
             Due Date
           </Text>
@@ -161,15 +193,15 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
         <Pressable
           style={[
             styles.toggleButton,
-            mode === 'weeksDays' && styles.toggleButtonActive,
+            mode === "weeksDays" && styles.toggleButtonActive,
           ]}
-          onPress={() => setMode('weeksDays')}
+          onPress={() => setMode("weeksDays")}
           accessibilityRole="button"
         >
           <Text
             style={[
               styles.toggleText,
-              mode === 'weeksDays' && styles.toggleTextActive,
+              mode === "weeksDays" && styles.toggleTextActive,
             ]}
           >
             Weeks & Days
@@ -177,7 +209,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
         </Pressable>
       </View>
 
-      {mode === 'weeksDays' ? (
+      {mode === "weeksDays" ? (
         <View style={styles.ageRow}>
           <View style={styles.inputWithHint}>
             <Text style={styles.label}>Weeks</Text>
@@ -186,7 +218,12 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               accessibilityLabel="Weeks"
               placeholder={"0-42 weeks"}
               value={weeks}
-              onChangeText={(text) => { if (/^\d*$/.test(text)) { setWeeksTouched(false); setWeeks(text); } }}
+              onChangeText={(text) => {
+                if (/^\d*$/.test(text)) {
+                  setWeeksTouched(false);
+                  setWeeks(text);
+                }
+              }}
               onBlur={() => setWeeksTouched(true)}
               keyboardType="number-pad"
               maxLength={2}
@@ -205,7 +242,12 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               accessibilityLabel="Days"
               placeholder={"0-6 days"}
               value={days}
-              onChangeText={(text) => { if (/^\d*$/.test(text)) { setDaysTouched(false); setDays(text); } }}
+              onChangeText={(text) => {
+                if (/^\d*$/.test(text)) {
+                  setDaysTouched(false);
+                  setDays(text);
+                }
+              }}
               onBlur={() => setDaysTouched(true)}
               keyboardType="number-pad"
               maxLength={1}
@@ -232,14 +274,17 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               <Text style={styles.label}>Due Date</Text>
               <View style={styles.dateInputRow}>
                 <Pressable
-                    style={styles.calendarButton}
-                    onPress={() => setShowPicker(true)}
-                    accessibilityLabel="Select due date"
+                  style={styles.calendarButton}
+                  onPress={() => setShowPicker(true)}
+                  accessibilityLabel="Select due date"
                 >
                   <Text style={styles.calendarButtonText}>📅</Text>
                 </Pressable>
                 <TextInput
-                  style={[styles.dateTextInput, showDateError && styles.inputError]}
+                  style={[
+                    styles.dateTextInput,
+                    showDateError && styles.inputError,
+                  ]}
                   accessibilityLabel="Due date"
                   placeholder="MM/DD/YYYY"
                   value={dateText}
@@ -263,7 +308,10 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
             </Pressable>
           </View>
           {computed && (
-            <Text style={styles.preview} accessibilityLabel="Gestational age preview">
+            <Text
+              style={styles.preview}
+              accessibilityLabel="Gestational age preview"
+            >
               = {computed.weeks}w {computed.days}d
             </Text>
           )}
@@ -283,53 +331,53 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
 const styles = StyleSheet.create({
   form: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   label: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#555',
+    fontWeight: "600",
+    color: "#555",
     marginBottom: 4,
   },
   nameInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 10,
-    backgroundColor: '#fafafa',
+    backgroundColor: "#fafafa",
   },
   toggleRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#4a90d9',
-    overflow: 'hidden',
+    borderColor: "#4a90d9",
+    overflow: "hidden",
   },
   toggleButton: {
     flex: 1,
     paddingVertical: 8,
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   toggleButtonActive: {
-    backgroundColor: '#4a90d9',
+    backgroundColor: "#4a90d9",
   },
   toggleText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#4a90d9',
+    fontWeight: "600",
+    color: "#4a90d9",
   },
   toggleTextActive: {
-    color: '#fff',
+    color: "#fff",
   },
   ageRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   inputWithHint: {
@@ -337,39 +385,39 @@ const styles = StyleSheet.create({
   },
   numberInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fafafa',
+    backgroundColor: "#fafafa",
   },
   dateInputRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 6,
   },
   dateTextInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fafafa',
+    backgroundColor: "#fafafa",
   },
   calendarButton: {
     borderWidth: 1,
-    borderColor: '#4a90d9',
+    borderColor: "#4a90d9",
     borderRadius: 8,
     paddingHorizontal: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   calendarButtonText: {
     fontSize: 22,
   },
   inputError: {
-    borderColor: '#ef4444',
+    borderColor: "#ef4444",
   },
   errorText: {
     color: "#ef4444",
@@ -380,22 +428,22 @@ const styles = StyleSheet.create({
   preview: {
     marginTop: 8,
     fontSize: 15,
-    color: '#4a90d9',
-    fontWeight: '600',
+    color: "#4a90d9",
+    fontWeight: "600",
   },
   addButton: {
-    backgroundColor: '#4a90d9',
+    backgroundColor: "#4a90d9",
     borderRadius: 8,
     paddingHorizontal: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   addButtonDisabled: {
-    backgroundColor: '#a0c4e8',
+    backgroundColor: "#a0c4e8",
   },
   addButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

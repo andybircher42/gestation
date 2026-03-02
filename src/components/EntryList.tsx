@@ -1,5 +1,5 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Entry } from '../storage';
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Entry } from "../storage";
 
 interface EntryRowProps {
   item: Entry;
@@ -17,8 +17,8 @@ function EntryRow({ item, onDelete }: EntryRowProps) {
       <View style={styles.entryInfo}>
         <Text style={styles.entryName}>{item.name}</Text>
         <Text style={styles.entryAge}>
-          {item.weeks} week{item.weeks !== 1 ? 's' : ''}, {item.days} day
-          {item.days !== 1 ? 's' : ''}
+          {item.weeks} week{item.weeks !== 1 ? "s" : ""}, {item.days} day
+          {item.days !== 1 ? "s" : ""}
         </Text>
       </View>
       <Pressable
@@ -40,10 +40,10 @@ export default function EntryList({ entries, onDelete }: EntryListProps) {
       renderItem={({ item }) => <EntryRow item={item} onDelete={onDelete} />}
       keyExtractor={(item) => item.id}
       style={styles.list}
-      contentContainerStyle={entries.length === 0 ? styles.emptyList : undefined}
-      ListEmptyComponent={
-        <Text style={styles.emptyText}>No entries yet</Text>
+      contentContainerStyle={
+        entries.length === 0 ? styles.emptyList : undefined
       }
+      ListEmptyComponent={<Text style={styles.emptyText}>No entries yet</Text>}
     />
   );
 }
@@ -54,22 +54,22 @@ const styles = StyleSheet.create({
   },
   emptyList: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyText: {
-    color: '#999',
+    color: "#999",
     fontSize: 16,
   },
   entry: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     marginHorizontal: 16,
     marginTop: 12,
     padding: 16,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -80,25 +80,25 @@ const styles = StyleSheet.create({
   },
   entryName: {
     fontSize: 17,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   entryAge: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   deleteButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   deleteText: {
-    color: '#999',
+    color: "#999",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

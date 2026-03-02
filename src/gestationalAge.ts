@@ -13,8 +13,16 @@ export function computeGestationalAge(
 ): { weeks: number; days: number } {
   const msPerDay = 86_400_000;
   // Strip time component by comparing UTC date midnights
-  const dueMidnight = Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
-  const todayMidnight = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const dueMidnight = Date.UTC(
+    dueDate.getFullYear(),
+    dueDate.getMonth(),
+    dueDate.getDate(),
+  );
+  const todayMidnight = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
   const diffDays = Math.round((dueMidnight - todayMidnight) / msPerDay);
   const totalDays = Math.max(0, Math.min(308, 280 - diffDays));
   return { weeks: Math.floor(totalDays / 7), days: totalDays % 7 };

@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /** A single gestation tracking entry. */
 export interface Entry {
@@ -8,8 +8,8 @@ export interface Entry {
   days: number;
 }
 
-const STORAGE_KEY = '@gestation_entries';
-const AGREEMENT_KEY = '@hipaa_agreement_accepted';
+const STORAGE_KEY = "@gestation_entries";
+const AGREEMENT_KEY = "@hipaa_agreement_accepted";
 
 /** Loads all saved entries from AsyncStorage. */
 export const loadEntries = async (): Promise<Entry[]> => {
@@ -30,7 +30,7 @@ export const checkAgreement = async (): Promise<boolean> => {
 
 /** Records that the user accepted the HIPAA disclaimer. */
 export const acceptAgreement = async (): Promise<void> => {
-  await AsyncStorage.setItem(AGREEMENT_KEY, 'true');
+  await AsyncStorage.setItem(AGREEMENT_KEY, "true");
 };
 
 /** Clears the stored HIPAA agreement so the disclaimer is shown again. */

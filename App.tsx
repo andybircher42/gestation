@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,11 +7,11 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
+} from "react-native";
 
-import EntryForm from './src/components/EntryForm';
-import EntryList from './src/components/EntryList';
-import HipaaAgreementModal from './src/components/HipaaAgreementModal';
+import EntryForm from "./src/components/EntryForm";
+import EntryList from "./src/components/EntryList";
+import HipaaAgreementModal from "./src/components/HipaaAgreementModal";
 import {
   Entry,
   loadEntries,
@@ -19,7 +19,7 @@ import {
   checkAgreement,
   acceptAgreement,
   resetAgreement,
-} from './src/storage';
+} from "./src/storage";
 
 /** Root component that manages entries state, persistence, and the HIPAA agreement flow. */
 export default function App() {
@@ -30,17 +30,27 @@ export default function App() {
   useEffect(() => {
     checkAgreement()
       .then((accepted) => {
-        if (!accepted) setShowAgreement(true);
+        if (!accepted) {
+          setShowAgreement(true);
+        }
       })
-      .catch((e) => console.error('Failed to check agreement', e))
+      .catch((e) => console.error("Failed to check agreement", e))
       .finally(() => setAgreementLoaded(true));
 
     loadEntries()
       .then(setEntries)
-      .catch((e) => console.error('Failed to load entries', e));
+      .catch((e) => console.error("Failed to load entries", e));
   }, []);
 
-  const handleAdd = ({ name, weeks, days }: { name: string; weeks: number; days: number }) => {
+  const handleAdd = ({
+    name,
+    weeks,
+    days,
+  }: {
+    name: string;
+    weeks: number;
+    days: number;
+  }) => {
     const entry = {
       id: Date.now().toString(),
       name,
@@ -50,7 +60,7 @@ export default function App() {
     const newEntries = [entry, ...entries];
     setEntries(newEntries);
     saveEntries(newEntries).catch((e) =>
-      console.error('Failed to save entries', e)
+      console.error("Failed to save entries", e),
     );
   };
 
@@ -58,26 +68,26 @@ export default function App() {
     const newEntries = entries.filter((e) => e.id !== id);
     setEntries(newEntries);
     saveEntries(newEntries).catch((e) =>
-      console.error('Failed to save entries', e)
+      console.error("Failed to save entries", e),
     );
   };
 
   const handleAcceptAgreement = () => {
     acceptAgreement()
       .then(() => setShowAgreement(false))
-      .catch((e) => console.error('Failed to save agreement', e));
+      .catch((e) => console.error("Failed to save agreement", e));
   };
 
   const handleResetAgreement = () => {
     resetAgreement()
       .then(() => setShowAgreement(true))
-      .catch((e) => console.error('Failed to reset agreement', e));
+      .catch((e) => console.error("Failed to reset agreement", e));
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.header}>
         <Text style={styles.title}>Gestation Tracker</Text>
@@ -103,33 +113,33 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
     paddingTop: 60,
     paddingBottom: 16,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: "700",
+    color: "#333",
   },
   devButton: {
-    position: 'absolute',
+    position: "absolute",
     right: 20,
     bottom: 16,
-    backgroundColor: '#ff6b6b',
+    backgroundColor: "#ff6b6b",
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   devButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
