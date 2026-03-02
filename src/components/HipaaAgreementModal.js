@@ -17,9 +17,9 @@ export default function HipaaAgreementModal({ visible, onAccept }) {
             <Text style={styles.modalText}>
               This app is not HIPAA compliant. By using this app, you agree
               that you will not enter any Protected Health Information (PHI)
-              as defined by HIPAA, including but not limited to patient names,
-              medical record numbers, or any other information that could be
-              used to identify a patient.
+              as defined by HIPAA, including but not limited to patient last
+              names, medical record numbers, or any other information that
+              could be used to identify a patient.
             </Text>
             <Text style={styles.modalText}>
               This app stores data locally on your device without encryption
