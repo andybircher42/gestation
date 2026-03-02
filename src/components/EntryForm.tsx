@@ -8,7 +8,11 @@ import {
   View,
 } from 'react-native';
 
-export default function EntryForm({ onAdd }) {
+interface EntryFormProps {
+  onAdd: (entry: { name: string; weeks: number; days: number }) => void;
+}
+
+export default function EntryForm({ onAdd }: EntryFormProps) {
   const [name, setName] = useState('');
   const [weeks, setWeeks] = useState('');
   const [days, setDays] = useState('');
