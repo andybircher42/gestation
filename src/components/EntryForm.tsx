@@ -194,7 +194,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                   onPress={() => setShowPicker(true)}
                   accessibilityLabel="Select due date"
                 >
-                  <Text style={styles.calendarButtonText}>Pick</Text>
+                  <Text style={styles.calendarButtonText}>📅</Text>
                 </Pressable>
               </View>
             </View>
@@ -310,9 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   calendarButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4a90d9',
+    fontSize: 22,
   },
   preview: {
     marginTop: 8,
