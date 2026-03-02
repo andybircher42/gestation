@@ -7,6 +7,26 @@
  *
  * Result is clamped to 0–308 days (0w0d to 44w0d).
  */
+/**
+ * Computes a due date from a gestational age in weeks and days.
+ *
+ * Inverse of computeGestationalAge: dueDate = today + (280 - totalDays) days.
+ */
+export function computeDueDate(
+  weeks: number,
+  days: number,
+  today: Date = new Date(),
+): Date {
+  const totalDays = weeks * 7 + days;
+  const daysUntilDue = 280 - totalDays;
+  const result = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() + daysUntilDue,
+  );
+  return result;
+}
+
 export function computeGestationalAge(
   dueDate: Date,
   today: Date = new Date(),

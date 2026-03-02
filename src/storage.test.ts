@@ -18,7 +18,9 @@ describe("loadEntries / saveEntries", () => {
   });
 
   it("returns parsed entries when they exist", async () => {
-    const data = [{ id: "1", name: "Baby", weeks: 10, days: 3 }];
+    const data = [
+      { id: "1", name: "Baby", weeks: 10, days: 3, dueDate: "2026-06-15" },
+    ];
     await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
     const entries = await loadEntries();
     expect(entries).toEqual(data);
@@ -26,8 +28,8 @@ describe("loadEntries / saveEntries", () => {
 
   it("round-trips with saveEntries", async () => {
     const data = [
-      { id: "1", name: "A", weeks: 5, days: 2 },
-      { id: "2", name: "B", weeks: 20, days: 0 },
+      { id: "1", name: "A", weeks: 5, days: 2, dueDate: "2026-09-01" },
+      { id: "2", name: "B", weeks: 20, days: 0, dueDate: "2026-06-15" },
     ];
     await saveEntries(data);
     const loaded = await loadEntries();

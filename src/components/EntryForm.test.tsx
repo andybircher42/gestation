@@ -5,6 +5,7 @@ import EntryForm, {
   parseDateText,
 } from "./EntryForm";
 import * as gestationalAge from "../gestationalAge";
+import { computeDueDate } from "../gestationalAge";
 
 /** Helper: switch to Gestational Age mode (Due Date is the default). */
 function switchToWeeksDays() {
@@ -12,7 +13,15 @@ function switchToWeeksDays() {
 }
 
 describe("EntryForm — Gestational Age mode", () => {
-  it("calls onAdd with trimmed name and parsed weeks/days", () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ now: new Date(2026, 2, 2) });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("calls onAdd with trimmed name, parsed weeks/days, and computed dueDate", () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
     switchToWeeksDays();
@@ -22,7 +31,14 @@ describe("EntryForm — Gestational Age mode", () => {
     fireEvent.changeText(screen.getByLabelText("Days"), "3");
     fireEvent.press(screen.getByText("Add"));
 
-    expect(onAdd).toHaveBeenCalledWith({ name: "Baby A", weeks: 12, days: 3 });
+    const expectedDueDate = computeDueDate(12, 3, new Date(2026, 2, 2));
+    const expectedDateStr = `${expectedDueDate.getFullYear()}-${String(expectedDueDate.getMonth() + 1).padStart(2, "0")}-${String(expectedDueDate.getDate()).padStart(2, "0")}`;
+    expect(onAdd).toHaveBeenCalledWith({
+      name: "Baby A",
+      weeks: 12,
+      days: 3,
+      dueDate: expectedDateStr,
+    });
   });
 
   it("does not accept empty weeks and days", () => {
@@ -306,7 +322,12 @@ describe("EntryForm — Due Date mode", () => {
     fireEvent.press(screen.getByTestId("date-picker-trigger"));
     fireEvent.press(screen.getByText("Add"));
 
-    expect(onAdd).toHaveBeenCalledWith({ name: "Baby B", weeks: 35, days: 2 });
+    expect(onAdd).toHaveBeenCalledWith({
+      name: "Baby B",
+      weeks: 35,
+      days: 2,
+      dueDate: "2026-06-15",
+    });
 
     jest.restoreAllMocks();
   });
@@ -582,6 +603,53 @@ describe("EntryForm — typed date input", () => {
 
     fireEvent.changeText(input, "1");
     expect(screen.queryByLabelText("Date error")).toBeNull();
+  });
+});
+
+describe("EntryForm — dueDate in onAdd callback", () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ now: new Date(2026, 2, 2) });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("passes the entered due date as ISO string in due date mode", () => {
+    jest
+      .spyOn(gestationalAge, "computeGestationalAge")
+      .mockReturnValue({ weeks: 28, days: 3 });
+
+    const onAdd = jest.fn();
+    render(<EntryForm onAdd={onAdd} />);
+
+    fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
+    fireEvent.changeText(screen.getByLabelText("Due date"), "6/15/2026");
+    fireEvent.press(screen.getByText("Add"));
+
+    expect(onAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ dueDate: "2026-06-15" }),
+    );
+
+    jest.restoreAllMocks();
+  });
+
+  it("passes a computed due date as ISO string in weeks/days mode", () => {
+    const onAdd = jest.fn();
+    render(<EntryForm onAdd={onAdd} />);
+    switchToWeeksDays();
+
+    fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
+    fireEvent.changeText(screen.getByLabelText("Weeks"), "20");
+    fireEvent.changeText(screen.getByLabelText("Days"), "0");
+    fireEvent.press(screen.getByText("Add"));
+
+    // 20w0d = 140 days; dueDate = today + (280 - 140) = today + 140 days
+    const expectedDueDate = computeDueDate(20, 0, new Date(2026, 2, 2));
+    const expectedDateStr = `${expectedDueDate.getFullYear()}-${String(expectedDueDate.getMonth() + 1).padStart(2, "0")}-${String(expectedDueDate.getDate()).padStart(2, "0")}`;
+    expect(onAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ dueDate: expectedDateStr }),
+    );
   });
 });
 

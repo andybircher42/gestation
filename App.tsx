@@ -58,16 +58,19 @@ export default function App() {
     name,
     weeks,
     days,
+    dueDate,
   }: {
     name: string;
     weeks: number;
     days: number;
+    dueDate: string;
   }) => {
     const entry = {
       id: Date.now().toString(),
       name,
       weeks,
       days,
+      dueDate,
     };
     const newEntries = [entry, ...entries];
     setEntries(newEntries);

@@ -1,4 +1,4 @@
-import { computeGestationalAge } from "./gestationalAge";
+import { computeDueDate, computeGestationalAge } from "./gestationalAge";
 
 describe("computeGestationalAge", () => {
   it("returns 40w0d when due date equals today", () => {
@@ -67,5 +67,47 @@ describe("computeGestationalAge", () => {
     expect(result.weeks).toBeGreaterThanOrEqual(0);
     expect(result.days).toBeGreaterThanOrEqual(0);
     expect(result.days).toBeLessThanOrEqual(6);
+  });
+});
+
+describe("computeDueDate", () => {
+  it("returns a date 280 days from today for 0w0d", () => {
+    const today = new Date(2026, 0, 1);
+    const result = computeDueDate(0, 0, today);
+    // 280 days from Jan 1 = Oct 8, 2026
+    expect(result).toEqual(new Date(2026, 9, 8));
+  });
+
+  it("returns today when gestational age is 40w0d", () => {
+    const today = new Date(2026, 2, 2);
+    const result = computeDueDate(40, 0, today);
+    expect(result).toEqual(new Date(2026, 2, 2));
+  });
+
+  it("returns tomorrow when gestational age is 39w6d", () => {
+    const today = new Date(2026, 2, 2);
+    const result = computeDueDate(39, 6, today);
+    expect(result).toEqual(new Date(2026, 2, 3));
+  });
+
+  it("round-trips with computeGestationalAge for mid-pregnancy", () => {
+    const today = new Date(2026, 2, 2);
+    const dueDate = computeDueDate(32, 3, today);
+    const age = computeGestationalAge(dueDate, today);
+    expect(age).toEqual({ weeks: 32, days: 3 });
+  });
+
+  it("round-trips with computeGestationalAge at 0w0d", () => {
+    const today = new Date(2026, 2, 2);
+    const dueDate = computeDueDate(0, 0, today);
+    const age = computeGestationalAge(dueDate, today);
+    expect(age).toEqual({ weeks: 0, days: 0 });
+  });
+
+  it("round-trips with computeGestationalAge at 40w0d", () => {
+    const today = new Date(2026, 2, 2);
+    const dueDate = computeDueDate(40, 0, today);
+    const age = computeGestationalAge(dueDate, today);
+    expect(age).toEqual({ weeks: 40, days: 0 });
   });
 });

@@ -11,12 +11,17 @@ import {
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { computeGestationalAge } from "../gestationalAge";
+import { computeDueDate, computeGestationalAge } from "../gestationalAge";
 
 type InputMode = "weeksDays" | "dueDate";
 
 interface EntryFormProps {
-  onAdd: (entry: { name: string; weeks: number; days: number }) => void;
+  onAdd: (entry: {
+    name: string;
+    weeks: number;
+    days: number;
+    dueDate: string;
+  }) => void;
 }
 
 export function getDateBounds(now: Date = new Date()): {
@@ -101,6 +106,13 @@ export function parseDateText(text: string): Date | null {
   return date;
 }
 
+function toISODateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 /** Form for adding a new gestation entry with name, weeks, and days fields. */
 export default function EntryForm({ onAdd }: EntryFormProps) {
   const [name, setName] = useState("");
@@ -154,12 +166,19 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     }
 
     if (mode === "weeksDays") {
-      onAdd({ name: name.trim(), weeks: w, days: d });
+      const computed_dueDate = computeDueDate(w, d);
+      onAdd({
+        name: name.trim(),
+        weeks: w,
+        days: d,
+        dueDate: toISODateString(computed_dueDate),
+      });
     } else {
       onAdd({
         name: name.trim(),
         weeks: computed!.weeks,
         days: computed!.days,
+        dueDate: toISODateString(dueDate!),
       });
     }
 

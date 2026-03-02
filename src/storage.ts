@@ -6,6 +6,7 @@ export interface Entry {
   name: string;
   weeks: number;
   days: number;
+  dueDate: string;
 }
 
 const STORAGE_KEY = "@gestation_entries";
