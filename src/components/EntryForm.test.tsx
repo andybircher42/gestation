@@ -80,6 +80,22 @@ describe('EntryForm', () => {
     expect(screen.getByPlaceholderText('0-6 days')).toBeTruthy();
   });
 
+  it('rejects non-numeric input in weeks and days fields', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+
+    fireEvent.changeText(screen.getByLabelText('Weeks'), 'abc');
+    expect(screen.getByLabelText('Weeks').props.value).toBe('');
+
+    fireEvent.changeText(screen.getByLabelText('Days'), '2x');
+    expect(screen.getByLabelText('Days').props.value).toBe('');
+
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '12');
+    expect(screen.getByLabelText('Weeks').props.value).toBe('12');
+
+    fireEvent.changeText(screen.getByLabelText('Days'), '3');
+    expect(screen.getByLabelText('Days').props.value).toBe('3');
+  });
+
   it('disables Add button when weeks is out of range', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);

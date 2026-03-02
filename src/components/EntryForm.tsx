@@ -54,7 +54,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
             accessibilityLabel="Weeks"
             placeholder={"0-42 weeks"}
             value={weeks}
-            onChangeText={setWeeks}
+            onChangeText={(text) => { if (/^\d*$/.test(text)) setWeeks(text); }}
             keyboardType="number-pad"
             maxLength={2}
             returnKeyType="next"
@@ -67,7 +67,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
             accessibilityLabel="Days"
             placeholder={"0-6 days"}
             value={days}
-            onChangeText={setDays}
+            onChangeText={(text) => { if (/^\d*$/.test(text)) setDays(text); }}
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="done"
