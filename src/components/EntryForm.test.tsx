@@ -327,7 +327,7 @@ describe("EntryForm — Due Date mode", () => {
     fireEvent.press(screen.getByTestId("date-picker-trigger"));
 
     // Mock picker returns June 15, 2026
-    expect(screen.getByLabelText("Due date").props.value).toBe("6/15/2026");
+    expect(screen.getByLabelText("Due date").props.value).toBe("06/15/2026");
   });
 
   it("clears due date after submission", () => {
@@ -412,7 +412,7 @@ describe("EntryForm — typed date input", () => {
     fireEvent.press(screen.getByLabelText("Select due date"));
     fireEvent.press(screen.getByTestId("date-picker-trigger"));
 
-    expect(screen.getByLabelText("Due date").props.value).toBe("6/15/2026");
+    expect(screen.getByLabelText("Due date").props.value).toBe("06/15/2026");
   });
 
   it("accepts a 2-digit year as 20xx", () => {
@@ -480,6 +480,23 @@ describe("EntryForm — typed date input", () => {
     fireEvent.changeText(input, "06/");
     fireEvent.changeText(input, "06/15");
     expect(input.props.value).toBe("06/15/");
+  });
+
+  it("normalizes date to MM/DD/YYYY on blur", () => {
+    jest
+      .spyOn(gestationalAge, "computeGestationalAge")
+      .mockReturnValue({ weeks: 28, days: 3 });
+
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText("Due date");
+
+    fireEvent.changeText(input, "6/5/26");
+    expect(input.props.value).toBe("6/5/26");
+
+    fireEvent(input, "blur");
+    expect(input.props.value).toBe("06/05/2026");
+
+    jest.restoreAllMocks();
   });
 
   it("clears text input after submission", () => {

@@ -179,8 +179,11 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     }
   };
 
-  const formatDate = (date: Date) =>
-    `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  const formatDate = (date: Date) => {
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${m}/${d}/${date.getFullYear()}`;
+  };
 
   return (
     <View style={styles.form}>
@@ -313,7 +316,12 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                   value={dateText}
                   keyboardType="number-pad"
                   onChangeText={handleDateTextChange}
-                  onBlur={() => setDateTouched(true)}
+                  onBlur={() => {
+                    setDateTouched(true);
+                    if (dueDate && !dateError) {
+                      setDateText(formatDate(dueDate));
+                    }
+                  }}
                 />
               </View>
               {showDateError && (
