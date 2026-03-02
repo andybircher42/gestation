@@ -65,7 +65,16 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
   const handleDateTextChange = (text: string) => {
     setDateTouched(false);
-    let updated = text.replace(/[^\d-]/g, "-");
+    let updated = text.replace(/[^\d-]/g, "-").replace(/-{2,}/g, "-");
+    // Limit to DD-DD-DDDD pattern: truncate after 2nd hyphen + 4 digits
+    const parts = updated.split("-");
+    if (parts.length > 3) {
+      updated = parts.slice(0, 3).join("-");
+    }
+    if (parts.length === 3 && parts[2].length > 4) {
+      parts[2] = parts[2].slice(0, 4);
+      updated = parts.join("-");
+    }
     if (text.length > dateText.length) {
       if (/^\d{2}$/.test(updated)) {
         updated += "-";

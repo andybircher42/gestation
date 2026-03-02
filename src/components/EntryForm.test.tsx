@@ -480,6 +480,33 @@ describe("EntryForm — typed date input", () => {
     expect(input.props.value).toBe("6-15-2026");
   });
 
+  it("limits input to DD-DD-DDDD pattern", () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText("Due date");
+
+    fireEvent.changeText(input, "03-28-20261");
+    expect(input.props.value).toBe("03-28-2026");
+  });
+
+  it("allows no more than 2 hyphens", () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText("Due date");
+
+    fireEvent.changeText(input, "03-28-38-28");
+    expect(input.props.value).toBe("03-28-38");
+  });
+
+  it("collapses consecutive hyphens into one", () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText("Due date");
+
+    fireEvent.changeText(input, "6---15---2026");
+    expect(input.props.value).toBe("6-15-2026");
+
+    fireEvent.changeText(input, "06--15--2026");
+    expect(input.props.value).toBe("06-15-2026");
+  });
+
   it('auto-inserts "-" after two-digit month', () => {
     render(<EntryForm onAdd={jest.fn()} />);
     const input = screen.getByLabelText("Due date");
