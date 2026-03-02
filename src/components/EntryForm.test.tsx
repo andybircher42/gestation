@@ -337,6 +337,69 @@ describe('EntryForm — typed date input', () => {
     expect(screen.getByLabelText('Due date').props.value).toBe('6/15/2026');
   });
 
+  it('accepts a 2-digit year as 20xx', () => {
+    jest.spyOn(gestationalAge, 'computeGestationalAge').mockReturnValue({ weeks: 28, days: 3 });
+
+    const onAdd = jest.fn();
+    render(<EntryForm onAdd={onAdd} />);
+
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Due date'), '6/15/26');
+    fireEvent.press(screen.getByText('Add'));
+
+    expect(onAdd).toHaveBeenCalledTimes(1);
+
+    jest.restoreAllMocks();
+  });
+
+  it('accepts single-digit month and day', () => {
+    jest.spyOn(gestationalAge, 'computeGestationalAge').mockReturnValue({ weeks: 30, days: 0 });
+
+    const onAdd = jest.fn();
+    render(<EntryForm onAdd={onAdd} />);
+
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Due date'), '1/5/2026');
+    fireEvent.press(screen.getByText('Add'));
+
+    expect(onAdd).toHaveBeenCalledTimes(1);
+
+    jest.restoreAllMocks();
+  });
+
+  it('replaces non-numeric characters with "/"', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    fireEvent.changeText(input, '6-15-2026');
+    expect(input.props.value).toBe('6/15/2026');
+
+    fireEvent.changeText(input, '6.15.2026');
+    expect(input.props.value).toBe('6/15/2026');
+
+    fireEvent.changeText(input, '6 15 2026');
+    expect(input.props.value).toBe('6/15/2026');
+  });
+
+  it('auto-inserts "/" after two-digit month', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    // Simulate typing "06" — should become "06/"
+    fireEvent.changeText(input, '06');
+    expect(input.props.value).toBe('06/');
+  });
+
+  it('auto-inserts "/" after two-digit day', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    // Simulate typing month then day
+    fireEvent.changeText(input, '06/');
+    fireEvent.changeText(input, '06/15');
+    expect(input.props.value).toBe('06/15/');
+  });
+
   it('clears text input after submission', () => {
     jest.spyOn(gestationalAge, 'computeGestationalAge').mockReturnValue({ weeks: 28, days: 3 });
 

@@ -43,11 +43,12 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
       : dueDate !== null);
 
   const parseDateText = (text: string): Date | null => {
-    const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
     if (!match) return null;
     const month = parseInt(match[1], 10);
     const day = parseInt(match[2], 10);
-    const year = parseInt(match[3], 10);
+    let year = parseInt(match[3], 10);
+    if (year < 100) year += 2000;
     if (month < 1 || month > 12) return null;
     if (day < 1 || day > 31) return null;
     const date = new Date(year, month - 1, day);
@@ -58,8 +59,16 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   };
 
   const handleDateTextChange = (text: string) => {
-    setDateText(text);
-    setDueDate(parseDateText(text));
+    let updated = text.replace(/[^\d/]/g, '/');
+    if (text.length > dateText.length) {
+      if (/^\d{2}$/.test(updated)) {
+        updated += '/';
+      } else if (/^\d{1,2}\/\d{2}$/.test(updated)) {
+        updated += '/';
+      }
+    }
+    setDateText(updated);
+    setDueDate(parseDateText(updated));
   };
 
   const handleAdd = () => {
@@ -192,8 +201,9 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                 <TextInput
                   style={styles.dateTextInput}
                   accessibilityLabel="Due date"
-                  placeholder="M/D/YYYY"
+                  placeholder="MM/DD/YYYY"
                   value={dateText}
+                  keyboardType="number-pad"
                   onChangeText={handleDateTextChange}
                 />
               </View>
