@@ -4,12 +4,12 @@ import * as Updates from "expo-updates";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 
+import DevToolbar from "./src/components/DevToolbar";
 import EntryForm from "./src/components/EntryForm";
 import EntryList from "./src/components/EntryList";
 import HipaaAgreementModal from "./src/components/HipaaAgreementModal";
@@ -99,6 +99,14 @@ export default function App() {
       .catch((e) => console.error("Failed to reset agreement", e));
   };
 
+  const handleSeedData = (seeded: Entry[]) => {
+    const newEntries = [...seeded, ...entries];
+    setEntries(newEntries);
+    saveEntries(newEntries).catch((e) =>
+      console.error("Failed to save seeded entries", e),
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -107,9 +115,10 @@ export default function App() {
       <View style={styles.header}>
         <Text style={styles.title}>Gestation Tracker</Text>
         {__DEV__ && (
-          <Pressable onPress={handleResetAgreement} style={styles.devButton}>
-            <Text style={styles.devButtonText}>Reset HIPAA</Text>
-          </Pressable>
+          <DevToolbar
+            onSeedData={handleSeedData}
+            onResetAgreement={handleResetAgreement}
+          />
         )}
       </View>
 
@@ -142,19 +151,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: "#333",
-  },
-  devButton: {
-    position: "absolute",
-    right: 20,
-    bottom: 16,
-    backgroundColor: "#ff6b6b",
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  devButtonText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "600",
   },
 });
