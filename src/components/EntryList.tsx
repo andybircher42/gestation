@@ -17,8 +17,7 @@ function EntryRow({ item, onDelete }: EntryRowProps) {
       <View style={styles.entryInfo}>
         <Text style={styles.entryName}>{item.name}</Text>
         <Text style={styles.entryAge}>
-          {item.weeks} week{item.weeks !== 1 ? "s" : ""}, {item.days} day
-          {item.days !== 1 ? "s" : ""}
+          {item.weeks}w {item.days}d
         </Text>
       </View>
       <Pressable

@@ -230,7 +230,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               mode === "weeksDays" && styles.toggleTextActive,
             ]}
           >
-            Weeks & Days
+            Gestational Age
           </Text>
         </Pressable>
       </View>
@@ -343,7 +343,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               style={styles.preview}
               accessibilityLabel="Gestational age preview"
             >
-              = {computed.weeks}w {computed.days}d
+              Gestational Age {"->"} {computed.weeks}w {computed.days}d
             </Text>
           )}
           {showPicker && (

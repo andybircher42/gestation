@@ -6,12 +6,12 @@ import EntryForm, {
 } from "./EntryForm";
 import * as gestationalAge from "../gestationalAge";
 
-/** Helper: switch to Weeks & Days mode (Due Date is the default). */
+/** Helper: switch to Gestational Age mode (Due Date is the default). */
 function switchToWeeksDays() {
-  fireEvent.press(screen.getByText("Weeks & Days"));
+  fireEvent.press(screen.getByText("Gestational Age"));
 }
 
-describe("EntryForm — Weeks & Days mode", () => {
+describe("EntryForm — Gestational Age mode", () => {
   it("calls onAdd with trimmed name and parsed weeks/days", () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
@@ -236,10 +236,10 @@ describe("EntryForm — mode toggle", () => {
     expect(screen.queryByLabelText("Days")).toBeNull();
   });
 
-  it("switches to Weeks & Days mode when toggle is pressed", () => {
+  it("switches to Gestational Age mode when toggle is pressed", () => {
     render(<EntryForm onAdd={jest.fn()} />);
 
-    fireEvent.press(screen.getByText("Weeks & Days"));
+    fireEvent.press(screen.getByText("Gestational Age"));
 
     expect(screen.getByLabelText("Weeks")).toBeTruthy();
     expect(screen.getByLabelText("Days")).toBeTruthy();
@@ -250,7 +250,7 @@ describe("EntryForm — mode toggle", () => {
   it("switches back to Due Date mode", () => {
     render(<EntryForm onAdd={jest.fn()} />);
 
-    fireEvent.press(screen.getByText("Weeks & Days"));
+    fireEvent.press(screen.getByText("Gestational Age"));
     fireEvent.press(screen.getByText("Due Date"));
 
     expect(screen.getByLabelText("Due date")).toBeTruthy();
@@ -288,7 +288,7 @@ describe("EntryForm — Due Date mode", () => {
     // Trigger mock date selection
     fireEvent.press(screen.getByTestId("date-picker-trigger"));
 
-    expect(screen.getByText("= 32w 4d")).toBeTruthy();
+    expect(screen.getByText("Gestational Age -> 32w 4d")).toBeTruthy();
 
     jest.restoreAllMocks();
   });
@@ -368,7 +368,7 @@ describe("EntryForm — typed date input", () => {
 
     fireEvent.changeText(screen.getByLabelText("Due date"), "6/15/2026");
 
-    expect(screen.getByText("= 28w 3d")).toBeTruthy();
+    expect(screen.getByText("Gestational Age -> 28w 3d")).toBeTruthy();
 
     jest.restoreAllMocks();
   });

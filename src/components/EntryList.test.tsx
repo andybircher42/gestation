@@ -12,21 +12,21 @@ describe("EntryList", () => {
     render(<EntryList entries={entries} onDelete={jest.fn()} />);
 
     expect(screen.getByText("Baby A")).toBeTruthy();
-    expect(screen.getByText("12 weeks, 3 days")).toBeTruthy();
+    expect(screen.getByText("12w 3d")).toBeTruthy();
   });
 
-  it("pluralizes singular (1 week, 1 day)", () => {
+  it("renders singular values", () => {
     const entries = [{ id: "1", name: "Baby", weeks: 1, days: 1 }];
     render(<EntryList entries={entries} onDelete={jest.fn()} />);
 
-    expect(screen.getByText("1 week, 1 day")).toBeTruthy();
+    expect(screen.getByText("1w 1d")).toBeTruthy();
   });
 
-  it("pluralizes zero (0 weeks, 0 days)", () => {
+  it("renders zero values", () => {
     const entries = [{ id: "1", name: "Baby", weeks: 0, days: 0 }];
     render(<EntryList entries={entries} onDelete={jest.fn()} />);
 
-    expect(screen.getByText("0 weeks, 0 days")).toBeTruthy();
+    expect(screen.getByText("0w 0d")).toBeTruthy();
   });
 
   it("calls onDelete with correct id", () => {
