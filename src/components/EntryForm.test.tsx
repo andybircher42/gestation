@@ -6,9 +6,9 @@ describe('EntryForm', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText('Name'), '  Baby A  ');
-    fireEvent.changeText(screen.getByPlaceholderText('Weeks'), '12');
-    fireEvent.changeText(screen.getByPlaceholderText('Days'), '3');
+    fireEvent.changeText(screen.getByLabelText('Name'), '  Baby A  ');
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '12');
+    fireEvent.changeText(screen.getByLabelText('Days'), '3');
     fireEvent.press(screen.getByText('Add'));
 
     expect(onAdd).toHaveBeenCalledWith({ name: 'Baby A', weeks: 12, days: 3 });
@@ -18,7 +18,7 @@ describe('EntryForm', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
     fireEvent.press(screen.getByText('Add'));
 
     expect(onAdd).toHaveBeenCalledWith({ name: 'Baby', weeks: 0, days: 0 });
@@ -28,22 +28,22 @@ describe('EntryForm', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText('Name'), 'Baby');
-    fireEvent.changeText(screen.getByPlaceholderText('Weeks'), '10');
-    fireEvent.changeText(screen.getByPlaceholderText('Days'), '5');
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '10');
+    fireEvent.changeText(screen.getByLabelText('Days'), '5');
     fireEvent.press(screen.getByText('Add'));
 
-    expect(screen.getByPlaceholderText('Name').props.value).toBe('');
-    expect(screen.getByPlaceholderText('Weeks').props.value).toBe('');
-    expect(screen.getByPlaceholderText('Days').props.value).toBe('');
+    expect(screen.getByLabelText('Name').props.value).toBe('');
+    expect(screen.getByLabelText('Weeks').props.value).toBe('');
+    expect(screen.getByLabelText('Days').props.value).toBe('');
   });
 
   it('does not call onAdd when name is empty', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText('Weeks'), '10');
-    fireEvent.changeText(screen.getByPlaceholderText('Days'), '3');
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '10');
+    fireEvent.changeText(screen.getByLabelText('Days'), '3');
     fireEvent.press(screen.getByText('Add'));
 
     expect(onAdd).not.toHaveBeenCalled();
@@ -53,9 +53,9 @@ describe('EntryForm', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText('Name'), 'Baby');
-    fireEvent.changeText(screen.getByPlaceholderText('Weeks'), '45');
-    fireEvent.changeText(screen.getByPlaceholderText('Days'), '0');
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '45');
+    fireEvent.changeText(screen.getByLabelText('Days'), '0');
     fireEvent.press(screen.getByText('Add'));
 
     expect(onAdd).not.toHaveBeenCalled();
@@ -65,29 +65,19 @@ describe('EntryForm', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText('Name'), 'Baby');
-    fireEvent.changeText(screen.getByPlaceholderText('Weeks'), '10');
-    fireEvent.changeText(screen.getByPlaceholderText('Days'), '7');
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '10');
+    fireEvent.changeText(screen.getByLabelText('Days'), '7');
     fireEvent.press(screen.getByText('Add'));
 
     expect(onAdd).not.toHaveBeenCalled();
   });
 
-  it('shows range hints', () => {
+  it('shows range hints as placeholder text', () => {
     render(<EntryForm onAdd={jest.fn()} />);
 
-    expect(screen.getByText('0–42')).toBeTruthy();
-    expect(screen.getByText('0–6')).toBeTruthy();
-  });
-
-  it('keeps range hints visible while typing', () => {
-    render(<EntryForm onAdd={jest.fn()} />);
-
-    fireEvent.changeText(screen.getByPlaceholderText('Weeks'), '10');
-    fireEvent.changeText(screen.getByPlaceholderText('Days'), '3');
-
-    expect(screen.getByText('0–42')).toBeTruthy();
-    expect(screen.getByText('0–6')).toBeTruthy();
+    expect(screen.getByPlaceholderText('0-42 weeks')).toBeTruthy();
+    expect(screen.getByPlaceholderText('0-6 days')).toBeTruthy();
   });
 
   it('Add button is disabled when name is empty and enabled when name is entered', () => {
@@ -99,7 +89,7 @@ describe('EntryForm', () => {
     expect(onAdd).not.toHaveBeenCalled();
 
     // After entering a name, the button should work (enabled)
-    fireEvent.changeText(screen.getByPlaceholderText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
     fireEvent.press(screen.getByText('Add'));
     expect(onAdd).toHaveBeenCalledTimes(1);
   });

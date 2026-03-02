@@ -37,37 +37,41 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
   return (
     <View style={styles.form}>
+      <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.nameInput}
-        placeholder="Name"
+        placeholder={"First Name"}
+        accessibilityLabel="Name"
         value={name}
         onChangeText={setName}
         returnKeyType="next"
       />
       <View style={styles.ageRow}>
         <View style={styles.inputWithHint}>
+          <Text style={styles.label}>Weeks</Text>
           <TextInput
             style={styles.numberInput}
-            placeholder="Weeks"
+            accessibilityLabel="Weeks"
+            placeholder={"0-42 weeks"}
             value={weeks}
             onChangeText={setWeeks}
             keyboardType="number-pad"
             maxLength={2}
             returnKeyType="next"
           />
-          <Text style={styles.hintText}>0–42</Text>
         </View>
         <View style={styles.inputWithHint}>
+          <Text style={styles.label}>Days</Text>
           <TextInput
             style={styles.numberInput}
-            placeholder="Days"
+            accessibilityLabel="Days"
+            placeholder={"0-6 days"}
             value={days}
             onChangeText={setDays}
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="done"
           />
-          <Text style={styles.hintText}>0–6</Text>
         </View>
         <Pressable
           style={[styles.addButton, !name.trim() && styles.addButtonDisabled]}
@@ -87,6 +91,12 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 4,
   },
   nameInput: {
     borderWidth: 1,
@@ -111,12 +121,6 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: '#fafafa',
-  },
-  hintText: {
-    fontSize: 11,
-    color: '#999',
-    marginTop: 2,
-    marginLeft: 4,
   },
   addButton: {
     backgroundColor: '#4a90d9',
