@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import EntryForm from './EntryForm';
+import EntryForm, { getDateError, parseDateText } from './EntryForm';
 import * as gestationalAge from '../gestationalAge';
 
 jest.mock('@react-native-community/datetimepicker', () => {
@@ -37,7 +37,7 @@ describe('EntryForm — Weeks & Days mode', () => {
     expect(onAdd).toHaveBeenCalledWith({ name: 'Baby A', weeks: 12, days: 3 });
   });
 
-  it('defaults weeks/days to 0 when left empty', () => {
+  it('does not accept empty weeks and days', () => {
     const onAdd = jest.fn();
     render(<EntryForm onAdd={onAdd} />);
     switchToWeeksDays();
@@ -45,7 +45,7 @@ describe('EntryForm — Weeks & Days mode', () => {
     fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
     fireEvent.press(screen.getByText('Add'));
 
-    expect(onAdd).toHaveBeenCalledWith({ name: 'Baby', weeks: 0, days: 0 });
+    expect(onAdd).not.toHaveBeenCalled();
   });
 
   it('clears inputs after submission', () => {
@@ -132,6 +132,7 @@ describe('EntryForm — Weeks & Days mode', () => {
     switchToWeeksDays();
 
     fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Days'), '3');
     fireEvent.changeText(screen.getByLabelText('Weeks'), '45');
     fireEvent.press(screen.getByText('Add'));
     expect(onAdd).not.toHaveBeenCalled();
@@ -147,6 +148,7 @@ describe('EntryForm — Weeks & Days mode', () => {
     switchToWeeksDays();
 
     fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '10');
     fireEvent.changeText(screen.getByLabelText('Days'), '7');
     fireEvent.press(screen.getByText('Add'));
     expect(onAdd).not.toHaveBeenCalled();
@@ -161,6 +163,9 @@ describe('EntryForm — Weeks & Days mode', () => {
     render(<EntryForm onAdd={onAdd} />);
     switchToWeeksDays();
 
+    fireEvent.changeText(screen.getByLabelText('Weeks'), '10');
+    fireEvent.changeText(screen.getByLabelText('Days'), '3');
+
     // Button should not fire when name is empty (disabled)
     fireEvent.press(screen.getByText('Add'));
     expect(onAdd).not.toHaveBeenCalled();
@@ -169,6 +174,67 @@ describe('EntryForm — Weeks & Days mode', () => {
     fireEvent.changeText(screen.getByLabelText('Name'), 'Baby');
     fireEvent.press(screen.getByText('Add'));
     expect(onAdd).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows error when weeks is out of range after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    switchToWeeksDays();
+
+    const weeksInput = screen.getByLabelText('Weeks');
+    fireEvent.changeText(weeksInput, '45');
+    expect(screen.queryByLabelText('Weeks error')).toBeNull();
+
+    fireEvent(weeksInput, 'blur');
+    expect(screen.getByLabelText('Weeks error')).toBeTruthy();
+    expect(screen.getByText(/Weeks must be/)).toBeTruthy();
+  });
+
+  it('shows error when days is out of range after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    switchToWeeksDays();
+
+    const daysInput = screen.getByLabelText('Days');
+    fireEvent.changeText(daysInput, '7');
+    expect(screen.queryByLabelText('Days error')).toBeNull();
+
+    fireEvent(daysInput, 'blur');
+    expect(screen.getByLabelText('Days error')).toBeTruthy();
+    expect(screen.getByText(/Days must be/)).toBeTruthy();
+  });
+
+  it('clears error when user starts typing again', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    switchToWeeksDays();
+
+    const weeksInput = screen.getByLabelText('Weeks');
+    fireEvent.changeText(weeksInput, '45');
+    fireEvent(weeksInput, 'blur');
+    expect(screen.getByLabelText('Weeks error')).toBeTruthy();
+
+    fireEvent.changeText(weeksInput, '4');
+    expect(screen.queryByLabelText('Weeks error')).toBeNull();
+  });
+
+  it('shows no error for valid weeks and days after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    switchToWeeksDays();
+
+    const weeksInput = screen.getByLabelText('Weeks');
+    const daysInput = screen.getByLabelText('Days');
+    fireEvent.changeText(weeksInput, '20');
+    fireEvent.changeText(daysInput, '3');
+    fireEvent(weeksInput, 'blur');
+    fireEvent(daysInput, 'blur');
+    expect(screen.queryByLabelText('Weeks error')).toBeNull();
+    expect(screen.queryByLabelText('Days error')).toBeNull();
+  });
+
+  it('shows no error when weeks and days are empty', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    switchToWeeksDays();
+
+    expect(screen.queryByLabelText('Weeks error')).toBeNull();
+    expect(screen.queryByLabelText('Days error')).toBeNull();
   });
 });
 
@@ -413,5 +479,200 @@ describe('EntryForm — typed date input', () => {
     expect(screen.getByLabelText('Due date').props.value).toBe('');
 
     jest.restoreAllMocks();
+  });
+
+  it('shows no error when input is empty', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+
+    expect(screen.queryByLabelText('Date error')).toBeNull();
+  });
+
+  it('shows no error for a valid date', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+
+    fireEvent.changeText(screen.getByLabelText('Due date'), '6/15/2026');
+
+    expect(screen.queryByLabelText('Date error')).toBeNull();
+  });
+
+  it('shows format error for incomplete date text after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    fireEvent.changeText(input, '6/15');
+    expect(screen.queryByLabelText('Date error')).toBeNull();
+
+    fireEvent(input, 'blur');
+    expect(screen.getByLabelText('Date error')).toBeTruthy();
+    expect(screen.getByText('Enter date as MM/DD/YYYY')).toBeTruthy();
+  });
+
+  it('shows error for invalid month after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    fireEvent.changeText(input, '13/1/2026');
+    fireEvent(input, 'blur');
+
+    expect(screen.getByText(/Month must be/)).toBeTruthy();
+  });
+
+  it('shows error for invalid day after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    fireEvent.changeText(input, '1/32/2026');
+    fireEvent(input, 'blur');
+
+    expect(screen.getByText(/Day must be/)).toBeTruthy();
+  });
+
+  it('shows error for impossible date like Feb 30 after blur', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    fireEvent.changeText(input, '2/30/2026');
+    fireEvent(input, 'blur');
+
+    expect(screen.getByText('2/30 is not a valid date')).toBeTruthy();
+  });
+
+  it('clears date error when user starts typing again', () => {
+    render(<EntryForm onAdd={jest.fn()} />);
+    const input = screen.getByLabelText('Due date');
+
+    fireEvent.changeText(input, '13/1/2026');
+    fireEvent(input, 'blur');
+    expect(screen.getByLabelText('Date error')).toBeTruthy();
+
+    fireEvent.changeText(input, '1');
+    expect(screen.queryByLabelText('Date error')).toBeNull();
+  });
+});
+
+describe('getDateError', () => {
+  it('returns null for empty string', () => {
+    expect(getDateError('')).toBeNull();
+  });
+
+  it('returns null for valid date', () => {
+    expect(getDateError('6/15/2026')).toBeNull();
+  });
+
+  it('returns null for valid date with 2-digit year', () => {
+    expect(getDateError('6/15/26')).toBeNull();
+  });
+
+  it('returns null for valid date with leading zeros', () => {
+    expect(getDateError('06/05/2026')).toBeNull();
+  });
+
+  it('returns format error for incomplete input', () => {
+    expect(getDateError('6/15')).toBe('Enter date as MM/DD/YYYY');
+  });
+
+  it('returns format error for text without slashes', () => {
+    expect(getDateError('abc')).toBe('Enter date as MM/DD/YYYY');
+  });
+
+  it('returns format error for too many digits in month', () => {
+    expect(getDateError('123/1/2026')).toBe('Enter date as MM/DD/YYYY');
+  });
+
+  it('returns month error for month 0', () => {
+    expect(getDateError('0/15/2026')).toMatch(/Month must be/);
+  });
+
+  it('returns month error for month 13', () => {
+    expect(getDateError('13/15/2026')).toMatch(/Month must be/);
+  });
+
+  it('returns day error for day 0', () => {
+    expect(getDateError('6/0/2026')).toMatch(/Day must be/);
+  });
+
+  it('returns day error for day 32', () => {
+    expect(getDateError('6/32/2026')).toMatch(/Day must be/);
+  });
+
+  it('returns invalid date error for Feb 30', () => {
+    expect(getDateError('2/30/2026')).toBe('2/30 is not a valid date');
+  });
+
+  it('returns invalid date error for Feb 29 in non-leap year', () => {
+    expect(getDateError('2/29/2027')).toBe('2/29 is not a valid date');
+  });
+
+  it('returns null for Feb 29 in leap year', () => {
+    expect(getDateError('2/29/2028')).toBeNull();
+  });
+
+  it('returns invalid date error for Apr 31', () => {
+    expect(getDateError('4/31/2026')).toBe('4/31 is not a valid date');
+  });
+});
+
+describe('parseDateText', () => {
+  it('returns null for empty string', () => {
+    expect(parseDateText('')).toBeNull();
+  });
+
+  it('returns null for non-date text', () => {
+    expect(parseDateText('abc')).toBeNull();
+  });
+
+  it('returns null for incomplete date', () => {
+    expect(parseDateText('6/15')).toBeNull();
+  });
+
+  it('parses a valid M/D/YYYY date', () => {
+    const date = parseDateText('6/15/2026');
+    expect(date).toEqual(new Date(2026, 5, 15));
+  });
+
+  it('parses a valid MM/DD/YYYY date', () => {
+    const date = parseDateText('01/05/2026');
+    expect(date).toEqual(new Date(2026, 0, 5));
+  });
+
+  it('parses a 2-digit year as 20xx', () => {
+    const date = parseDateText('6/15/26');
+    expect(date).toEqual(new Date(2026, 5, 15));
+  });
+
+  it('returns null for month 0', () => {
+    expect(parseDateText('0/15/2026')).toBeNull();
+  });
+
+  it('returns null for month 13', () => {
+    expect(parseDateText('13/15/2026')).toBeNull();
+  });
+
+  it('returns null for day 0', () => {
+    expect(parseDateText('6/0/2026')).toBeNull();
+  });
+
+  it('returns null for day 32', () => {
+    expect(parseDateText('6/32/2026')).toBeNull();
+  });
+
+  it('returns null for Feb 30', () => {
+    expect(parseDateText('2/30/2026')).toBeNull();
+  });
+
+  it('returns null for Feb 29 in non-leap year', () => {
+    expect(parseDateText('2/29/2027')).toBeNull();
+  });
+
+  it('parses Feb 29 in leap year', () => {
+    expect(parseDateText('2/29/2028')).toEqual(new Date(2028, 1, 29));
+  });
+
+  it('returns null for Apr 31', () => {
+    expect(parseDateText('4/31/2026')).toBeNull();
+  });
+
+  it('returns null for single-digit year', () => {
+    expect(parseDateText('6/15/6')).toBeNull();
   });
 });

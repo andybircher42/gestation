@@ -19,6 +19,39 @@ interface EntryFormProps {
   onAdd: (entry: { name: string; weeks: number; days: number }) => void;
 }
 
+export function getDateError(text: string): string | null {
+  if (!text) return null;
+  const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (!match) return 'Enter date as MM/DD/YYYY';
+  const month = parseInt(match[1], 10);
+  if (month < 1 || month > 12) return 'Month must be 1\u201312';
+  const day = parseInt(match[2], 10);
+  if (day < 1 || day > 31) return 'Day must be 1\u201331';
+  let year = parseInt(match[3], 10);
+  if (year < 100) year += 2000;
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return `${match[1]}/${match[2]} is not a valid date`;
+  }
+  return null;
+}
+
+export function parseDateText(text: string): Date | null {
+  const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (!match) return null;
+  const month = parseInt(match[1], 10);
+  const day = parseInt(match[2], 10);
+  let year = parseInt(match[3], 10);
+  if (year < 100) year += 2000;
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > 31) return null;
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return null;
+  }
+  return date;
+}
+
 /** Form for adding a new gestation entry with name, weeks, and days fields. */
 export default function EntryForm({ onAdd }: EntryFormProps) {
   const [name, setName] = useState('');
@@ -28,37 +61,32 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   const [dateText, setDateText] = useState('');
   const [mode, setMode] = useState<InputMode>('dueDate');
   const [showPicker, setShowPicker] = useState(false);
+  const [weeksTouched, setWeeksTouched] = useState(false);
+  const [daysTouched, setDaysTouched] = useState(false);
+  const [dateTouched, setDateTouched] = useState(false);
 
   const w = weeks ? parseInt(weeks, 10) : 0;
   const d = days ? parseInt(days, 10) : 0;
   const weeksValid = !weeks || (!isNaN(w) && w >= 0 && w <= 44);
   const daysValid = !days || (!isNaN(d) && d >= 0 && d <= 6);
+  const weeksError = weeks && !weeksValid ? 'Weeks must be 0\u201342' : null;
+  const daysError = days && !daysValid ? 'Days must be 0\u20136' : null;
 
   const computed = dueDate ? computeGestationalAge(dueDate) : null;
 
   const canAdd =
     !!name.trim() &&
     (mode === 'weeksDays'
-      ? weeksValid && daysValid
+      ? !!weeks && !!days && weeksValid && daysValid
       : dueDate !== null);
 
-  const parseDateText = (text: string): Date | null => {
-    const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-    if (!match) return null;
-    const month = parseInt(match[1], 10);
-    const day = parseInt(match[2], 10);
-    let year = parseInt(match[3], 10);
-    if (year < 100) year += 2000;
-    if (month < 1 || month > 12) return null;
-    if (day < 1 || day > 31) return null;
-    const date = new Date(year, month - 1, day);
-    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
-      return null;
-    }
-    return date;
-  };
+  const dateError = getDateError(dateText);
+  const showWeeksError = weeksTouched && weeksError;
+  const showDaysError = daysTouched && daysError;
+  const showDateError = dateTouched && dateError;
 
   const handleDateTextChange = (text: string) => {
+    setDateTouched(false);
     let updated = text.replace(/[^\d/]/g, '/');
     if (text.length > dateText.length) {
       if (/^\d{2}$/.test(updated)) {
@@ -154,28 +182,40 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
           <View style={styles.inputWithHint}>
             <Text style={styles.label}>Weeks</Text>
             <TextInput
-              style={styles.numberInput}
+              style={[styles.numberInput, showWeeksError && styles.inputError]}
               accessibilityLabel="Weeks"
               placeholder={"0-42 weeks"}
               value={weeks}
-              onChangeText={(text) => { if (/^\d*$/.test(text)) setWeeks(text); }}
+              onChangeText={(text) => { if (/^\d*$/.test(text)) { setWeeksTouched(false); setWeeks(text); } }}
+              onBlur={() => setWeeksTouched(true)}
               keyboardType="number-pad"
               maxLength={2}
               returnKeyType="next"
             />
+            {showWeeksError && (
+              <Text style={styles.errorText} accessibilityLabel="Weeks error">
+                {weeksError}
+              </Text>
+            )}
           </View>
           <View style={styles.inputWithHint}>
             <Text style={styles.label}>Days</Text>
             <TextInput
-              style={styles.numberInput}
+              style={[styles.numberInput, showDaysError && styles.inputError]}
               accessibilityLabel="Days"
               placeholder={"0-6 days"}
               value={days}
-              onChangeText={(text) => { if (/^\d*$/.test(text)) setDays(text); }}
+              onChangeText={(text) => { if (/^\d*$/.test(text)) { setDaysTouched(false); setDays(text); } }}
+              onBlur={() => setDaysTouched(true)}
               keyboardType="number-pad"
               maxLength={1}
               returnKeyType="done"
             />
+            {showDaysError && (
+              <Text style={styles.errorText} accessibilityLabel="Days error">
+                {daysError}
+              </Text>
+            )}
           </View>
           <Pressable
             style={[styles.addButton, !canAdd && styles.addButtonDisabled]}
@@ -199,14 +239,20 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                   <Text style={styles.calendarButtonText}>📅</Text>
                 </Pressable>
                 <TextInput
-                  style={styles.dateTextInput}
+                  style={[styles.dateTextInput, showDateError && styles.inputError]}
                   accessibilityLabel="Due date"
                   placeholder="MM/DD/YYYY"
                   value={dateText}
                   keyboardType="number-pad"
                   onChangeText={handleDateTextChange}
+                  onBlur={() => setDateTouched(true)}
                 />
               </View>
+              {showDateError && (
+                <Text style={styles.errorText} accessibilityLabel="Date error">
+                  {dateError}
+                </Text>
+              )}
             </View>
             <Pressable
               style={[styles.addButton, !canAdd && styles.addButtonDisabled]}
@@ -321,6 +367,15 @@ const styles = StyleSheet.create({
   },
   calendarButtonText: {
     fontSize: 22,
+  },
+  inputError: {
+    borderColor: '#ef4444',
+  },
+  errorText: {
+    color: "#ef4444",
+    fontSize: 13,
+    marginTop: 4,
+    marginBottom: 8,
   },
   preview: {
     marginTop: 8,
