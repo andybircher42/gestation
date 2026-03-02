@@ -13,6 +13,7 @@ import EntryForm from './src/components/EntryForm';
 import EntryList from './src/components/EntryList';
 import HipaaAgreementModal from './src/components/HipaaAgreementModal';
 import {
+  Entry,
   loadEntries,
   saveEntries,
   checkAgreement,
@@ -21,7 +22,7 @@ import {
 } from './src/storage';
 
 export default function App() {
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState<Entry[]>([]);
   const [showAgreement, setShowAgreement] = useState(false);
   const [agreementLoaded, setAgreementLoaded] = useState(false);
 
@@ -38,7 +39,7 @@ export default function App() {
       .catch((e) => console.error('Failed to load entries', e));
   }, []);
 
-  const handleAdd = ({ name, weeks, days }) => {
+  const handleAdd = ({ name, weeks, days }: { name: string; weeks: number; days: number }) => {
     const entry = {
       id: Date.now().toString(),
       name,
@@ -52,7 +53,7 @@ export default function App() {
     );
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     const newEntries = entries.filter((e) => e.id !== id);
     setEntries(newEntries);
     saveEntries(newEntries).catch((e) =>

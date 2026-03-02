@@ -1,7 +1,7 @@
 {
   "name": "gestation",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "start": "expo start --port 8083",
     "android": "expo start --android --port 8083",
@@ -12,7 +12,7 @@
   "jest": {
     "preset": "jest-expo",
     "setupFiles": [
-      "./jest.setup.js"
+      "./jest.setup.ts"
     ]
   },
   "dependencies": {
