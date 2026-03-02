@@ -12,6 +12,7 @@ interface HipaaAgreementModalProps {
   onAccept: () => void;
 }
 
+/** Modal that displays the HIPAA non-compliance disclaimer and requires user acceptance. */
 export default function HipaaAgreementModal({ visible, onAccept }: HipaaAgreementModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade">

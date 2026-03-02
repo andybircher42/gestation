@@ -21,6 +21,7 @@ import {
   resetAgreement,
 } from './src/storage';
 
+/** Root component that manages entries state, persistence, and the HIPAA agreement flow. */
 export default function App() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [showAgreement, setShowAgreement] = useState(false);

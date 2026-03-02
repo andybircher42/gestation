@@ -12,6 +12,7 @@ interface EntryFormProps {
   onAdd: (entry: { name: string; weeks: number; days: number }) => void;
 }
 
+/** Form for adding a new gestation entry with name, weeks, and days fields. */
 export default function EntryForm({ onAdd }: EntryFormProps) {
   const [name, setName] = useState('');
   const [weeks, setWeeks] = useState('');

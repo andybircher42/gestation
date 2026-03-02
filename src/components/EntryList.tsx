@@ -32,6 +32,7 @@ function EntryRow({ item, onDelete }: EntryRowProps) {
   );
 }
 
+/** Scrollable list of gestation entries with swipe-to-delete support. */
 export default function EntryList({ entries, onDelete }: EntryListProps) {
   return (
     <FlatList
