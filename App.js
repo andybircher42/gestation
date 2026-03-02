@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -16,6 +17,7 @@ import {
   saveEntries,
   checkAgreement,
   acceptAgreement,
+  resetAgreement,
 } from './src/storage';
 
 export default function App() {
@@ -64,6 +66,12 @@ export default function App() {
       .catch((e) => console.error('Failed to save agreement', e));
   };
 
+  const handleResetAgreement = () => {
+    resetAgreement()
+      .then(() => setShowAgreement(true))
+      .catch((e) => console.error('Failed to reset agreement', e));
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -71,6 +79,11 @@ export default function App() {
     >
       <View style={styles.header}>
         <Text style={styles.title}>Gestation Tracker</Text>
+        {__DEV__ && (
+          <Pressable onPress={handleResetAgreement} style={styles.devButton}>
+            <Text style={styles.devButtonText}>Reset HIPAA</Text>
+          </Pressable>
+        )}
       </View>
 
       <EntryForm onAdd={handleAdd} />
@@ -102,5 +115,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: '#333',
+  },
+  devButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 16,
+    backgroundColor: '#ff6b6b',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  devButtonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
   },
 });

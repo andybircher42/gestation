@@ -20,3 +20,7 @@ export const checkAgreement = async () => {
 export const acceptAgreement = async () => {
   await AsyncStorage.setItem(AGREEMENT_KEY, 'true');
 };
+
+export const resetAgreement = async () => {
+  await AsyncStorage.removeItem(AGREEMENT_KEY);
+};
