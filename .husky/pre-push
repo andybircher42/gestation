@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# Block push if any tracked files contain the forbidden marker
+MARKER="DO NOT"
+MARKER="$MARKER SUBMIT"
+matches=$(git grep -n "$MARKER" 2>/dev/null || true)
+if [ -n "$matches" ]; then
+  echo "Push blocked: found \"$MARKER\" in the following files:"
+  echo ""
+  echo "$matches"
+  echo ""
+  echo "Remove these markers before pushing."
+  exit 1
+fi
