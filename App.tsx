@@ -26,6 +26,8 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const splashLogo = require("./assets/splash-icon.png");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const headerLogo = require("./assets/icon.png");
 
 const SPLASH_DURATION_MS = 2000;
 
@@ -169,6 +171,11 @@ export default function App() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.header}>
+        <Image
+          source={headerLogo}
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
         <Text style={styles.title}>In Due Time</Text>
         {__DEV__ && (
           <DevToolbar
@@ -203,7 +210,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f3f3f1",
   },
   splashLogo: {
     width: 280,
@@ -214,14 +221,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingTop: 60,
     paddingBottom: 16,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
+    gap: 10,
+  },
+  headerLogo: {
+    width: 36,
+    height: 36,
   },
   title: {
+    flex: 1,
     fontSize: 24,
     fontWeight: "700",
     color: "#333",
