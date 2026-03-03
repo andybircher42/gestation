@@ -25,6 +25,11 @@ describe("formatDueDate", () => {
     const now = new Date(2026, 2, 2);
     expect(formatDueDate("2025-12-25", now)).toBe("Dec 25 '25");
   });
+
+  it("returns the raw string for malformed input", () => {
+    expect(formatDueDate("garbage")).toBe("garbage");
+    expect(formatDueDate("")).toBe("");
+  });
 });
 
 describe("expandTwoDigitYear", () => {

@@ -121,7 +121,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           .then(async (update) => {
             if (update.isAvailable) {
               await Updates.fetchUpdateAsync();
-              await Updates.reloadAsync();
             }
           })
           .catch((e) => console.error("Failed to check for updates", e));
@@ -181,7 +180,8 @@ function AppContent({ loadThemePreference }: AppContentProps) {
             source={headerLogo}
             style={styles.headerLogo}
             resizeMode="contain"
-            accessibilityLabel="App logo"
+            accessible={false}
+            testID="header-logo"
           />
           <Text style={styles.title}>in due time</Text>
           {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}
@@ -270,7 +270,7 @@ function createStyles(colors: ColorTokens) {
     header: {
       flexDirection: "row",
       alignItems: "center",
-      paddingTop: 60,
+      paddingTop: (Constants.statusBarHeight ?? 0) + 16,
       paddingBottom: 16,
       paddingHorizontal: 20,
       backgroundColor: colors.contentBackground,

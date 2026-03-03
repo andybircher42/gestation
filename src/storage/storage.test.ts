@@ -5,7 +5,6 @@ import {
   checkAgreement,
   isValidEntry,
   loadEntries,
-  loadEntriesSafe,
   resetAgreement,
   saveEntries,
 } from "./storage";
@@ -14,39 +13,15 @@ beforeEach(() => {
   void AsyncStorage.clear();
 });
 
-describe("loadEntries / saveEntries", () => {
-  it("returns [] when empty", async () => {
-    const entries = await loadEntries();
-    expect(entries).toEqual([]);
-  });
-
-  it("returns parsed entries when they exist", async () => {
-    const data = [{ id: "1", name: "Baby", dueDate: "2026-06-15" }];
-    await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
-    const entries = await loadEntries();
-    expect(entries).toEqual(data);
-  });
-
-  it("loads legacy entries that contain extra weeks/days fields", async () => {
-    const legacy = [
-      { id: "1", name: "Baby", weeks: 10, days: 3, dueDate: "2026-06-15" },
-    ];
-    await AsyncStorage.setItem("@gestation_entries", JSON.stringify(legacy));
-    const entries = await loadEntries();
-    expect(entries).toHaveLength(1);
-    expect(entries[0].id).toBe("1");
-    expect(entries[0].name).toBe("Baby");
-    expect(entries[0].dueDate).toBe("2026-06-15");
-  });
-
-  it("round-trips with saveEntries", async () => {
+describe("saveEntries", () => {
+  it("round-trips with loadEntries", async () => {
     const data = [
       { id: "1", name: "A", dueDate: "2026-09-01" },
       { id: "2", name: "B", dueDate: "2026-06-15" },
     ];
     await saveEntries(data);
-    const loaded = await loadEntries();
-    expect(loaded).toEqual(data);
+    const result = await loadEntries();
+    expect(result.entries).toEqual(data);
   });
 });
 
@@ -107,9 +82,9 @@ describe("isValidEntry", () => {
   });
 });
 
-describe("loadEntriesSafe", () => {
+describe("loadEntries", () => {
   it("returns empty when storage is empty", async () => {
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     expect(result).toEqual({ entries: [], discardedCount: 0 });
   });
 
@@ -120,7 +95,7 @@ describe("loadEntriesSafe", () => {
     ];
     await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
 
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     expect(result.entries).toEqual(data);
     expect(result.discardedCount).toBe(0);
   });
@@ -134,7 +109,7 @@ describe("loadEntriesSafe", () => {
     ];
     await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
 
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     expect(result.entries).toHaveLength(2);
     expect(result.entries[0].name).toBe("Good");
     expect(result.entries[1].name).toBe("Also good");
@@ -148,7 +123,7 @@ describe("loadEntriesSafe", () => {
   it("handles total JSON corruption", async () => {
     await AsyncStorage.setItem("@gestation_entries", "{not valid json");
 
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     expect(result).toEqual({ entries: [], discardedCount: 1 });
 
     // Verify key was removed
@@ -162,7 +137,7 @@ describe("loadEntriesSafe", () => {
       JSON.stringify({ not: "an array" }),
     );
 
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     expect(result).toEqual({ entries: [], discardedCount: 1 });
 
     const stored = await AsyncStorage.getItem("@gestation_entries");
@@ -174,7 +149,7 @@ describe("loadEntriesSafe", () => {
     await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
     (AsyncStorage.setItem as jest.Mock).mockClear();
 
-    await loadEntriesSafe();
+    await loadEntries();
 
     expect(AsyncStorage.setItem).not.toHaveBeenCalled();
   });
@@ -185,7 +160,7 @@ describe("loadEntriesSafe", () => {
     ];
     await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
 
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     expect(result.entries[0]).toEqual({
       id: "1",
       name: "Baby",

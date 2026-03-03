@@ -102,8 +102,16 @@ describe("EntryList", () => {
       makeEntry({ id: "abc", name: "Baby", dueDate: "2026-10-31" }),
     ]);
 
-    fireEvent.press(screen.getByLabelText("Delete"));
+    fireEvent.press(screen.getByLabelText("Delete Baby"));
     expect(onDelete).toHaveBeenCalledWith("abc");
+  });
+
+  it("delete button has accessible role and label", () => {
+    renderList([makeEntry({ id: "1", name: "Baby A" })]);
+
+    const deleteButton = screen.getByLabelText("Delete Baby A");
+    expect(deleteButton).toBeTruthy();
+    expect(deleteButton.props.accessibilityRole).toBe("button");
   });
 
   it("renders multiple entries", () => {
@@ -200,6 +208,26 @@ describe("EntryList", () => {
     // Toggle name to descending
     fireEvent.press(screen.getByText(/Name/));
     expect(screen.getByText(/Name ↓/)).toBeTruthy();
+  });
+
+  it("sort buttons communicate selected state for accessibility", () => {
+    renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
+
+    const dueDateButton = screen.getByRole("button", { name: /Due Date/ });
+    const nameButton = screen.getByRole("button", { name: "Name" });
+
+    expect(dueDateButton.props.accessibilityState).toEqual({ selected: true });
+    expect(nameButton.props.accessibilityState).toEqual({ selected: false });
+
+    fireEvent.press(nameButton);
+
+    const dueDateButton2 = screen.getByRole("button", { name: /Due Date/ });
+    const nameButton2 = screen.getByRole("button", { name: /Name/ });
+
+    expect(dueDateButton2.props.accessibilityState).toEqual({
+      selected: false,
+    });
+    expect(nameButton2.props.accessibilityState).toEqual({ selected: true });
   });
 
   it("breaks due date ties by name ascending", () => {

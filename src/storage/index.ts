@@ -4,7 +4,6 @@ export {
   checkAgreement,
   isValidEntry,
   loadEntries,
-  loadEntriesSafe,
   resetAgreement,
   saveEntries,
 } from "./storage";

@@ -106,7 +106,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Delete"));
+    fireEvent.press(screen.getByLabelText("Delete Baby"));
 
     await waitFor(() => {
       expect(screen.getByText(/Deleted Baby/)).toBeTruthy();
@@ -119,7 +119,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Delete"));
+    fireEvent.press(screen.getByLabelText("Delete Baby"));
 
     await waitFor(() => {
       expect(screen.getByText("Undo")).toBeTruthy();
@@ -138,7 +138,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Delete"));
+    fireEvent.press(screen.getByLabelText("Delete Baby"));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Undo toast")).toBeTruthy();
@@ -203,7 +203,7 @@ describe("App", () => {
       expect(screen.getByText("in due time")).toBeTruthy();
     });
 
-    const header = screen.getByLabelText("App logo");
+    const header = screen.getByTestId("header-logo");
     expect(header.props.source).toBe(headerLogoDark);
   });
 
@@ -214,7 +214,7 @@ describe("App", () => {
       expect(screen.getByText("in due time")).toBeTruthy();
     });
 
-    const header = screen.getByLabelText("App logo");
+    const header = screen.getByTestId("header-logo");
     expect(header.props.source).toBe(headerLogoLight);
   });
 
@@ -225,7 +225,7 @@ describe("App", () => {
       expect(screen.getByText("in due time")).toBeTruthy();
     });
 
-    const header = screen.getByLabelText("App logo");
+    const header = screen.getByTestId("header-logo");
     expect(header.props.source).toBe(headerLogoLight);
   });
 

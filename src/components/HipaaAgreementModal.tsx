@@ -41,7 +41,11 @@ export default function HipaaAgreementModal({
               is intended for personal, non-clinical use only.
             </Text>
           </ScrollView>
-          <Pressable style={styles.agreeButton} onPress={onAccept}>
+          <Pressable
+            style={styles.agreeButton}
+            onPress={onAccept}
+            accessibilityRole="button"
+          >
             <Text style={styles.agreeButtonText}>I Agree</Text>
           </Pressable>
         </View>

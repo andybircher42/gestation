@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   Animated,
@@ -24,6 +30,8 @@ const DEFAULT_DIR: Record<SortBy, SortDir> = {
   name: "asc",
 };
 
+type EntryStyles = ReturnType<typeof createStyles>;
+
 interface EntryRowProps {
   item: Entry;
   backgroundColor: string;
@@ -31,7 +39,9 @@ interface EntryRowProps {
   onDelete: (id: string) => void;
   nameWidth?: number;
   onNameLayout?: (id: string, width: number) => void;
-  colors: ColorTokens;
+  styles: EntryStyles;
+  deleteIconColor: string;
+  deleteButtonColor: string;
 }
 
 interface EntryListProps {
@@ -41,14 +51,16 @@ interface EntryListProps {
 }
 
 /** Individual entry row with swipe-to-delete support. */
-function EntryRow({
+const EntryRow = React.memo(function EntryRow({
   item,
   backgroundColor,
   textColor,
   onDelete,
   nameWidth,
   onNameLayout,
-  colors,
+  styles,
+  deleteIconColor,
+  deleteButtonColor,
 }: EntryRowProps) {
   const { weeks, days } = gestationalAgeFromDueDate(item.dueDate);
   const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
@@ -57,13 +69,11 @@ function EntryRow({
     onDismiss: () => onDelete(item.id),
   });
 
-  const styles = useMemo(() => createStyles(colors), [colors]);
-
   return (
     <View style={styles.entryWrapper}>
       <View style={styles.deleteBackground} testID="delete-background">
-        <Ionicons name="trash-outline" size={22} color={colors.white} />
-        <Ionicons name="trash-outline" size={22} color={colors.white} />
+        <Ionicons name="trash-outline" size={22} color={deleteIconColor} />
+        <Ionicons name="trash-outline" size={22} color={deleteIconColor} />
       </View>
       <Animated.View
         testID="entry-row"
@@ -96,19 +106,15 @@ function EntryRow({
           onPress={() => onDelete(item.id)}
           style={styles.deleteButton}
           hitSlop={8}
-          accessibilityLabel="Delete"
           accessibilityRole="button"
+          accessibilityLabel={`Delete ${item.name}`}
         >
-          <Ionicons
-            name="trash-outline"
-            size={16}
-            color={colors.textTertiary}
-          />
+          <Ionicons name="trash-outline" size={16} color={deleteButtonColor} />
         </Pressable>
       </Animated.View>
     </View>
   );
-}
+});
 
 /** Scrollable list of gestation entries with swipe-to-delete support. */
 export default function EntryList({
@@ -194,6 +200,7 @@ export default function EntryList({
               ]}
               onPress={() => handleSortPress("dueDate")}
               accessibilityRole="button"
+              accessibilityState={{ selected: sortBy === "dueDate" }}
             >
               <Text
                 style={[
@@ -212,6 +219,7 @@ export default function EntryList({
               ]}
               onPress={() => handleSortPress("name")}
               accessibilityRole="button"
+              accessibilityState={{ selected: sortBy === "name" }}
             >
               <Text
                 style={[
@@ -256,7 +264,9 @@ export default function EntryList({
             onDelete={onDelete}
             nameWidth={maxNameWidth}
             onNameLayout={handleNameLayout}
-            colors={colors}
+            styles={styles}
+            deleteIconColor={colors.white}
+            deleteButtonColor={colors.textTertiary}
           />
         )}
         keyExtractor={(item) => item.id}

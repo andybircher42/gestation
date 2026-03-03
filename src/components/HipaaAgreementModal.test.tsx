@@ -23,6 +23,14 @@ describe("HipaaAgreementModal", () => {
     expect(onAccept).toHaveBeenCalledTimes(1);
   });
 
+  it('"I Agree" button has accessible role', () => {
+    renderWithTheme(
+      <HipaaAgreementModal visible={true} onAccept={jest.fn()} />,
+    );
+
+    expect(screen.getByRole("button", { name: "I Agree" })).toBeTruthy();
+  });
+
   it("does not render content when visible=false", () => {
     renderWithTheme(
       <HipaaAgreementModal visible={false} onAccept={jest.fn()} />,

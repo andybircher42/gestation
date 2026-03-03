@@ -139,6 +139,36 @@ describe("useEntries", () => {
     expect(result.current.entries[1].name).toBe("Existing");
   });
 
+  it("two rapid add calls both persist", () => {
+    const result = setup();
+
+    act(() => {
+      result.current.add({ name: "A", dueDate: "2026-09-01" });
+      result.current.add({ name: "B", dueDate: "2026-06-01" });
+    });
+
+    expect(result.current.entries).toHaveLength(2);
+  });
+
+  it("two rapid remove calls both take effect", () => {
+    const result = setup();
+
+    act(() => {
+      result.current.add({ name: "A", dueDate: "2026-09-01" });
+      result.current.add({ name: "B", dueDate: "2026-06-01" });
+    });
+
+    const idA = result.current.entries.find((e) => e.name === "A")!.id;
+    const idB = result.current.entries.find((e) => e.name === "B")!.id;
+
+    act(() => {
+      result.current.remove(idA);
+      result.current.remove(idB);
+    });
+
+    expect(result.current.entries).toHaveLength(0);
+  });
+
   it("sets discardedCount when corrupted entries are found", async () => {
     const data = [
       { id: "1", name: "Good", dueDate: "2026-09-01" },

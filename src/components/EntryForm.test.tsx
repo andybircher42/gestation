@@ -268,6 +268,26 @@ describe("EntryForm — mode toggle", () => {
     expect(screen.queryByLabelText("Weeks")).toBeNull();
     expect(screen.queryByLabelText("Days")).toBeNull();
   });
+
+  it("mode toggle buttons communicate selected state for accessibility", () => {
+    renderForm();
+
+    const dueDateButton = screen.getByRole("button", { name: "Due Date" });
+    const gaButton = screen.getByRole("button", { name: "Gestational Age" });
+
+    expect(dueDateButton.props.accessibilityState).toEqual({ selected: true });
+    expect(gaButton.props.accessibilityState).toEqual({ selected: false });
+
+    fireEvent.press(gaButton);
+
+    const dueDateButton2 = screen.getByRole("button", { name: "Due Date" });
+    const gaButton2 = screen.getByRole("button", { name: "Gestational Age" });
+
+    expect(dueDateButton2.props.accessibilityState).toEqual({
+      selected: false,
+    });
+    expect(gaButton2.props.accessibilityState).toEqual({ selected: true });
+  });
 });
 
 describe("EntryForm — Due Date mode", () => {
