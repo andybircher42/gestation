@@ -44,6 +44,8 @@ jobs:
           android_version=$(jq -r '.[0].appVersion' /tmp/android.json)
           android_build=$(jq -r '.[0].appBuildVersion' /tmp/android.json)
 
+          mkdir -p "$GITHUB_WORKSPACE/_site"
+
           jq -n \
             --arg ios_id "$ios_id" \
             --arg ios_version "$ios_version" \
@@ -54,15 +56,13 @@ jobs:
             '{
               ios: { buildId: $ios_id, version: $ios_version, buildNumber: $ios_build },
               android: { buildId: $android_id, version: $android_version, buildNumber: $android_build }
-            }' > /tmp/latest-build.json
+            }' > "$GITHUB_WORKSPACE/_site/latest-build.json"
 
-          cat /tmp/latest-build.json
+          cat "$GITHUB_WORKSPACE/_site/latest-build.json"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /tmp
-          keep_files: false
-          destination_dir: .
-          include_files: latest-build.json
+          publish_dir: ./_site
+          force_orphan: true
