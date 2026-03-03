@@ -1,8 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
   FlatList,
+  LayoutChangeEvent,
   PanResponder,
   Pressable,
   StyleSheet,
@@ -12,6 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { Entry } from "@/storage";
+import { formatDueDate } from "@/util/dateUtils";
 
 type SortBy = "dueDate" | "name";
 type SortDir = "asc" | "desc";
@@ -26,6 +28,8 @@ const SWIPE_THRESHOLD = 100;
 interface EntryRowProps {
   item: Entry;
   onDelete: (id: string) => void;
+  nameWidth?: number;
+  onNameLayout?: (id: string, width: number) => void;
 }
 
 interface EntryListProps {
@@ -35,7 +39,7 @@ interface EntryListProps {
 }
 
 /** Individual entry row with swipe-to-delete support. */
-function EntryRow({ item, onDelete }: EntryRowProps) {
+function EntryRow({ item, onDelete, nameWidth, onNameLayout }: EntryRowProps) {
   const translateX = useRef(new Animated.Value(0)).current;
   const onDeleteRef = useRef(onDelete);
   onDeleteRef.current = onDelete;
@@ -76,10 +80,18 @@ function EntryRow({ item, onDelete }: EntryRowProps) {
         style={[styles.entry, { transform: [{ translateX }] }]}
         {...panResponder.panHandlers}
       >
-        <Text style={styles.entryName}>{item.name}</Text>
+        <Text
+          style={[styles.entryName, nameWidth > 0 && { minWidth: nameWidth }]}
+          onLayout={(e: LayoutChangeEvent) =>
+            onNameLayout?.(item.id, e.nativeEvent.layout.width)
+          }
+        >
+          {item.name}
+        </Text>
         <Text style={styles.entryAge}>
           {item.weeks}w {item.days}d
         </Text>
+        <Text style={styles.entryDueDate}>{formatDueDate(item.dueDate)}</Text>
         <Pressable
           onPress={() => onDelete(item.id)}
           style={styles.deleteButton}
@@ -100,6 +112,32 @@ export default function EntryList({
 }: EntryListProps) {
   const [sortBy, setSortBy] = useState<SortBy>("dueDate");
   const [sortDir, setSortDir] = useState<SortDir>(DEFAULT_DIR.dueDate);
+  const nameWidths = useRef(new Map<string, number>());
+  const [maxNameWidth, setMaxNameWidth] = useState(0);
+
+  const handleNameLayout = useCallback((id: string, width: number) => {
+    nameWidths.current.set(id, width);
+    const newMax = Math.max(...nameWidths.current.values());
+    setMaxNameWidth((prev) => (newMax !== prev ? newMax : prev));
+  }, []);
+
+  useEffect(() => {
+    const ids = new Set(entries.map((e) => e.id));
+    let changed = false;
+    for (const key of nameWidths.current.keys()) {
+      if (!ids.has(key)) {
+        nameWidths.current.delete(key);
+        changed = true;
+      }
+    }
+    if (changed) {
+      const newMax =
+        nameWidths.current.size > 0
+          ? Math.max(...nameWidths.current.values())
+          : 0;
+      setMaxNameWidth(newMax);
+    }
+  }, [entries]);
 
   const handleSortPress = (field: SortBy) => {
     if (field === sortBy) {
@@ -201,7 +239,14 @@ export default function EntryList({
       )}
       <FlatList
         data={sorted}
-        renderItem={({ item }) => <EntryRow item={item} onDelete={onDelete} />}
+        renderItem={({ item }) => (
+          <EntryRow
+            item={item}
+            onDelete={onDelete}
+            nameWidth={maxNameWidth}
+            onNameLayout={handleNameLayout}
+          />
+        )}
         keyExtractor={(item) => item.id}
         style={styles.list}
         contentContainerStyle={
@@ -296,12 +341,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   entryName: {
-    flex: 1,
     fontSize: 16,
     fontWeight: "600",
     color: "#333",
   },
   entryAge: {
+    fontSize: 14,
+    color: "#666",
+    marginLeft: 8,
+  },
+  entryDueDate: {
+    flex: 1,
+    textAlign: "right",
     fontSize: 14,
     color: "#666",
     marginRight: 12,

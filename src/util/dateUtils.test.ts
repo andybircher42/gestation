@@ -1,9 +1,27 @@
 import {
   expandTwoDigitYear,
+  formatDueDate,
   getDateBounds,
   getDateError,
   parseDateText,
 } from "./dateUtils";
+
+describe("formatDueDate", () => {
+  it("formats same-year date as 'Mon D'", () => {
+    const now = new Date(2026, 2, 2);
+    expect(formatDueDate("2026-06-15", now)).toBe("Jun 15");
+  });
+
+  it('formats different-year date as "Mon D \'YY"', () => {
+    const now = new Date(2026, 2, 2);
+    expect(formatDueDate("2027-01-03", now)).toBe("Jan 3 '27");
+  });
+
+  it("formats past different-year date", () => {
+    const now = new Date(2026, 2, 2);
+    expect(formatDueDate("2025-12-25", now)).toBe("Dec 25 '25");
+  });
+});
 
 describe("expandTwoDigitYear", () => {
   // now = March 2, 2026 → cutoff = 2036

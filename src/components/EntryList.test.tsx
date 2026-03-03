@@ -6,8 +6,10 @@ import { Entry } from "@/storage";
 import EntryList from "./EntryList";
 
 /** Creates a test entry with a default dueDate. */
-function makeEntry(fields: Omit<Entry, "dueDate">): Entry {
-  return { ...fields, dueDate: "2026-06-15" };
+function makeEntry(
+  fields: Omit<Entry, "dueDate"> & { dueDate?: string },
+): Entry {
+  return { dueDate: "2026-06-15", ...fields };
 }
 
 describe("EntryList", () => {
@@ -422,6 +424,48 @@ describe("EntryList", () => {
 
     expect(onDeleteAll).not.toHaveBeenCalled();
     alertSpy.mockRestore();
+  });
+
+  it("renders due date in the row", () => {
+    const entries = [
+      makeEntry({
+        id: "1",
+        name: "Baby",
+        weeks: 12,
+        days: 3,
+        dueDate: "2026-06-15",
+      }),
+    ];
+    render(
+      <EntryList
+        entries={entries}
+        onDelete={jest.fn()}
+        onDeleteAll={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Jun 15")).toBeTruthy();
+  });
+
+  it("renders due date with year suffix when different year", () => {
+    const entries = [
+      makeEntry({
+        id: "1",
+        name: "Baby",
+        weeks: 12,
+        days: 3,
+        dueDate: "2027-01-03",
+      }),
+    ];
+    render(
+      <EntryList
+        entries={entries}
+        onDelete={jest.fn()}
+        onDeleteAll={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Jan 3 '27")).toBeTruthy();
   });
 
   it("renders delete background behind entry rows", () => {

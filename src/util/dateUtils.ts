@@ -19,9 +19,7 @@ export function expandTwoDigitYear(
 ): number {
   const currentCentury = Math.floor(now.getFullYear() / 100) * 100;
   const candidate = currentCentury + shortYear;
-  return candidate > now.getFullYear() + 10
-    ? candidate - 100
-    : candidate;
+  return candidate > now.getFullYear() + 10 ? candidate - 100 : candidate;
 }
 
 const DATE_PATTERN = /^(\d{1,2})-(\d{1,2})-(\d{2,4})$/;
@@ -120,6 +118,31 @@ export function formatDateInput(
   const month = String(parts.month).padStart(2, "0");
   const day = String(parts.day).padStart(2, "0");
   return `${month}-${day}-${parts.year}`;
+}
+
+const SHORT_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** Formats an ISO date string for display: "Jun 15" (same year) or "Jun 15 '26" (different year). */
+export function formatDueDate(isoDate: string, now: Date = new Date()): string {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const month = SHORT_MONTHS[m - 1];
+  if (y === now.getFullYear()) {
+    return `${month} ${d}`;
+  }
+  return `${month} ${d} '${String(y).slice(-2)}`;
 }
 
 /** Formats a Date as an ISO date string (YYYY-MM-DD). */

@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 
@@ -24,6 +25,7 @@ const splashLogo = require("./assets/splash-icon.png");
 const headerLogo = require("./assets/icon.png");
 
 const SPLASH_DURATION_MS = 2000;
+const APP_LABEL = (Constants.expoConfig?.extra?.appLabel as string) ?? "";
 
 /** Root component that manages the HIPAA agreement flow and delegates entry state to useEntries. */
 export default function App() {
@@ -113,6 +115,7 @@ export default function App() {
           resizeMode="contain"
         />
         <Text style={styles.title}>in due time</Text>
+        {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}
         {__DEV__ && (
           <DevToolbar
             onSeedData={seed}
@@ -166,6 +169,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
     gap: 10,
+    zIndex: 10,
+    overflow: "visible",
   },
   headerLogo: {
     width: 36,
@@ -176,5 +181,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: "#333",
+  },
+  appLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#4a90d9",
+    backgroundColor: "#e8f0fe",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    overflow: "hidden",
   },
 });

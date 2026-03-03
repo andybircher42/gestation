@@ -96,7 +96,8 @@ const styles = StyleSheet.create({
     gap: 8,
     position: "absolute",
     right: 20,
-    bottom: 16,
+    bottom: -20,
+    zIndex: 10,
   },
   devButton: {
     backgroundColor: "#ff6b6b",
