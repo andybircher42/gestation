@@ -14,15 +14,6 @@
     "lint:fix": "eslint --fix .",
     "prepare": "husky"
   },
-  "jest": {
-    "preset": "jest-expo",
-    "setupFiles": [
-      "./jest.setup.ts"
-    ],
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    }
-  },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -45,6 +36,8 @@
   "private": true,
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@swc/core": "^1.15.18",
+    "@swc/jest": "^0.2.39",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "29.5.14",

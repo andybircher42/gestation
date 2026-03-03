@@ -28,6 +28,13 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["node_modules/", "babel.config.js", ".expo/", "dist/"],
+    ignores: [
+      "node_modules/",
+      "babel.config.js",
+      "jest.config.js",
+      "jest-transformer.js",
+      ".expo/",
+      "dist/",
+    ],
   },
 );
