@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Keyboard,
   Platform,
@@ -12,7 +12,8 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
-import colors from "@/theme/colors";
+import { ColorTokens } from "@/theme/colors";
+import { useTheme } from "@/theme/ThemeContext";
 import {
   formatDateInput,
   getDateBounds,
@@ -30,6 +31,9 @@ interface EntryFormProps {
 
 /** Form for adding a new gestation entry with name, weeks, and days fields. */
 export default function EntryForm({ onAdd }: EntryFormProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [name, setName] = useState("");
   const [weeks, setWeeks] = useState("");
   const [days, setDays] = useState("");
@@ -302,121 +306,127 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  form: {
-    backgroundColor: colors.white,
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: colors.textLabel,
-    marginBottom: 4,
-  },
-  nameInput: {
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 10,
-    backgroundColor: colors.inputBackground,
-  },
-  toggleRow: {
-    flexDirection: "row",
-    marginBottom: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    overflow: "hidden",
-  },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: "center",
-    backgroundColor: colors.white,
-  },
-  toggleButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  toggleText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.primary,
-  },
-  toggleTextActive: {
-    color: colors.white,
-  },
-  ageRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  inputWithHint: {
-    flex: 1,
-  },
-  numberInput: {
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: colors.inputBackground,
-  },
-  dateInputRow: {
-    flexDirection: "row",
-    gap: 6,
-  },
-  dateTextInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: colors.inputBackground,
-  },
-  calendarButton: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.white,
-  },
-  calendarButtonText: {
-    fontSize: 22,
-  },
-  inputError: {
-    borderColor: colors.destructive,
-  },
-  errorText: {
-    color: colors.destructive,
-    fontSize: 13,
-    marginTop: 4,
-    marginBottom: 8,
-  },
-  preview: {
-    marginTop: 8,
-    fontSize: 15,
-    color: colors.primary,
-    fontWeight: "600",
-  },
-  addButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addButtonDisabled: {
-    backgroundColor: colors.primaryDisabled,
-  },
-  addButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+/** Creates styles based on the active color palette. */
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+    form: {
+      backgroundColor: colors.contentBackground,
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    label: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textLabel,
+      marginBottom: 4,
+    },
+    nameInput: {
+      borderWidth: 1,
+      borderColor: colors.inputBorder,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      marginBottom: 10,
+      backgroundColor: colors.inputBackground,
+      color: colors.textPrimary,
+    },
+    toggleRow: {
+      flexDirection: "row",
+      marginBottom: 10,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      overflow: "hidden",
+    },
+    toggleButton: {
+      flex: 1,
+      paddingVertical: 8,
+      alignItems: "center",
+      backgroundColor: colors.contentBackground,
+    },
+    toggleButtonActive: {
+      backgroundColor: colors.primary,
+    },
+    toggleText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.primary,
+    },
+    toggleTextActive: {
+      color: colors.white,
+    },
+    ageRow: {
+      flexDirection: "row",
+      gap: 10,
+    },
+    inputWithHint: {
+      flex: 1,
+    },
+    numberInput: {
+      borderWidth: 1,
+      borderColor: colors.inputBorder,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      backgroundColor: colors.inputBackground,
+      color: colors.textPrimary,
+    },
+    dateInputRow: {
+      flexDirection: "row",
+      gap: 6,
+    },
+    dateTextInput: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.inputBorder,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      backgroundColor: colors.inputBackground,
+      color: colors.textPrimary,
+    },
+    calendarButton: {
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.contentBackground,
+    },
+    calendarButtonText: {
+      fontSize: 22,
+    },
+    inputError: {
+      borderColor: colors.destructive,
+    },
+    errorText: {
+      color: colors.destructive,
+      fontSize: 13,
+      marginTop: 4,
+      marginBottom: 8,
+    },
+    preview: {
+      marginTop: 8,
+      fontSize: 15,
+      color: colors.primary,
+      fontWeight: "600",
+    },
+    addButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 24,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    addButtonDisabled: {
+      backgroundColor: colors.primaryDisabled,
+    },
+    addButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });
+}

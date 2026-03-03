@@ -13,7 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import useSwipeDismiss from "@/hooks/useSwipeDismiss";
 import { Entry } from "@/storage";
-import colors from "@/theme/colors";
+import { ColorTokens } from "@/theme/colors";
+import { useTheme } from "@/theme/ThemeContext";
 import { formatDueDate } from "@/util/dateUtils";
 import { gestationalAgeFromDueDate } from "@/util/gestationalAge";
 
@@ -27,10 +28,12 @@ const DEFAULT_DIR: Record<SortBy, SortDir> = {
 
 interface EntryRowProps {
   item: Entry;
-  colorIndex: number;
+  backgroundColor: string;
+  textColor: string;
   onDelete: (id: string) => void;
   nameWidth?: number;
   onNameLayout?: (id: string, width: number) => void;
+  colors: ColorTokens;
 }
 
 interface EntryListProps {
@@ -42,10 +45,12 @@ interface EntryListProps {
 /** Individual entry row with swipe-to-delete support. */
 function EntryRow({
   item,
-  colorIndex,
+  backgroundColor,
+  textColor,
   onDelete,
   nameWidth,
   onNameLayout,
+  colors,
 }: EntryRowProps) {
   const { weeks, days } = gestationalAgeFromDueDate(item.dueDate);
   const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
@@ -54,20 +59,19 @@ function EntryRow({
     onDismiss: () => onDelete(item.id),
   });
 
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.entryWrapper}>
       <View style={styles.deleteBackground} testID="delete-background">
-        <Ionicons name="trash-outline" size={22} color="#fff" />
-        <Ionicons name="trash-outline" size={22} color="#fff" />
+        <Ionicons name="trash-outline" size={22} color={colors.white} />
+        <Ionicons name="trash-outline" size={22} color={colors.white} />
       </View>
       <Animated.View
         testID="entry-row"
         style={[
           styles.entry,
-          {
-            backgroundColor:
-              colors.rowColors[colorIndex % colors.rowColors.length],
-          },
+          { backgroundColor },
           { transform: [{ translateX }] },
         ]}
         {...panHandlers}
@@ -75,6 +79,7 @@ function EntryRow({
         <Text
           style={[
             styles.entryName,
+            { color: textColor },
             (nameWidth ?? 0) > 0 && { minWidth: nameWidth },
           ]}
           onLayout={(e: LayoutChangeEvent) =>
@@ -83,10 +88,12 @@ function EntryRow({
         >
           {item.name}
         </Text>
-        <Text style={styles.entryAge}>
+        <Text style={[styles.entryAge, { color: textColor }]}>
           {weeks}w {days}d
         </Text>
-        <Text style={styles.entryDueDate}>{formatDueDate(item.dueDate)}</Text>
+        <Text style={[styles.entryDueDate, { color: textColor }]}>
+          {formatDueDate(item.dueDate)}
+        </Text>
         <Pressable
           onPress={() => onDelete(item.id)}
           style={styles.deleteButton}
@@ -105,6 +112,9 @@ export default function EntryList({
   onDelete,
   onDeleteAll,
 }: EntryListProps) {
+  const { colors, rowColors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [sortBy, setSortBy] = useState<SortBy>("dueDate");
   const [sortDir, setSortDir] = useState<SortDir>(DEFAULT_DIR.dueDate);
   const nameWidths = useRef(new Map<string, number>());
@@ -237,10 +247,12 @@ export default function EntryList({
         renderItem={({ item, index }) => (
           <EntryRow
             item={item}
-            colorIndex={index}
+            backgroundColor={rowColors[index % rowColors.length]}
+            textColor={colors.textEntryRow}
             onDelete={onDelete}
             nameWidth={maxNameWidth}
             onNameLayout={handleNameLayout}
+            colors={colors}
           />
         )}
         keyExtractor={(item) => item.id}
@@ -256,114 +268,113 @@ export default function EntryList({
   );
 }
 
-const styles = StyleSheet.create({
-  listContainer: {
-    flex: 1,
-  },
-  toolbarRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginTop: 12,
-    gap: 10,
-  },
-  sortRow: {
-    flex: 1,
-    flexDirection: "row",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    overflow: "hidden",
-  },
-  deleteAllButton: {
-    backgroundColor: colors.destructive,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  deleteAllText: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  sortButton: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: "center",
-    backgroundColor: colors.white,
-  },
-  sortButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  sortText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.primary,
-  },
-  sortTextActive: {
-    color: colors.white,
-  },
-  list: {
-    flex: 1,
-  },
-  emptyList: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  emptyText: {
-    color: colors.textTertiary,
-    fontSize: 16,
-  },
-  entryWrapper: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  deleteBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.destructive,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  entry: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.white,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  entryName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.textPrimary,
-  },
-  entryAge: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginLeft: 8,
-  },
-  entryDueDate: {
-    flex: 1,
-    textAlign: "right",
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginRight: 12,
-  },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.deleteButtonBg,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  deleteText: {
-    color: colors.textTertiary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+/** Creates styles based on the active color palette. */
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+    listContainer: {
+      flex: 1,
+    },
+    toolbarRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginHorizontal: 16,
+      marginTop: 12,
+      gap: 10,
+    },
+    sortRow: {
+      flex: 1,
+      flexDirection: "row",
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      overflow: "hidden",
+    },
+    deleteAllButton: {
+      backgroundColor: colors.destructive,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    deleteAllText: {
+      color: colors.white,
+      fontSize: 13,
+      fontWeight: "600",
+    },
+    sortButton: {
+      flex: 1,
+      paddingVertical: 8,
+      alignItems: "center",
+      backgroundColor: colors.contentBackground,
+    },
+    sortButtonActive: {
+      backgroundColor: colors.primary,
+    },
+    sortText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.primary,
+    },
+    sortTextActive: {
+      color: colors.white,
+    },
+    list: {
+      flex: 1,
+    },
+    emptyList: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    emptyText: {
+      color: colors.textTertiary,
+      fontSize: 16,
+    },
+    entryWrapper: {
+      marginHorizontal: 16,
+      marginTop: 8,
+      borderRadius: 10,
+      overflow: "hidden",
+    },
+    deleteBackground: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.destructive,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+    },
+    entry: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+    },
+    entryName: {
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    entryAge: {
+      fontSize: 14,
+      marginLeft: 8,
+    },
+    entryDueDate: {
+      flex: 1,
+      textAlign: "right",
+      fontSize: 14,
+      marginRight: 12,
+    },
+    deleteButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.deleteButtonBg,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    deleteText: {
+      color: colors.textTertiary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });
+}

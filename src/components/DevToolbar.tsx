@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Entry } from "@/storage";
-import colors from "@/theme/colors";
+import { ColorTokens } from "@/theme/colors";
+import { useTheme } from "@/theme/ThemeContext";
 import { toISODateString } from "@/util/dateUtils";
 
 interface DevToolbarProps {
@@ -72,6 +74,9 @@ export default function DevToolbar({
   onSeedData,
   onResetAgreement,
 }: DevToolbarProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.devRow}>
       <Pressable
@@ -87,24 +92,27 @@ export default function DevToolbar({
   );
 }
 
-const styles = StyleSheet.create({
-  devRow: {
-    flexDirection: "row",
-    gap: 8,
-    position: "absolute",
-    right: 20,
-    bottom: -20,
-    zIndex: 10,
-  },
-  devButton: {
-    backgroundColor: colors.devButton,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  devButtonText: {
-    color: colors.white,
-    fontSize: 11,
-    fontWeight: "600",
-  },
-});
+/** Creates styles based on the active color palette. */
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+    devRow: {
+      flexDirection: "row",
+      gap: 8,
+      position: "absolute",
+      right: 20,
+      bottom: -20,
+      zIndex: 10,
+    },
+    devButton: {
+      backgroundColor: colors.devButton,
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    devButtonText: {
+      color: colors.white,
+      fontSize: 11,
+      fontWeight: "600",
+    },
+  });
+}

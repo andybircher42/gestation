@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Animated, Pressable, StyleSheet, Text } from "react-native";
 
 import useSwipeDismiss from "@/hooks/useSwipeDismiss";
 import { Entry } from "@/storage";
-import colors from "@/theme/colors";
+import { ColorTokens } from "@/theme/colors";
+import { useTheme } from "@/theme/ThemeContext";
 import { gestationalAgeFromDueDate } from "@/util/gestationalAge";
 
 interface UndoToastProps {
@@ -20,6 +21,8 @@ export default function UndoToast({
   onUndo,
   onDismiss,
 }: UndoToastProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { weeks, days } = gestationalAgeFromDueDate(entry.dueDate);
   const { animatedValue: translateY, panHandlers } = useSwipeDismiss({
     axis: "y",
@@ -55,34 +58,37 @@ export default function UndoToast({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 32,
-    left: 16,
-    right: 16,
-    backgroundColor: colors.textPrimary,
-    borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  message: {
-    flex: 1,
-    color: colors.white,
-    fontSize: 14,
-  },
-  undoButton: {
-    marginLeft: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: colors.primary,
-    borderRadius: 6,
-  },
-  undoText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
+/** Creates styles based on the active color palette. */
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+    container: {
+      position: "absolute",
+      bottom: 32,
+      left: 16,
+      right: 16,
+      backgroundColor: colors.toastBackground,
+      borderRadius: 10,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+    },
+    message: {
+      flex: 1,
+      color: colors.toastText,
+      fontSize: 14,
+    },
+    undoButton: {
+      marginLeft: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      backgroundColor: colors.primary,
+      borderRadius: 6,
+    },
+    undoText: {
+      color: colors.white,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+  });
+}

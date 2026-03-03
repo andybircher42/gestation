@@ -1,6 +1,7 @@
-import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 
 import { Entry } from "@/storage";
+import renderWithTheme from "@/test/renderWithTheme";
 
 import UndoToast from "./UndoToast";
 
@@ -21,7 +22,7 @@ describe("UndoToast", () => {
   });
 
   it("displays the deleted entry details", () => {
-    render(
+    renderWithTheme(
       <UndoToast entry={mockEntry} onUndo={jest.fn()} onDismiss={jest.fn()} />,
     );
 
@@ -29,7 +30,7 @@ describe("UndoToast", () => {
   });
 
   it("shows an Undo button", () => {
-    render(
+    renderWithTheme(
       <UndoToast entry={mockEntry} onUndo={jest.fn()} onDismiss={jest.fn()} />,
     );
 
@@ -38,7 +39,7 @@ describe("UndoToast", () => {
 
   it("calls onUndo when Undo is pressed", () => {
     const onUndo = jest.fn();
-    render(
+    renderWithTheme(
       <UndoToast entry={mockEntry} onUndo={onUndo} onDismiss={jest.fn()} />,
     );
 
@@ -49,7 +50,7 @@ describe("UndoToast", () => {
 
   it("calls onDismiss after 5 seconds", () => {
     const onDismiss = jest.fn();
-    render(
+    renderWithTheme(
       <UndoToast entry={mockEntry} onUndo={jest.fn()} onDismiss={onDismiss} />,
     );
 
@@ -64,7 +65,7 @@ describe("UndoToast", () => {
 
   it("does not call onDismiss before 5 seconds", () => {
     const onDismiss = jest.fn();
-    render(
+    renderWithTheme(
       <UndoToast entry={mockEntry} onUndo={jest.fn()} onDismiss={onDismiss} />,
     );
 

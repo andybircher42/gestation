@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Modal,
   Pressable,
@@ -7,7 +8,8 @@ import {
   View,
 } from "react-native";
 
-import colors from "@/theme/colors";
+import { ColorTokens } from "@/theme/colors";
+import { useTheme } from "@/theme/ThemeContext";
 
 interface HipaaAgreementModalProps {
   visible: boolean;
@@ -19,6 +21,9 @@ export default function HipaaAgreementModal({
   visible,
   onAccept,
 }: HipaaAgreementModalProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.modalOverlay}>
@@ -46,46 +51,49 @@ export default function HipaaAgreementModal({
   );
 }
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalContent: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 24,
-    width: "100%",
-    maxHeight: "80%",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.textPrimary,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  modalScroll: {
-    marginBottom: 20,
-  },
-  modalText: {
-    fontSize: 15,
-    color: colors.textModal,
-    lineHeight: 22,
-    marginBottom: 12,
-  },
-  agreeButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-  },
-  agreeButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+/** Creates styles based on the active color palette. */
+function createStyles(colors: ColorTokens) {
+  return StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: colors.modalOverlay,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 24,
+    },
+    modalContent: {
+      backgroundColor: colors.contentBackground,
+      borderRadius: 16,
+      padding: 24,
+      width: "100%",
+      maxHeight: "80%",
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 16,
+      textAlign: "center",
+    },
+    modalScroll: {
+      marginBottom: 20,
+    },
+    modalText: {
+      fontSize: 15,
+      color: colors.textModal,
+      lineHeight: 22,
+      marginBottom: 12,
+    },
+    agreeButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      padding: 14,
+      alignItems: "center",
+    },
+    agreeButtonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });
+}

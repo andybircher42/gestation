@@ -1,7 +1,9 @@
 import { Alert } from "react-native";
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, screen } from "@testing-library/react-native";
 
 import { Entry } from "@/storage";
+import renderWithTheme from "@/test/renderWithTheme";
+import { lightRowColors } from "@/theme/colors";
 
 import EntryList from "./EntryList";
 
@@ -23,7 +25,7 @@ afterEach(() => {
 
 describe("EntryList", () => {
   it('shows "No entries yet" when empty', () => {
-    render(
+    renderWithTheme(
       <EntryList entries={[]} onDelete={jest.fn()} onDeleteAll={jest.fn()} />,
     );
     expect(screen.getByText("No entries yet")).toBeTruthy();
@@ -34,7 +36,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "1", name: "Baby A", dueDate: "2026-09-11" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -51,7 +53,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "1", name: "Baby", dueDate: "2026-11-29" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -67,7 +69,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "1", name: "Baby", dueDate: "2026-12-07" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -83,7 +85,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "abc", name: "Baby", dueDate: "2026-10-31" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={onDelete}
@@ -101,7 +103,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Baby B", dueDate: "2026-07-15" }),
       makeEntry({ id: "3", name: "Baby C", dueDate: "2026-04-04" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -121,7 +123,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Old", dueDate: "2026-04-04" }),
       makeEntry({ id: "3", name: "Middle", dueDate: "2026-07-15" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -141,7 +143,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Old", dueDate: "2026-04-04" }),
       makeEntry({ id: "3", name: "Middle", dueDate: "2026-07-15" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -163,7 +165,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Alice", dueDate: "2026-04-04" }),
       makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-15" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -185,7 +187,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Alice", dueDate: "2026-04-04" }),
       makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-15" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -208,7 +210,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Alice", dueDate: "2026-04-04" }),
       makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-15" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -239,7 +241,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -269,7 +271,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Alice", dueDate: "2026-07-20" }),
       makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-20" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -289,7 +291,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Alice", dueDate: "2026-07-20" }),
       makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-20" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -313,7 +315,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Sam", dueDate: "2026-05-11" }), // 30w0d
       makeEntry({ id: "3", name: "Sam", dueDate: "2026-07-20" }), // 20w0d
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -335,7 +337,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "Sam", dueDate: "2026-05-11" }), // 30w0d
       makeEntry({ id: "3", name: "Sam", dueDate: "2026-07-20" }), // 20w0d
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -358,7 +360,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "EndOfYear", dueDate: "2026-12-01" }),
       makeEntry({ id: "3", name: "MidYear", dueDate: "2026-07-20" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -374,7 +376,7 @@ describe("EntryList", () => {
   });
 
   it("does not show sort controls when list is empty", () => {
-    render(
+    renderWithTheme(
       <EntryList entries={[]} onDelete={jest.fn()} onDeleteAll={jest.fn()} />,
     );
 
@@ -385,7 +387,7 @@ describe("EntryList", () => {
 
   it("shows Delete All button when entries exist", () => {
     const entries = [makeEntry({ id: "1", name: "Baby" })];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -399,7 +401,7 @@ describe("EntryList", () => {
   it("shows confirmation dialog when Delete All is pressed", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const entries = [makeEntry({ id: "1", name: "Baby" })];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -421,7 +423,7 @@ describe("EntryList", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const onDeleteAll = jest.fn();
     const entries = [makeEntry({ id: "1", name: "Baby" })];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -447,7 +449,7 @@ describe("EntryList", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const onDeleteAll = jest.fn();
     const entries = [makeEntry({ id: "1", name: "Baby" })];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -473,7 +475,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "1", name: "Baby", dueDate: "2026-06-15" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -488,7 +490,7 @@ describe("EntryList", () => {
     const entries = [
       makeEntry({ id: "1", name: "Baby", dueDate: "2027-01-03" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -505,7 +507,7 @@ describe("EntryList", () => {
       makeEntry({ id: "2", name: "B" }),
       makeEntry({ id: "3", name: "C" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -515,13 +517,13 @@ describe("EntryList", () => {
 
     const rows = screen.getAllByTestId("entry-row");
     expect(rows[0].props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#EF9A9A" }),
+      expect.objectContaining({ backgroundColor: lightRowColors[0] }),
     );
     expect(rows[1].props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#FFCC80" }),
+      expect.objectContaining({ backgroundColor: lightRowColors[1] }),
     );
     expect(rows[2].props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#FFF176" }),
+      expect.objectContaining({ backgroundColor: lightRowColors[2] }),
     );
   });
 
@@ -529,7 +531,7 @@ describe("EntryList", () => {
     const entries = Array.from({ length: 8 }, (_, i) =>
       makeEntry({ id: String(i), name: `Baby ${i}` }),
     );
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -540,13 +542,13 @@ describe("EntryList", () => {
     const rows = screen.getAllByTestId("entry-row");
     // 8th row (index 7) should wrap back to the first color (red)
     expect(rows[7].props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#EF9A9A" }),
+      expect.objectContaining({ backgroundColor: lightRowColors[0] }),
     );
   });
 
   it("renders delete background behind entry rows", () => {
     const entries = [makeEntry({ id: "1", name: "Baby" })];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
@@ -562,7 +564,7 @@ describe("EntryList", () => {
       makeEntry({ id: "1", name: "Baby A" }),
       makeEntry({ id: "2", name: "Baby B" }),
     ];
-    render(
+    renderWithTheme(
       <EntryList
         entries={entries}
         onDelete={jest.fn()}
