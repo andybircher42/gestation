@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import useSwipeDismiss from "@/hooks/useSwipeDismiss";
+import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import colors from "@/theme/colors";
 import { formatDueDate } from "@/util/dateUtils";

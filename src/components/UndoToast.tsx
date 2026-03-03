@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Animated, Pressable, StyleSheet, Text } from "react-native";
 
-import useSwipeDismiss from "@/hooks/useSwipeDismiss";
+import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import colors from "@/theme/colors";
 import { gestationalAgeFromDueDate } from "@/util/gestationalAge";
