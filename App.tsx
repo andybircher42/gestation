@@ -126,9 +126,7 @@ export default function App() {
 
   const handleDeleteAll = () => {
     setEntries([]);
-    saveEntries([]).catch((e) =>
-      console.error("Failed to clear entries", e),
-    );
+    saveEntries([]).catch((e) => console.error("Failed to clear entries", e));
   };
 
   const handleAcceptAgreement = () => {
@@ -176,7 +174,7 @@ export default function App() {
           style={styles.headerLogo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>In Due Time</Text>
+        <Text style={styles.title}>in due time</Text>
         {__DEV__ && (
           <DevToolbar
             onSeedData={handleSeedData}
@@ -186,7 +184,11 @@ export default function App() {
       </View>
 
       <EntryForm onAdd={handleAdd} />
-      <EntryList entries={entries} onDelete={handleDelete} onDeleteAll={handleDeleteAll} />
+      <EntryList
+        entries={entries}
+        onDelete={handleDelete}
+        onDeleteAll={handleDeleteAll}
+      />
       <HipaaAgreementModal
         visible={showAgreement && agreementLoaded}
         onAccept={handleAcceptAgreement}

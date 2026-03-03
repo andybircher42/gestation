@@ -30,7 +30,9 @@ afterEach(() => {
 async function renderApp() {
   render(<App />);
   await act(async () => {
+    await Promise.resolve();
     jest.advanceTimersByTime(2000);
+    await Promise.resolve();
   });
 }
 
@@ -38,14 +40,14 @@ describe("App", () => {
   it("shows loading screen with logo on launch", () => {
     render(<App />);
     expect(screen.getByTestId("splash-logo")).toBeTruthy();
-    expect(screen.queryByText("In Due Time")).toBeNull();
+    expect(screen.queryByText("in due time")).toBeNull();
   });
 
   it("renders the title after loading", async () => {
     await renderApp();
 
     await waitFor(() => {
-      expect(screen.getByText("In Due Time")).toBeTruthy();
+      expect(screen.getByText("in due time")).toBeTruthy();
     });
   });
 
