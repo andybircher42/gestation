@@ -15,3 +15,8 @@ jest.mock("expo-updates", () => ({
   fetchUpdateAsync: jest.fn(),
   reloadAsync: jest.fn(),
 }));
+
+jest.mock("vexo-analytics", () => ({
+  vexo: jest.fn(),
+  identifyDevice: jest.fn().mockResolvedValue(undefined),
+}));

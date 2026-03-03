@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   acceptAgreement,
   checkAgreement,
+  getOrCreateDeviceId,
   isValidEntry,
   loadEntries,
   resetAgreement,
@@ -167,6 +168,24 @@ describe("loadEntries", () => {
       dueDate: "2026-06-15",
     });
     expect(result.entries[0]).not.toHaveProperty("weeks");
+  });
+});
+
+describe("getOrCreateDeviceId", () => {
+  it("generates and persists a UUID on first call", async () => {
+    const id = await getOrCreateDeviceId();
+    expect(id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    );
+
+    const stored = await AsyncStorage.getItem("@device_id");
+    expect(stored).toBe(id);
+  });
+
+  it("returns the same value on subsequent calls", async () => {
+    const first = await getOrCreateDeviceId();
+    const second = await getOrCreateDeviceId();
+    expect(second).toBe(first);
   });
 });
 

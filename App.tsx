@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
+import { identifyDevice, vexo } from "vexo-analytics";
 
 import {
   DevToolbar,
@@ -24,7 +25,12 @@ import {
   UndoToast,
 } from "@/components";
 import { useEntries, useThemePreference } from "@/hooks";
-import { acceptAgreement, checkAgreement, resetAgreement } from "@/storage";
+import {
+  acceptAgreement,
+  checkAgreement,
+  getOrCreateDeviceId,
+  resetAgreement,
+} from "@/storage";
 import { ColorTokens, ThemeProvider, useTheme } from "@/theme";
 
 import headerLogoLight from "./assets/icon.png";
@@ -36,6 +42,10 @@ import splashLogoDark from "./assets/splash-icon-dark.png";
 
 const SPLASH_DURATION_MS = 2000;
 const APP_LABEL = (Constants.expoConfig?.extra?.appLabel as string) ?? "";
+
+if (!__DEV__) {
+  vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8");
+}
 
 /** Root component that wraps AppContent with ThemeProvider. */
 export default function App() {
@@ -98,7 +108,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     let mounted = true;
 
     async function init() {
-      const [accepted] = await Promise.all([
+      const [accepted, , , deviceId] = await Promise.all([
         checkAgreement().catch((e) => {
           console.error("Failed to check agreement", e);
           return false;
@@ -107,6 +117,10 @@ function AppContent({ loadThemePreference }: AppContentProps) {
         loadThemePreference().catch((e) =>
           console.error("Failed to load theme preference", e),
         ),
+        getOrCreateDeviceId().catch((e) => {
+          console.error("Failed to get device ID", e);
+          return undefined;
+        }),
       ]);
       if (!mounted) {
         return;
@@ -117,6 +131,9 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       setAgreementLoaded(true);
 
       if (!__DEV__) {
+        if (deviceId) {
+          identifyDevice(deviceId);
+        }
         Updates.checkForUpdateAsync()
           .then(async (update) => {
             if (update.isAvailable) {

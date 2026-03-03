@@ -9,6 +9,7 @@ export interface Entry {
 
 const STORAGE_KEY = "@gestation_entries";
 const AGREEMENT_KEY = "@hipaa_agreement_accepted";
+const DEVICE_ID_KEY = "@device_id";
 
 /** Persists the full entries array to AsyncStorage. */
 export const saveEntries = async (entries: Entry[]): Promise<void> => {
@@ -29,6 +30,17 @@ export const acceptAgreement = async (): Promise<void> => {
 /** Clears the stored HIPAA agreement so the disclaimer is shown again. */
 export const resetAgreement = async (): Promise<void> => {
   await AsyncStorage.removeItem(AGREEMENT_KEY);
+};
+
+/** Returns a persistent device ID, generating and storing one on first call. */
+export const getOrCreateDeviceId = async (): Promise<string> => {
+  const existing = await AsyncStorage.getItem(DEVICE_ID_KEY);
+  if (existing) {
+    return existing;
+  }
+  const id = crypto.randomUUID();
+  await AsyncStorage.setItem(DEVICE_ID_KEY, id);
+  return id;
 };
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}/;
