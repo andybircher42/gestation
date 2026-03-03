@@ -12,13 +12,23 @@ import * as Updates from "expo-updates";
 
 import { ColorTokens, useTheme } from "@/theme";
 
+interface BuildStatus {
+  isOutdated: boolean;
+  latestVersion?: string;
+}
+
 interface AppInfoModalProps {
   visible: boolean;
   onClose: () => void;
+  buildStatus?: BuildStatus;
 }
 
 /** Centered overlay modal that displays basic app information (name and version). */
-export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
+export default function AppInfoModal({
+  visible,
+  onClose,
+  buildStatus,
+}: AppInfoModalProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -44,9 +54,23 @@ export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
               Update {Updates.updateId.slice(0, 8)}
             </Text>
           )}
-          <Text style={[styles.detailText, styles.lastDetail]}>
+          <Text style={styles.detailText}>
             {Platform.OS === "ios" ? "iOS" : "Android"} {Platform.Version}
           </Text>
+          {buildStatus != null && (
+            <Text
+              style={[
+                styles.detailText,
+                styles.lastDetail,
+                buildStatus.isOutdated ? styles.outdatedText : undefined,
+              ]}
+            >
+              {buildStatus.isOutdated
+                ? `New build available (v${buildStatus.latestVersion})`
+                : "Up to date"}
+            </Text>
+          )}
+          {buildStatus == null && <View style={styles.lastDetail} />}
           <Pressable
             style={styles.closeButton}
             onPress={onClose}
@@ -102,6 +126,10 @@ function createStyles(colors: ColorTokens) {
     },
     lastDetail: {
       marginBottom: 20,
+    },
+    outdatedText: {
+      color: colors.primary,
+      fontWeight: "600",
     },
     closeButton: {
       backgroundColor: colors.primary,

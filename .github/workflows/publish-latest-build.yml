@@ -1,0 +1,65 @@
+name: Publish Latest Build Info
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Query latest iOS build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build:list --json --limit 1 --status finished --platform ios > /tmp/ios.json
+
+      - name: Query latest Android build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build:list --json --limit 1 --status finished --platform android > /tmp/android.json
+
+      - name: Build latest-build.json
+        run: |
+          ios_id=$(jq -r '.[0].id' /tmp/ios.json)
+          ios_version=$(jq -r '.[0].appVersion' /tmp/ios.json)
+          ios_build=$(jq -r '.[0].appBuildVersion' /tmp/ios.json)
+
+          android_id=$(jq -r '.[0].id' /tmp/android.json)
+          android_version=$(jq -r '.[0].appVersion' /tmp/android.json)
+          android_build=$(jq -r '.[0].appBuildVersion' /tmp/android.json)
+
+          jq -n \
+            --arg ios_id "$ios_id" \
+            --arg ios_version "$ios_version" \
+            --arg ios_build "$ios_build" \
+            --arg android_id "$android_id" \
+            --arg android_version "$android_version" \
+            --arg android_build "$android_build" \
+            '{
+              ios: { buildId: $ios_id, version: $ios_version, buildNumber: $ios_build },
+              android: { buildId: $android_id, version: $android_version, buildNumber: $android_build }
+            }' > /tmp/latest-build.json
+
+          cat /tmp/latest-build.json
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp
+          keep_files: false
+          destination_dir: .
+          include_files: latest-build.json

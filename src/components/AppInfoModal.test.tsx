@@ -28,4 +28,37 @@ describe("AppInfoModal", () => {
 
     expect(screen.queryByText("About")).toBeNull();
   });
+
+  it("shows 'Up to date' when buildStatus is not outdated", () => {
+    renderWithTheme(
+      <AppInfoModal
+        visible={true}
+        onClose={jest.fn()}
+        buildStatus={{ isOutdated: false }}
+      />,
+    );
+
+    expect(screen.getByText("Up to date")).toBeTruthy();
+  });
+
+  it("shows new build available when buildStatus is outdated", () => {
+    renderWithTheme(
+      <AppInfoModal
+        visible={true}
+        onClose={jest.fn()}
+        buildStatus={{ isOutdated: true, latestVersion: "2.5.0" }}
+      />,
+    );
+
+    expect(
+      screen.getByText("New build available (v2.5.0)"),
+    ).toBeTruthy();
+  });
+
+  it("does not show build status when prop is omitted", () => {
+    renderWithTheme(<AppInfoModal visible={true} onClose={jest.fn()} />);
+
+    expect(screen.queryByText("Up to date")).toBeNull();
+    expect(screen.queryByText(/New build available/)).toBeNull();
+  });
 });
