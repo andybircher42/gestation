@@ -25,10 +25,8 @@ import { acceptAgreement, checkAgreement, resetAgreement } from "@/storage";
 import { ColorTokens } from "@/theme/colors";
 import { ThemeProvider, useTheme } from "@/theme/ThemeContext";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const splashLogo = require("./assets/splash-icon.png");
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const headerLogo = require("./assets/icon.png");
+import splashLogo from "./assets/splash-icon.png";
+import headerLogo from "./assets/icon.png";
 
 const SPLASH_DURATION_MS = 2000;
 const APP_LABEL = (Constants.expoConfig?.extra?.appLabel as string) ?? "";
@@ -111,7 +109,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           .catch((e) => console.error("Failed to check for updates", e));
       }
     }
-    init();
+    void init();
   }, [load, loadThemePreference]);
 
   const handleAcceptAgreement = () => {

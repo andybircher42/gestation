@@ -9,7 +9,7 @@ import {
 } from "./storage";
 
 beforeEach(() => {
-  AsyncStorage.clear();
+  void AsyncStorage.clear();
 });
 
 describe("loadEntries / saveEntries", () => {

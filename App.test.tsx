@@ -12,7 +12,7 @@ import App from "./App";
 const originalConsoleError = console.error;
 
 beforeEach(() => {
-  AsyncStorage.clear();
+  void AsyncStorage.clear();
   jest.useFakeTimers({ now: new Date(2026, 2, 2) });
   console.error = (...args: unknown[]) => {
     if (typeof args[0] === "string" && args[0].includes("not wrapped in act")) {
@@ -31,6 +31,24 @@ async function renderApp() {
   render(<App />);
   await act(async () => {
     jest.advanceTimersByTime(2000);
+  });
+}
+
+async function acceptHipaa() {
+  await waitFor(() => {
+    expect(screen.getByText("I Agree")).toBeTruthy();
+  });
+  fireEvent.press(screen.getByText("I Agree"));
+}
+
+async function addEntry(name: string, weeks: string, days: string) {
+  fireEvent.press(screen.getByText("Gestational Age"));
+  fireEvent.changeText(screen.getByLabelText("Name"), name);
+  fireEvent.changeText(screen.getByLabelText("Weeks"), weeks);
+  fireEvent.changeText(screen.getByLabelText("Days"), days);
+  fireEvent.press(screen.getByText("Add"));
+  await waitFor(() => {
+    expect(screen.getByText(name)).toBeTruthy();
   });
 }
 
@@ -60,47 +78,17 @@ describe("App", () => {
 
   it("adds an entry via the form in weeks/days mode", async () => {
     await renderApp();
+    await acceptHipaa();
+    await addEntry("TestBaby", "20", "3");
 
-    // Accept HIPAA
-    await waitFor(() => {
-      expect(screen.getByText("I Agree")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByText("I Agree"));
-
-    // Switch to weeks/days mode
-    fireEvent.press(screen.getByText("Gestational Age"));
-
-    fireEvent.changeText(screen.getByLabelText("Name"), "TestBaby");
-    fireEvent.changeText(screen.getByLabelText("Weeks"), "20");
-    fireEvent.changeText(screen.getByLabelText("Days"), "3");
-    fireEvent.press(screen.getByText("Add"));
-
-    await waitFor(() => {
-      expect(screen.getByText("TestBaby")).toBeTruthy();
-      expect(screen.getByText("20w 3d")).toBeTruthy();
-    });
+    expect(screen.getByText("20w 3d")).toBeTruthy();
   });
 
   it("deletes an entry and shows undo toast", async () => {
     await renderApp();
+    await acceptHipaa();
+    await addEntry("Baby", "10", "0");
 
-    await waitFor(() => {
-      expect(screen.getByText("I Agree")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByText("I Agree"));
-
-    // Add an entry
-    fireEvent.press(screen.getByText("Gestational Age"));
-    fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
-    fireEvent.changeText(screen.getByLabelText("Weeks"), "10");
-    fireEvent.changeText(screen.getByLabelText("Days"), "0");
-    fireEvent.press(screen.getByText("Add"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Baby")).toBeTruthy();
-    });
-
-    // Delete it
     fireEvent.press(screen.getByText("✕"));
 
     await waitFor(() => {
@@ -111,24 +99,9 @@ describe("App", () => {
 
   it("restores entry when undo is pressed", async () => {
     await renderApp();
+    await acceptHipaa();
+    await addEntry("Baby", "10", "0");
 
-    await waitFor(() => {
-      expect(screen.getByText("I Agree")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByText("I Agree"));
-
-    // Add an entry
-    fireEvent.press(screen.getByText("Gestational Age"));
-    fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
-    fireEvent.changeText(screen.getByLabelText("Weeks"), "10");
-    fireEvent.changeText(screen.getByLabelText("Days"), "0");
-    fireEvent.press(screen.getByText("Add"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Baby")).toBeTruthy();
-    });
-
-    // Delete and undo
     fireEvent.press(screen.getByText("✕"));
 
     await waitFor(() => {
@@ -145,22 +118,8 @@ describe("App", () => {
 
   it("undo toast auto-dismisses after 5 seconds", async () => {
     await renderApp();
-
-    await waitFor(() => {
-      expect(screen.getByText("I Agree")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByText("I Agree"));
-
-    // Add and delete
-    fireEvent.press(screen.getByText("Gestational Age"));
-    fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
-    fireEvent.changeText(screen.getByLabelText("Weeks"), "10");
-    fireEvent.changeText(screen.getByLabelText("Days"), "0");
-    fireEvent.press(screen.getByText("Add"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Baby")).toBeTruthy();
-    });
+    await acceptHipaa();
+    await addEntry("Baby", "10", "0");
 
     fireEvent.press(screen.getByText("✕"));
 
@@ -179,17 +138,8 @@ describe("App", () => {
 
   it("persists entries to AsyncStorage", async () => {
     await renderApp();
-
-    await waitFor(() => {
-      expect(screen.getByText("I Agree")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByText("I Agree"));
-
-    fireEvent.press(screen.getByText("Gestational Age"));
-    fireEvent.changeText(screen.getByLabelText("Name"), "Saved");
-    fireEvent.changeText(screen.getByLabelText("Weeks"), "15");
-    fireEvent.changeText(screen.getByLabelText("Days"), "2");
-    fireEvent.press(screen.getByText("Add"));
+    await acceptHipaa();
+    await addEntry("Saved", "15", "2");
 
     await waitFor(async () => {
       const stored = await AsyncStorage.getItem("@gestation_entries");

@@ -24,7 +24,7 @@ export function expandTwoDigitYear(
 
 const DATE_PATTERN = /^(\d{1,2})-(\d{1,2})-(\d{2,4})$/;
 
-/** Extracts month, day, and year from a MM-DD-YYYY or M-D-YY text string, expanding 2-digit years. */
+/** Extracts month, day, and year from an MM-DD-YYYY or M-D-YY text string, expanding 2-digit years. */
 export function parseDateParts(
   text: string,
   now: Date = new Date(),
