@@ -34,7 +34,7 @@ export const resetAgreement = async (): Promise<void> => {
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}/;
 
 /** Type guard that validates a value has the shape of a valid Entry. */
-export function isValidEntry(value: unknown): value is Entry {
+export const isValidEntry = (value: unknown): value is Entry => {
   if (value == null || typeof value !== "object") {
     return false;
   }
@@ -47,7 +47,7 @@ export function isValidEntry(value: unknown): value is Entry {
     typeof obj.dueDate === "string" &&
     ISO_DATE_RE.test(obj.dueDate)
   );
-}
+};
 
 /** Result of loading entries with validation info. */
 export interface LoadResult {
