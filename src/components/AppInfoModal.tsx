@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import {
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -7,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
@@ -16,7 +18,12 @@ import { ColorTokens, useTheme } from "@/theme";
 interface BuildStatus {
   isOutdated: boolean;
   latestVersion?: string;
+  latestBuildId?: string;
 }
+
+const EAS_BUILD_BASE_URL =
+  "https://expo.dev/accounts/andybircher/projects/in-due-time/builds";
+const HELP_URL = "https://andybircher42.github.io/gestation/";
 
 interface AppInfoModalProps {
   visible: boolean;
@@ -50,37 +57,85 @@ export default function AppInfoModal({
           <Text style={styles.appName}>{appName}</Text>
           <Text style={styles.versionText}>Version {appVersion}</Text>
           <Pressable
+            style={styles.copyRow}
             onPress={() => Clipboard.setStringAsync(buildId)}
             accessibilityLabel="Copy build ID"
             accessibilityRole="button"
           >
-            <Text style={styles.detailText}>Build {buildId.slice(0, 8)}…</Text>
+            <Text style={styles.detailText}>
+              Build version: {buildId.slice(0, 8)}…
+            </Text>
+            <Ionicons
+              name="copy-outline"
+              size={12}
+              color={colors.textTertiary}
+            />
           </Pressable>
           {Updates.updateId != null && (
             <Pressable
+              style={styles.copyRow}
               onPress={() => Clipboard.setStringAsync(Updates.updateId!)}
               accessibilityLabel="Copy update ID"
               accessibilityRole="button"
             >
               <Text style={styles.detailText}>
-                Update {Updates.updateId.slice(0, 8)}…
+                Update version: {Updates.updateId.slice(0, 8)}…
               </Text>
+              <Ionicons
+                name="copy-outline"
+                size={12}
+                color={colors.textTertiary}
+              />
             </Pressable>
           )}
-          <Text style={styles.detailText}>
-            {Platform.OS === "ios" ? "iOS" : "Android"} {Platform.Version}
-          </Text>
-          {buildStatus != null && (
-            <Text
-              style={[
-                styles.detailText,
-                styles.lastDetail,
-                buildStatus.isOutdated ? styles.outdatedText : undefined,
-              ]}
-            >
-              {buildStatus.isOutdated
-                ? `New build available (v${buildStatus.latestVersion})`
-                : "Up to date"}
+          <Pressable
+            style={styles.copyRow}
+            onPress={() =>
+              Clipboard.setStringAsync(
+                `${Platform.OS === "ios" ? "iOS" : "Android"} ${Platform.Version}`,
+              )
+            }
+            accessibilityLabel="Copy platform version"
+            accessibilityRole="button"
+          >
+            <Text style={styles.detailText}>
+              {Platform.OS === "ios" ? "iOS" : "Android"} version:{" "}
+              {Platform.Version}
+            </Text>
+            <Ionicons
+              name="copy-outline"
+              size={12}
+              color={colors.textTertiary}
+            />
+          </Pressable>
+          {buildStatus != null && buildStatus.isOutdated && (
+            <View style={styles.statusRow}>
+              <Pressable
+                onPress={() => {
+                  const url = buildStatus.latestBuildId
+                    ? `${EAS_BUILD_BASE_URL}/${buildStatus.latestBuildId}`
+                    : EAS_BUILD_BASE_URL;
+                  Linking.openURL(url).catch(() => {});
+                }}
+                accessibilityLabel="Download new build"
+                accessibilityRole="link"
+              >
+                <Text style={[styles.detailText, styles.outdatedText]}>
+                  New build available (v{buildStatus.latestVersion})
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => Linking.openURL(HELP_URL).catch(() => {})}
+                accessibilityLabel="How to update"
+                accessibilityRole="link"
+              >
+                <Text style={[styles.detailText, styles.helpLink]}>Help</Text>
+              </Pressable>
+            </View>
+          )}
+          {buildStatus != null && !buildStatus.isOutdated && (
+            <Text style={[styles.detailText, styles.lastDetail]}>
+              Up to date
             </Text>
           )}
           {buildStatus == null && <View style={styles.lastDetail} />}
@@ -132,10 +187,21 @@ function createStyles(colors: ColorTokens) {
       color: colors.textModal,
       marginBottom: 4,
     },
+    copyRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
     detailText: {
       fontSize: 13,
       color: colors.textTertiary,
       marginBottom: 4,
+    },
+    statusRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 20,
     },
     lastDetail: {
       marginBottom: 20,
@@ -143,6 +209,11 @@ function createStyles(colors: ColorTokens) {
     outdatedText: {
       color: colors.primary,
       fontWeight: "600",
+      textDecorationLine: "underline",
+    },
+    helpLink: {
+      color: colors.textTertiary,
+      textDecorationLine: "underline",
     },
     closeButton: {
       backgroundColor: colors.primary,

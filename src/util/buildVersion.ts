@@ -18,6 +18,7 @@ interface LatestBuildData {
 interface BuildCheckResult {
   isOutdated: boolean;
   latestVersion?: string;
+  latestBuildId?: string;
 }
 
 /** Fetches latest build info from GitHub Pages and compares against current build ID. */
@@ -43,7 +44,11 @@ export async function checkForNewerBuild(): Promise<BuildCheckResult> {
     }
 
     if (latest.buildId !== currentBuildId) {
-      return { isOutdated: true, latestVersion: latest.version };
+      return {
+        isOutdated: true,
+        latestVersion: latest.version,
+        latestBuildId: latest.buildId,
+      };
     }
 
     return { isOutdated: false };

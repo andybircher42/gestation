@@ -1,20 +1,24 @@
 import { useMemo } from "react";
-import { Animated, Linking, Platform, Pressable, StyleSheet, Text } from "react-native";
+import { Animated, Linking, Pressable, StyleSheet, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import { useSwipeDismiss } from "@/hooks";
 import { ColorTokens, useTheme } from "@/theme";
 
 interface UpdateBuildToastProps {
   latestVersion: string;
+  latestBuildId?: string;
   onDismiss: () => void;
 }
 
-const IOS_STORE_URL = "https://apps.apple.com";
-const ANDROID_STORE_URL = "https://play.google.com/store";
+const EAS_BUILD_BASE_URL =
+  "https://expo.dev/accounts/andybircher/projects/in-due-time/builds";
+const HELP_URL = "https://andybircher42.github.io/gestation/";
 
 /** Toast shown when a newer native build is available. */
 export default function UpdateBuildToast({
   latestVersion,
+  latestBuildId,
   onDismiss,
 }: UpdateBuildToastProps) {
   const { colors } = useTheme();
@@ -29,8 +33,14 @@ export default function UpdateBuildToast({
   });
 
   const handleDetails = () => {
-    const url = Platform.OS === "ios" ? IOS_STORE_URL : ANDROID_STORE_URL;
+    const url = latestBuildId
+      ? `${EAS_BUILD_BASE_URL}/${latestBuildId}`
+      : EAS_BUILD_BASE_URL;
     Linking.openURL(url).catch(() => {});
+  };
+
+  const handleHelp = () => {
+    Linking.openURL(HELP_URL).catch(() => {});
   };
 
   return (
@@ -39,15 +49,28 @@ export default function UpdateBuildToast({
       accessibilityLabel="Update build toast"
       {...panHandlers}
     >
-      <Text style={styles.message}>
-        New build available (v{latestVersion})
-      </Text>
+      <Pressable onPress={handleDetails} style={styles.messageRow}>
+        <Text style={styles.message}>
+          New build available (v{latestVersion})
+        </Text>
+        <Text style={styles.downloadLink}>Tap to download</Text>
+      </Pressable>
       <Pressable
-        onPress={handleDetails}
-        style={styles.detailsButton}
-        accessibilityRole="button"
+        onPress={handleHelp}
+        style={styles.helpButton}
+        accessibilityLabel="How to update"
+        accessibilityRole="link"
       >
-        <Text style={styles.detailsText}>Details</Text>
+        <Text style={styles.helpText}>Help</Text>
+      </Pressable>
+      <Pressable
+        onPress={onDismiss}
+        style={styles.dismissButton}
+        accessibilityLabel="Dismiss"
+        accessibilityRole="button"
+        hitSlop={8}
+      >
+        <Ionicons name="close" size={18} color={colors.toastText} />
       </Pressable>
     </Animated.View>
   );
@@ -68,22 +91,35 @@ function createStyles(colors: ColorTokens) {
       paddingVertical: 12,
       paddingHorizontal: 16,
     },
-    message: {
+    messageRow: {
       flex: 1,
+    },
+    message: {
       color: colors.toastText,
       fontSize: 14,
-    },
-    detailsButton: {
-      marginLeft: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      backgroundColor: colors.primary,
-      borderRadius: 6,
-    },
-    detailsText: {
-      color: colors.white,
-      fontSize: 14,
       fontWeight: "600",
+    },
+    downloadLink: {
+      color: colors.toastText,
+      fontSize: 12,
+      textDecorationLine: "underline",
+      marginTop: 2,
+      opacity: 0.8,
+    },
+    helpButton: {
+      marginLeft: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 6,
+    },
+    helpText: {
+      color: colors.toastText,
+      fontSize: 13,
+      textDecorationLine: "underline",
+      opacity: 0.8,
+    },
+    dismissButton: {
+      marginLeft: 4,
+      padding: 4,
     },
   });
 }

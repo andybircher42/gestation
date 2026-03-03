@@ -79,6 +79,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   const isLoadingRef = useRef(true);
   const [newerBuild, setNewerBuild] = useState<{
     latestVersion: string;
+    latestBuildId?: string;
   } | null>(null);
   const [buildToastDismissed, setBuildToastDismissed] = useState(false);
 
@@ -165,7 +166,10 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       checkForNewerBuild()
         .then((result) => {
           if (mounted && result.isOutdated && result.latestVersion) {
-            setNewerBuild({ latestVersion: result.latestVersion });
+            setNewerBuild({
+              latestVersion: result.latestVersion,
+              latestBuildId: result.latestBuildId,
+            });
           }
         })
         .catch(() => {});
@@ -275,7 +279,11 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           onClose={() => setShowAppInfo(false)}
           buildStatus={
             newerBuild
-              ? { isOutdated: true, latestVersion: newerBuild.latestVersion }
+              ? {
+                  isOutdated: true,
+                  latestVersion: newerBuild.latestVersion,
+                  latestBuildId: newerBuild.latestBuildId,
+                }
               : { isOutdated: false }
           }
         />
@@ -291,6 +299,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
         {newerBuild && !buildToastDismissed && !deletedEntry && (
           <UpdateBuildToast
             latestVersion={newerBuild.latestVersion}
+            latestBuildId={newerBuild.latestBuildId}
             onDismiss={() => setBuildToastDismissed(true)}
           />
         )}

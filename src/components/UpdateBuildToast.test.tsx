@@ -35,15 +35,26 @@ describe("UpdateBuildToast", () => {
     expect(screen.getByText("New build available (v3.1.0)")).toBeTruthy();
   });
 
-  it("shows a Details button", () => {
+  it("shows tap to download link", () => {
     renderToast();
-    expect(screen.getByText("Details")).toBeTruthy();
+    expect(screen.getByText("Tap to download")).toBeTruthy();
   });
 
-  it("opens store URL when Details is pressed", () => {
+  it("opens build URL when message is pressed", () => {
     renderToast();
-    fireEvent.press(screen.getByText("Details"));
+    fireEvent.press(screen.getByText("Tap to download"));
     expect(Linking.openURL).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows dismiss button", () => {
+    renderToast();
+    expect(screen.getByLabelText("Dismiss")).toBeTruthy();
+  });
+
+  it("calls onDismiss when dismiss button is pressed", () => {
+    const { onDismiss } = renderToast();
+    fireEvent.press(screen.getByLabelText("Dismiss"));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
   it("has an accessibility label", () => {
