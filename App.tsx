@@ -166,75 +166,86 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   }
 
   return (
-    <KeyboardAvoidingView
+    <ImageBackground
+      source={splashBg}
+      resizeMode="cover"
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      testID="app-bg"
     >
-      <View style={styles.header}>
-        <Image
-          source={headerLogo}
-          style={styles.headerLogo}
-          resizeMode="contain"
-          accessibilityLabel="App logo"
-        />
-        <Text style={styles.title}>in due time</Text>
-        {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}
-        <Pressable
-          ref={settingsRef}
-          onPress={openThemePicker}
-          accessibilityLabel="Theme settings"
-          accessibilityRole="button"
-          hitSlop={8}
-        >
-          <Ionicons
-            name="settings-outline"
-            size={24}
-            color={colors.textPrimary}
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View style={styles.header}>
+          <Image
+            source={headerLogo}
+            style={styles.headerLogo}
+            resizeMode="contain"
+            accessibilityLabel="App logo"
           />
-        </Pressable>
-        {__DEV__ && (
-          <DevToolbar
-            onSeedData={seed}
-            onResetAgreement={handleResetAgreement}
+          <Text style={styles.title}>in due time</Text>
+          {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}
+          <Pressable
+            ref={settingsRef}
+            onPress={openThemePicker}
+            accessibilityLabel="Theme settings"
+            accessibilityRole="button"
+            hitSlop={8}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={colors.textPrimary}
+            />
+          </Pressable>
+          {__DEV__ && (
+            <DevToolbar
+              onSeedData={seed}
+              onResetAgreement={handleResetAgreement}
+            />
+          )}
+        </View>
+
+        <EntryForm onAdd={add} />
+        <EntryList
+          entries={entries}
+          onDelete={remove}
+          onDeleteAll={removeAll}
+        />
+        <HipaaAgreementModal
+          visible={showAgreement && agreementLoaded}
+          onAccept={handleAcceptAgreement}
+        />
+        <ThemePickerModal
+          visible={showThemePicker}
+          currentMode={themeMode}
+          onSelect={setThemeMode}
+          onClose={() => setShowThemePicker(false)}
+          anchor={pickerAnchor}
+        />
+
+        {deletedEntry && (
+          <UndoToast
+            entry={deletedEntry.entry}
+            onUndo={undo}
+            onDismiss={dismissUndo}
           />
         )}
-      </View>
 
-      <EntryForm onAdd={add} />
-      <EntryList entries={entries} onDelete={remove} onDeleteAll={removeAll} />
-      <HipaaAgreementModal
-        visible={showAgreement && agreementLoaded}
-        onAccept={handleAcceptAgreement}
-      />
-      <ThemePickerModal
-        visible={showThemePicker}
-        currentMode={themeMode}
-        onSelect={setThemeMode}
-        onClose={() => setShowThemePicker(false)}
-        anchor={pickerAnchor}
-      />
+        {discardedCount > 0 && !deletedEntry && (
+          <InfoToast
+            message={
+              discardedCount === 1
+                ? "1 entry was corrupted and removed"
+                : `${discardedCount} entries were corrupted and removed`
+            }
+            onDismiss={dismissDiscarded}
+          />
+        )}
 
-      {deletedEntry && (
-        <UndoToast
-          entry={deletedEntry.entry}
-          onUndo={undo}
-          onDismiss={dismissUndo}
-        />
-      )}
-
-      {discardedCount > 0 && !deletedEntry && (
-        <InfoToast
-          message={
-            discardedCount === 1
-              ? "1 entry was corrupted and removed"
-              : `${discardedCount} entries were corrupted and removed`
-          }
-          onDismiss={dismissDiscarded}
-        />
-      )}
-
-      <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
-    </KeyboardAvoidingView>
+        <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }
 
@@ -252,7 +263,9 @@ function createStyles(colors: ColorTokens) {
     },
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+    },
+    keyboardView: {
+      flex: 1,
     },
     header: {
       flexDirection: "row",

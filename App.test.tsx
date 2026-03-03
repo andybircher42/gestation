@@ -277,4 +277,28 @@ describe("App", () => {
       expect(screen.getByTestId("splash-bg").props.source).toBe(splashBgLight);
     });
   });
+
+  it("uses dark app background in dark mode", async () => {
+    await renderAppWithTheme("dark");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("app-bg").props.source).toBe(splashBgDark);
+    });
+  });
+
+  it("uses light app background in light mode", async () => {
+    await renderAppWithTheme("light");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("app-bg").props.source).toBe(splashBgLight);
+    });
+  });
+
+  it("uses light app background in mono mode", async () => {
+    await renderAppWithTheme("mono");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("app-bg").props.source).toBe(splashBgLight);
+    });
+  });
 });
