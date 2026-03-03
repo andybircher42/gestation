@@ -1,9 +1,12 @@
 import {
   expandTwoDigitYear,
+  formatDateInput,
   formatDueDate,
   getDateBounds,
   getDateError,
+  parseDateParts,
   parseDateText,
+  toISODateString,
 } from "./dateUtils";
 
 describe("formatDueDate", () => {
@@ -187,5 +190,77 @@ describe("parseDateText", () => {
 
   it("returns null for single-digit year", () => {
     expect(parseDateText("6-15-6")).toBeNull();
+  });
+});
+
+describe("parseDateParts", () => {
+  const now = new Date(2026, 2, 2);
+
+  it("returns null for non-matching input", () => {
+    expect(parseDateParts("abc", now)).toBeNull();
+  });
+
+  it("returns null for incomplete date", () => {
+    expect(parseDateParts("6-15", now)).toBeNull();
+  });
+
+  it("extracts month, day, and 4-digit year", () => {
+    const result = parseDateParts("6-15-2026", now);
+    expect(result).toEqual(
+      expect.objectContaining({ month: 6, day: 15, year: 2026 }),
+    );
+  });
+
+  it("extracts month and day with leading zeros", () => {
+    const result = parseDateParts("01-05-2026", now);
+    expect(result).toEqual(
+      expect.objectContaining({ month: 1, day: 5, year: 2026 }),
+    );
+  });
+
+  it("expands a 2-digit year", () => {
+    const result = parseDateParts("6-15-26", now);
+    expect(result).toEqual(
+      expect.objectContaining({ month: 6, day: 15, year: 2026 }),
+    );
+  });
+
+  it("includes the raw RegExp match", () => {
+    const result = parseDateParts("6-15-2026", now);
+    expect(result!.raw[0]).toBe("6-15-2026");
+  });
+});
+
+describe("formatDateInput", () => {
+  const now = new Date(2026, 2, 2);
+
+  it("returns null for non-matching input", () => {
+    expect(formatDateInput("abc", now)).toBeNull();
+  });
+
+  it("normalizes single-digit month and day to MM-DD-YYYY", () => {
+    expect(formatDateInput("6-5-2026", now)).toBe("06-05-2026");
+  });
+
+  it("preserves already-padded input", () => {
+    expect(formatDateInput("06-15-2026", now)).toBe("06-15-2026");
+  });
+
+  it("expands a 2-digit year", () => {
+    expect(formatDateInput("6-15-26", now)).toBe("06-15-2026");
+  });
+});
+
+describe("toISODateString", () => {
+  it("formats a date as YYYY-MM-DD", () => {
+    expect(toISODateString(new Date(2026, 5, 15))).toBe("2026-06-15");
+  });
+
+  it("zero-pads single-digit month and day", () => {
+    expect(toISODateString(new Date(2026, 0, 5))).toBe("2026-01-05");
+  });
+
+  it("handles Dec 31 correctly", () => {
+    expect(toISODateString(new Date(2026, 11, 31))).toBe("2026-12-31");
   });
 });
