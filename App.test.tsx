@@ -9,16 +9,6 @@ import {
 
 import App from "./App";
 
-jest.mock("expo-status-bar", () => ({
-  StatusBar: () => null,
-}));
-
-jest.mock("expo-updates", () => ({
-  checkForUpdateAsync: jest.fn().mockResolvedValue({ isAvailable: false }),
-  fetchUpdateAsync: jest.fn(),
-  reloadAsync: jest.fn(),
-}));
-
 const originalConsoleError = console.error;
 
 beforeEach(() => {
