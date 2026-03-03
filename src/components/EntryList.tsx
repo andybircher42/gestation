@@ -96,8 +96,14 @@ function EntryRow({
           onPress={() => onDelete(item.id)}
           style={styles.deleteButton}
           hitSlop={8}
+          accessibilityLabel="Delete"
+          accessibilityRole="button"
         >
-          <Text style={styles.deleteText}>✕</Text>
+          <Ionicons
+            name="trash-outline"
+            size={16}
+            color={colors.textTertiary}
+          />
         </Pressable>
       </Animated.View>
     </View>
@@ -368,11 +374,6 @@ function createStyles(colors: ColorTokens) {
       backgroundColor: colors.deleteButtonBg,
       justifyContent: "center",
       alignItems: "center",
-    },
-    deleteText: {
-      color: colors.textTertiary,
-      fontSize: 16,
-      fontWeight: "600",
     },
   });
 }

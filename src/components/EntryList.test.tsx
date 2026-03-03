@@ -102,7 +102,7 @@ describe("EntryList", () => {
       makeEntry({ id: "abc", name: "Baby", dueDate: "2026-10-31" }),
     ]);
 
-    fireEvent.press(screen.getByText("✕"));
+    fireEvent.press(screen.getByLabelText("Delete"));
     expect(onDelete).toHaveBeenCalledWith("abc");
   });
 

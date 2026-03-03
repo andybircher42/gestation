@@ -106,7 +106,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByText("✕"));
+    fireEvent.press(screen.getByLabelText("Delete"));
 
     await waitFor(() => {
       expect(screen.getByText(/Deleted Baby/)).toBeTruthy();
@@ -119,7 +119,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByText("✕"));
+    fireEvent.press(screen.getByLabelText("Delete"));
 
     await waitFor(() => {
       expect(screen.getByText("Undo")).toBeTruthy();
@@ -138,7 +138,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByText("✕"));
+    fireEvent.press(screen.getByLabelText("Delete"));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Undo toast")).toBeTruthy();
