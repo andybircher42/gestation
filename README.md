@@ -54,6 +54,17 @@ Available channels (defined in `eas.json`):
 | `preview`      | `preview`       | Internal testers / TestFlight     |
 | `production`   | `production`    | Live app store users              |
 
+### Updating Latest Build Info
+
+After creating a new EAS build, run the **Publish Latest Build Info** GitHub Actions workflow to notify users that a newer native build is available. The workflow queries EAS for the latest finished builds and publishes a `latest-build.json` file to GitHub Pages. The app fetches this file at launch and shows a toast if the user's build is outdated.
+
+To run: **Actions** tab → **Publish Latest Build Info** → **Run workflow**
+
+One-time setup:
+
+1. Add an `EXPO_TOKEN` secret to the repo (Settings → Secrets and variables → Actions)
+2. Enable GitHub Pages (Settings → Pages → Source: "Deploy from a branch" → branch: `gh-pages`, folder: `/ (root)`)
+
 ### Important Notes
 
 - Updates only work when the `runtimeVersion` matches the build. If you change native code (new native modules, SDK upgrade, `app.json` native config), you must create a **new build** — an OTA update won't be enough.
