@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 
@@ -48,11 +49,23 @@ export default function AppInfoModal({
           <Text style={styles.modalTitle}>About</Text>
           <Text style={styles.appName}>{appName}</Text>
           <Text style={styles.versionText}>Version {appVersion}</Text>
-          <Text style={styles.detailText}>Build {buildId.slice(0, 8)}</Text>
+          <Pressable
+            onPress={() => Clipboard.setStringAsync(buildId)}
+            accessibilityLabel="Copy build ID"
+            accessibilityRole="button"
+          >
+            <Text style={styles.detailText}>Build {buildId.slice(0, 8)}…</Text>
+          </Pressable>
           {Updates.updateId != null && (
-            <Text style={styles.detailText}>
-              Update {Updates.updateId.slice(0, 8)}
-            </Text>
+            <Pressable
+              onPress={() => Clipboard.setStringAsync(Updates.updateId!)}
+              accessibilityLabel="Copy update ID"
+              accessibilityRole="button"
+            >
+              <Text style={styles.detailText}>
+                Update {Updates.updateId.slice(0, 8)}…
+              </Text>
+            </Pressable>
           )}
           <Text style={styles.detailText}>
             {Platform.OS === "ios" ? "iOS" : "Android"} {Platform.Version}

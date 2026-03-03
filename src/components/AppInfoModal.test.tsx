@@ -1,4 +1,5 @@
 import { fireEvent, screen } from "@testing-library/react-native";
+import * as Clipboard from "expo-clipboard";
 
 import renderWithTheme from "@/test/renderWithTheme";
 
@@ -21,6 +22,19 @@ describe("AppInfoModal", () => {
 
     fireEvent.press(screen.getByText("Close"));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows ellipsis after truncated build ID", () => {
+    renderWithTheme(<AppInfoModal visible={true} onClose={jest.fn()} />);
+
+    expect(screen.getByText(/Build .*…/)).toBeTruthy();
+  });
+
+  it("copies full build ID when build text is pressed", () => {
+    renderWithTheme(<AppInfoModal visible={true} onClose={jest.fn()} />);
+
+    fireEvent.press(screen.getByLabelText("Copy build ID"));
+    expect(Clipboard.setStringAsync).toHaveBeenCalledWith(expect.any(String));
   });
 
   it("does not render content when visible=false", () => {
@@ -50,9 +64,7 @@ describe("AppInfoModal", () => {
       />,
     );
 
-    expect(
-      screen.getByText("New build available (v2.5.0)"),
-    ).toBeTruthy();
+    expect(screen.getByText("New build available (v2.5.0)")).toBeTruthy();
   });
 
   it("does not show build status when prop is omitted", () => {
