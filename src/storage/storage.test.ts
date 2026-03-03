@@ -6,7 +6,7 @@ import {
   loadEntries,
   resetAgreement,
   saveEntries,
-} from ".";
+} from "./storage";
 
 beforeEach(() => {
   void AsyncStorage.clear();
