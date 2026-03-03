@@ -36,7 +36,6 @@ function mockGestationalAge(weeks: number, days: number) {
 }
 
 describe("EntryForm — Gestational Age mode", () => {
-
   it("calls onAdd with trimmed name, parsed weeks/days, and computed dueDate", () => {
     const onAdd = renderInWeeksDaysMode();
 
@@ -475,7 +474,7 @@ describe("EntryForm — typed date input", () => {
 
   it("clears text input after submission", () => {
     mockGestationalAge(28, 3);
-    const onAdd = renderForm();
+    renderForm();
 
     fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
     fireEvent.changeText(screen.getByLabelText("Due date"), "6-15-2026");
