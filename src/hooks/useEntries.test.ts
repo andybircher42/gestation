@@ -163,4 +163,54 @@ describe("useEntries", () => {
     expect(result.current.entries[0].name).toBe("Seeded");
     expect(result.current.entries[1].name).toBe("Existing");
   });
+
+  it("sets discardedCount when corrupted entries are found", async () => {
+    const data = [
+      { id: "1", name: "Good", dueDate: "2026-09-01" },
+      null,
+      { id: "", name: "Bad", dueDate: "2026-06-15" },
+    ];
+    await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
+
+    const { result } = renderHook(() => useEntries());
+
+    await act(async () => {
+      await result.current.load();
+    });
+
+    expect(result.current.entries).toHaveLength(1);
+    expect(result.current.discardedCount).toBe(2);
+  });
+
+  it("discardedCount is 0 when no corruption", async () => {
+    const data = [{ id: "1", name: "A", dueDate: "2026-09-01" }];
+    await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
+
+    const { result } = renderHook(() => useEntries());
+
+    await act(async () => {
+      await result.current.load();
+    });
+
+    expect(result.current.discardedCount).toBe(0);
+  });
+
+  it("dismissDiscarded clears the discardedCount", async () => {
+    const data = [null, { id: "1", name: "Good", dueDate: "2026-09-01" }];
+    await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
+
+    const { result } = renderHook(() => useEntries());
+
+    await act(async () => {
+      await result.current.load();
+    });
+
+    expect(result.current.discardedCount).toBe(1);
+
+    act(() => {
+      result.current.dismissDiscarded();
+    });
+
+    expect(result.current.discardedCount).toBe(0);
+  });
 });
