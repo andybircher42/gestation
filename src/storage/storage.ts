@@ -10,12 +10,6 @@ export interface Entry {
 const STORAGE_KEY = "@gestation_entries";
 const AGREEMENT_KEY = "@hipaa_agreement_accepted";
 
-/** Loads all saved entries from AsyncStorage. */
-export const loadEntries = async (): Promise<Entry[]> => {
-  const json = await AsyncStorage.getItem(STORAGE_KEY);
-  return json ? JSON.parse(json) : [];
-};
-
 /** Persists the full entries array to AsyncStorage. */
 export const saveEntries = async (entries: Entry[]): Promise<void> => {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
@@ -62,7 +56,7 @@ export interface LoadResult {
 }
 
 /** Loads entries with validation, discarding corrupted items and re-saving if needed. */
-export const loadEntriesSafe = async (): Promise<LoadResult> => {
+export const loadEntries = async (): Promise<LoadResult> => {
   const json = await AsyncStorage.getItem(STORAGE_KEY);
   if (json == null) {
     return { entries: [], discardedCount: 0 };

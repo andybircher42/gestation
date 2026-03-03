@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { Entry, loadEntriesSafe, saveEntries } from "@/storage";
+import { Entry, loadEntries, saveEntries } from "@/storage";
 
 let idCounter = 0;
 
@@ -30,7 +30,7 @@ export default function useEntries() {
 
   /** Hydrates entries from AsyncStorage. Call once during app initialization. */
   const load = useCallback(async () => {
-    const result = await loadEntriesSafe();
+    const result = await loadEntries();
     setEntries(result.entries);
     setDiscardedCount(result.discardedCount);
   }, []);
