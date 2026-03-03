@@ -104,6 +104,8 @@ const EntryRow = React.memo(function EntryRow({
           onPress={() => onDelete(item.id)}
           style={styles.deleteButton}
           hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={`Delete ${item.name}`}
         >
           <Text style={styles.deleteText}>✕</Text>
         </Pressable>
@@ -196,6 +198,7 @@ export default function EntryList({
               ]}
               onPress={() => handleSortPress("dueDate")}
               accessibilityRole="button"
+              accessibilityState={{ selected: sortBy === "dueDate" }}
             >
               <Text
                 style={[
@@ -214,6 +217,7 @@ export default function EntryList({
               ]}
               onPress={() => handleSortPress("name")}
               accessibilityRole="button"
+              accessibilityState={{ selected: sortBy === "name" }}
             >
               <Text
                 style={[

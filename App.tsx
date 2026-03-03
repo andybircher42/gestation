@@ -98,7 +98,9 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           console.error("Failed to load theme preference", e),
         ),
       ]);
-      if (!mounted) {return;}
+      if (!mounted) {
+        return;
+      }
       if (!accepted) {
         setShowAgreement(true);
       }
@@ -158,6 +160,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           source={headerLogo}
           style={styles.headerLogo}
           resizeMode="contain"
+          accessible={false}
         />
         <Text style={styles.title}>in due time</Text>
         {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}

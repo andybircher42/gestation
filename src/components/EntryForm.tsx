@@ -154,6 +154,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
           ]}
           onPress={() => setMode("dueDate")}
           accessibilityRole="button"
+          accessibilityState={{ selected: mode === "dueDate" }}
         >
           <Text
             style={[
@@ -171,6 +172,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
           ]}
           onPress={() => setMode("weeksDays")}
           accessibilityRole="button"
+          accessibilityState={{ selected: mode === "weeksDays" }}
         >
           <Text
             style={[
