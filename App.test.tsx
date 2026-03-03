@@ -27,9 +27,22 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+async function renderApp() {
+  render(<App />);
+  await act(async () => {
+    jest.advanceTimersByTime(2000);
+  });
+}
+
 describe("App", () => {
-  it("renders the title", async () => {
+  it("shows loading screen with logo on launch", () => {
     render(<App />);
+    expect(screen.getByTestId("splash-logo")).toBeTruthy();
+    expect(screen.queryByText("In Due Time")).toBeNull();
+  });
+
+  it("renders the title after loading", async () => {
+    await renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("In Due Time")).toBeTruthy();
@@ -37,15 +50,15 @@ describe("App", () => {
   });
 
   it("shows HIPAA agreement on first launch", async () => {
-    render(<App />);
+    await renderApp();
 
     await waitFor(() => {
-      expect(screen.getByText(/HIPAA/)).toBeTruthy();
+      expect(screen.getAllByText(/HIPAA/).length).toBeGreaterThan(0);
     });
   });
 
   it("adds an entry via the form in weeks/days mode", async () => {
-    render(<App />);
+    await renderApp();
 
     // Accept HIPAA
     await waitFor(() => {
@@ -68,7 +81,7 @@ describe("App", () => {
   });
 
   it("deletes an entry and shows undo toast", async () => {
-    render(<App />);
+    await renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("I Agree")).toBeTruthy();
@@ -96,7 +109,7 @@ describe("App", () => {
   });
 
   it("restores entry when undo is pressed", async () => {
-    render(<App />);
+    await renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("I Agree")).toBeTruthy();
@@ -130,7 +143,7 @@ describe("App", () => {
   });
 
   it("undo toast auto-dismisses after 5 seconds", async () => {
-    render(<App />);
+    await renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("I Agree")).toBeTruthy();
@@ -164,7 +177,7 @@ describe("App", () => {
   });
 
   it("persists entries to AsyncStorage", async () => {
-    render(<App />);
+    await renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("I Agree")).toBeTruthy();

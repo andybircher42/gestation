@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -23,8 +24,14 @@ import {
   resetAgreement,
 } from "./src/storage";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const splashLogo = require("./assets/icon.png");
+
+const SPLASH_DURATION_MS = 2000;
+
 /** Root component that manages entries state, persistence, and the HIPAA agreement flow. */
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [showAgreement, setShowAgreement] = useState(false);
   const [agreementLoaded, setAgreementLoaded] = useState(false);
@@ -32,6 +39,11 @@ export default function App() {
     entry: Entry;
     previousEntries: Entry[];
   } | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     checkAgreement()
@@ -137,6 +149,20 @@ export default function App() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <View style={styles.splashContainer}>
+        <Image
+          source={splashLogo}
+          style={styles.splashLogo}
+          resizeMode="contain"
+          testID="splash-logo"
+        />
+        <StatusBar style="auto" />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -173,6 +199,16 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+  },
+  splashLogo: {
+    width: 180,
+    height: 180,
+  },
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
