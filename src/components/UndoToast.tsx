@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Animated, Pressable, StyleSheet, Text } from "react-native";
 
-import useSwipeDismiss from "@/hooks/useSwipeDismiss";
+import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import { ColorTokens } from "@/theme/colors";
 import { useTheme } from "@/theme/ThemeContext";

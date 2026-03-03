@@ -19,14 +19,13 @@ import EntryList from "@/components/EntryList";
 import HipaaAgreementModal from "@/components/HipaaAgreementModal";
 import ThemePickerModal from "@/components/ThemePickerModal";
 import UndoToast from "@/components/UndoToast";
-import useEntries from "@/hooks/useEntries";
-import useThemePreference from "@/hooks/useThemePreference";
+import { useEntries, useThemePreference } from "@/hooks";
 import { acceptAgreement, checkAgreement, resetAgreement } from "@/storage";
 import { ColorTokens } from "@/theme/colors";
 import { ThemeProvider, useTheme } from "@/theme/ThemeContext";
 
-import splashLogo from "./assets/splash-icon.png";
 import headerLogo from "./assets/icon.png";
+import splashLogo from "./assets/splash-icon.png";
 
 const SPLASH_DURATION_MS = 2000;
 const APP_LABEL = (Constants.expoConfig?.extra?.appLabel as string) ?? "";
