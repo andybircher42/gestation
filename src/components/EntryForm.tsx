@@ -20,6 +20,7 @@ import {
   getDateBounds,
   getDateError,
   parseDateText,
+  toDisplayDateString,
   toISODateString,
 } from "@/util";
 
@@ -109,10 +110,10 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
         name: name.trim(),
         dueDate: toISODateString(computed_dueDate),
       });
-    } else {
+    } else if (dueDate) {
       onAdd({
         name: name.trim(),
-        dueDate: toISODateString(dueDate!),
+        dueDate: toISODateString(dueDate),
       });
     }
 
@@ -128,14 +129,8 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     setShowPicker(Platform.OS === "ios");
     if (selected) {
       setDueDate(selected);
-      setDateText(formatDate(selected));
+      setDateText(toDisplayDateString(selected));
     }
-  };
-
-  const formatDate = (date: Date) => {
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${m}-${d}-${date.getFullYear()}`;
   };
 
   return (

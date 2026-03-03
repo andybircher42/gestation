@@ -6,6 +6,7 @@ export {
   getDateError,
   parseDateParts,
   parseDateText,
+  toDisplayDateString,
   toISODateString,
 } from "./dateUtils";
 export {

@@ -6,6 +6,7 @@ import {
   getDateError,
   parseDateParts,
   parseDateText,
+  toDisplayDateString,
   toISODateString,
 } from "./dateUtils";
 
@@ -248,6 +249,20 @@ describe("formatDateInput", () => {
 
   it("expands a 2-digit year", () => {
     expect(formatDateInput("6-15-26", now)).toBe("06-15-2026");
+  });
+});
+
+describe("toDisplayDateString", () => {
+  it("formats a date as MM-DD-YYYY", () => {
+    expect(toDisplayDateString(new Date(2026, 5, 15))).toBe("06-15-2026");
+  });
+
+  it("zero-pads single-digit month and day", () => {
+    expect(toDisplayDateString(new Date(2026, 0, 5))).toBe("01-05-2026");
+  });
+
+  it("handles Dec 31 correctly", () => {
+    expect(toDisplayDateString(new Date(2026, 11, 31))).toBe("12-31-2026");
   });
 });
 
