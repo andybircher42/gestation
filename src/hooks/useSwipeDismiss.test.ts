@@ -258,7 +258,7 @@ describe("useSwipeDismiss", () => {
     const onDismiss1 = jest.fn();
     const onDismiss2 = jest.fn();
     const { rerender } = renderHook(
-      ({ onDismiss }) =>
+      ({ onDismiss }: { onDismiss: () => void }) =>
         useSwipeDismiss({ axis: "x", threshold: 100, onDismiss }),
       { initialProps: { onDismiss: onDismiss1 } },
     );
