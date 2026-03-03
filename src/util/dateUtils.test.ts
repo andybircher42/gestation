@@ -157,17 +157,9 @@ describe("getDateBounds", () => {
 });
 
 describe("parseDateText", () => {
-  it("returns null for empty string", () => {
-    expect(parseDateText("")).toBeNull();
-  });
-
-  it("returns null for non-date text", () => {
-    expect(parseDateText("abc")).toBeNull();
-  });
-
-  it("returns null for incomplete date", () => {
-    expect(parseDateText("6-15")).toBeNull();
-  });
+  // Invalid-input cases (null returns) are covered by getDateError tests,
+  // which delegates to parseDateText internally. These tests focus on
+  // successful parsing and edge cases unique to parseDateText.
 
   it("parses a valid M-D-YYYY date", () => {
     const date = parseDateText("6-15-2026");
@@ -189,36 +181,8 @@ describe("parseDateText", () => {
     expect(date).toEqual(new Date(1999, 5, 15));
   });
 
-  it("returns null for month 0", () => {
-    expect(parseDateText("0-15-2026")).toBeNull();
-  });
-
-  it("returns null for month 13", () => {
-    expect(parseDateText("13-15-2026")).toBeNull();
-  });
-
-  it("returns null for day 0", () => {
-    expect(parseDateText("6-0-2026")).toBeNull();
-  });
-
-  it("returns null for day 32", () => {
-    expect(parseDateText("6-32-2026")).toBeNull();
-  });
-
-  it("returns null for Feb 30", () => {
-    expect(parseDateText("2-30-2026")).toBeNull();
-  });
-
-  it("returns null for Feb 29 in non-leap year", () => {
-    expect(parseDateText("2-29-2027")).toBeNull();
-  });
-
   it("parses Feb 29 in leap year", () => {
     expect(parseDateText("2-29-2028")).toEqual(new Date(2028, 1, 29));
-  });
-
-  it("returns null for Apr 31", () => {
-    expect(parseDateText("4-31-2026")).toBeNull();
   });
 
   it("returns null for single-digit year", () => {

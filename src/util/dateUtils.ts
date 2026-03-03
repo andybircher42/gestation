@@ -54,19 +54,15 @@ export function getDateError(
   if (!parts) {
     return "Enter date as MM-DD-YYYY";
   }
-  const { month, day, year, raw } = parts;
+  const { month, day, raw } = parts;
   if (month < 1 || month > 12) {
     return "Month must be 1\u201312";
   }
   if (day < 1 || day > 31) {
     return "Day must be 1\u201331";
   }
-  const date = new Date(year, month - 1, day);
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
+  const date = parseDateText(text, now);
+  if (!date) {
     return `${raw[1]}-${raw[2]} is not a valid date`;
   }
   const { min, max } = getDateBounds(now);

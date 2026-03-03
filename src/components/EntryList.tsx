@@ -105,7 +105,10 @@ function EntryRow({
         {...panResponder.panHandlers}
       >
         <Text
-          style={[styles.entryName, nameWidth > 0 && { minWidth: nameWidth }]}
+          style={[
+            styles.entryName,
+            (nameWidth ?? 0) > 0 && { minWidth: nameWidth },
+          ]}
           onLayout={(e: LayoutChangeEvent) =>
             onNameLayout?.(item.id, e.nativeEvent.layout.width)
           }
