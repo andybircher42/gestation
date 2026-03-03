@@ -29,6 +29,7 @@ describe("formatDueDate", () => {
   it("returns the raw string for malformed input", () => {
     expect(formatDueDate("garbage")).toBe("garbage");
     expect(formatDueDate("")).toBe("");
+    expect(formatDueDate("abc-06-15")).toBe("abc-06-15");
   });
 });
 
