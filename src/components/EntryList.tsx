@@ -26,8 +26,19 @@ const DEFAULT_DIR: Record<SortBy, SortDir> = {
 
 const SWIPE_THRESHOLD = 100;
 
+const ROW_COLORS = [
+  "#EF9A9A", // red
+  "#FFCC80", // orange
+  "#FFF176", // yellow
+  "#A5D6A7", // green
+  "#90CAF9", // blue
+  "#B39DDB", // indigo
+  "#CE93D8", // violet
+];
+
 interface EntryRowProps {
   item: Entry;
+  colorIndex: number;
   onDelete: (id: string) => void;
   nameWidth?: number;
   onNameLayout?: (id: string, width: number) => void;
@@ -40,7 +51,13 @@ interface EntryListProps {
 }
 
 /** Individual entry row with swipe-to-delete support. */
-function EntryRow({ item, onDelete, nameWidth, onNameLayout }: EntryRowProps) {
+function EntryRow({
+  item,
+  colorIndex,
+  onDelete,
+  nameWidth,
+  onNameLayout,
+}: EntryRowProps) {
   const { weeks, days } = gestationalAgeFromDueDate(item.dueDate);
   const translateX = useRef(new Animated.Value(0)).current;
   const onDeleteRef = useRef(onDelete);
@@ -79,7 +96,12 @@ function EntryRow({ item, onDelete, nameWidth, onNameLayout }: EntryRowProps) {
         <Ionicons name="trash-outline" size={22} color="#fff" />
       </View>
       <Animated.View
-        style={[styles.entry, { transform: [{ translateX }] }]}
+        testID="entry-row"
+        style={[
+          styles.entry,
+          { backgroundColor: ROW_COLORS[colorIndex % ROW_COLORS.length] },
+          { transform: [{ translateX }] },
+        ]}
         {...panResponder.panHandlers}
       >
         <Text
@@ -241,9 +263,10 @@ export default function EntryList({
       )}
       <FlatList
         data={sorted}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <EntryRow
             item={item}
+            colorIndex={index}
             onDelete={onDelete}
             nameWidth={maxNameWidth}
             onNameLayout={handleNameLayout}

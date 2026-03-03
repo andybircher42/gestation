@@ -499,6 +499,51 @@ describe("EntryList", () => {
     expect(screen.getByText("Jan 3 '27")).toBeTruthy();
   });
 
+  it("assigns rainbow background colors to rows in order", () => {
+    const entries = [
+      makeEntry({ id: "1", name: "A" }),
+      makeEntry({ id: "2", name: "B" }),
+      makeEntry({ id: "3", name: "C" }),
+    ];
+    render(
+      <EntryList
+        entries={entries}
+        onDelete={jest.fn()}
+        onDeleteAll={jest.fn()}
+      />,
+    );
+
+    const rows = screen.getAllByTestId("entry-row");
+    expect(rows[0].props.style).toEqual(
+      expect.objectContaining({ backgroundColor: "#EF9A9A" }),
+    );
+    expect(rows[1].props.style).toEqual(
+      expect.objectContaining({ backgroundColor: "#FFCC80" }),
+    );
+    expect(rows[2].props.style).toEqual(
+      expect.objectContaining({ backgroundColor: "#FFF176" }),
+    );
+  });
+
+  it("cycles rainbow colors after 7 rows", () => {
+    const entries = Array.from({ length: 8 }, (_, i) =>
+      makeEntry({ id: String(i), name: `Baby ${i}` }),
+    );
+    render(
+      <EntryList
+        entries={entries}
+        onDelete={jest.fn()}
+        onDeleteAll={jest.fn()}
+      />,
+    );
+
+    const rows = screen.getAllByTestId("entry-row");
+    // 8th row (index 7) should wrap back to the first color (red)
+    expect(rows[7].props.style).toEqual(
+      expect.objectContaining({ backgroundColor: "#EF9A9A" }),
+    );
+  });
+
   it("renders delete background behind entry rows", () => {
     const entries = [makeEntry({ id: "1", name: "Baby" })];
     render(
