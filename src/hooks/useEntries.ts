@@ -69,6 +69,7 @@ export default function useEntries() {
   const removeAll = useCallback(() => {
     setEntries([]);
     persistEntries([]);
+    setDeletedEntry(null);
   }, [persistEntries]);
 
   const seed = useCallback(

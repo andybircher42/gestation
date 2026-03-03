@@ -24,7 +24,12 @@ export default function HipaaAgreementModal({
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {}}
+    >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Important Notice</Text>

@@ -61,7 +61,7 @@ export function generateSeedEntries(): Entry[] {
       today.getDate() + i * 12 + jitter,
     );
     return {
-      id: (Date.now() + i).toString(),
+      id: `${Date.now()}-seed-${i}`,
       name,
       dueDate: toISODateString(dueDate),
     };

@@ -54,6 +54,7 @@ export default function ThemePickerModal({
         <Pressable
           style={StyleSheet.absoluteFill}
           onPress={onClose}
+          accessibilityRole="button"
           accessibilityLabel="Close theme picker"
         />
         <View style={[styles.dropdown, dropdownPosition]}>

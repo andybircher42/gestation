@@ -48,7 +48,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
   const w = weeks ? parseInt(weeks, 10) : 0;
   const d = days ? parseInt(days, 10) : 0;
-  const weeksValid = !weeks || (!isNaN(w) && w >= 0 && w <= 44);
+  const weeksValid = !weeks || (!isNaN(w) && w >= 0 && w <= 42);
   const daysValid = !days || (!isNaN(d) && d >= 0 && d <= 6);
   const weeksError = weeks && !weeksValid ? "Weeks must be 0\u201342" : null;
   const daysError = days && !daysValid ? "Days must be 0\u20136" : null;
@@ -123,6 +123,9 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     setDays("");
     setDueDate(null);
     setDateText("");
+    setWeeksTouched(false);
+    setDaysTouched(false);
+    setDateTouched(false);
     Keyboard.dismiss();
   };
 
@@ -140,6 +143,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
       <TextInput
         style={styles.nameInput}
         placeholder={"First Name"}
+        placeholderTextColor={colors.textTertiary}
         accessibilityLabel="Name"
         value={name}
         onChangeText={setName}
@@ -194,6 +198,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               style={[styles.numberInput, showWeeksError && styles.inputError]}
               accessibilityLabel="Weeks"
               placeholder={"0-42"}
+              placeholderTextColor={colors.textTertiary}
               value={weeks}
               onChangeText={makeNumericHandler(setWeeks, setWeeksTouched)}
               onBlur={() => setWeeksTouched(true)}
@@ -213,6 +218,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               style={[styles.numberInput, showDaysError && styles.inputError]}
               accessibilityLabel="Days"
               placeholder={"0-6"}
+              placeholderTextColor={colors.textTertiary}
               value={days}
               onChangeText={makeNumericHandler(setDays, setDaysTouched)}
               onBlur={() => setDaysTouched(true)}
@@ -230,6 +236,9 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
             style={[styles.addButton, !canAdd && styles.addButtonDisabled]}
             onPress={handleAdd}
             disabled={!canAdd}
+            accessibilityRole="button"
+            accessibilityLabel="Add entry"
+            accessibilityState={{ disabled: !canAdd }}
           >
             <Text style={styles.addButtonText}>Add</Text>
           </Pressable>
@@ -254,6 +263,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                   ]}
                   accessibilityLabel="Due date"
                   placeholder="MM-DD-YYYY"
+                  placeholderTextColor={colors.textTertiary}
                   value={dateText}
                   keyboardType="number-pad"
                   onChangeText={handleDateTextChange}

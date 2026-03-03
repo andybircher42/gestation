@@ -101,7 +101,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       const [accepted] = await Promise.all([
         checkAgreement().catch((e) => {
           console.error("Failed to check agreement", e);
-          return true;
+          return false;
         }),
         load().catch((e) => console.error("Failed to load entries", e)),
         loadThemePreference().catch((e) =>
@@ -173,7 +173,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     >
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.header}>
           <Image
@@ -183,7 +183,9 @@ function AppContent({ loadThemePreference }: AppContentProps) {
             accessible={false}
             testID="header-logo"
           />
-          <Text style={styles.title}>in due time</Text>
+          <Text style={styles.title} accessibilityRole="header">
+            in due time
+          </Text>
           {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}
           <Pressable
             ref={settingsRef}

@@ -124,6 +124,23 @@ describe("useEntries", () => {
     });
   });
 
+  it("removeAll clears deletedEntry so undo cannot restore", () => {
+    const result = setup();
+    const id = addEntry(result);
+
+    act(() => {
+      result.current.remove(id);
+    });
+
+    expect(result.current.deletedEntry).not.toBeNull();
+
+    act(() => {
+      result.current.removeAll();
+    });
+
+    expect(result.current.deletedEntry).toBeNull();
+  });
+
   it("seed prepends seeded entries", () => {
     const result = setup();
     addEntry(result, "Existing");

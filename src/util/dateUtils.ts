@@ -135,7 +135,7 @@ const SHORT_MONTHS = [
 export function formatDueDate(isoDate: string, now: Date = new Date()): string {
   const [y, m, d] = isoDate.split("-").map(Number);
   const month = SHORT_MONTHS[m - 1];
-  if (!month || isNaN(d)) {
+  if (!month || isNaN(d) || isNaN(y)) {
     return isoDate;
   }
   if (y === now.getFullYear()) {
