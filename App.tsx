@@ -111,7 +111,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           .then(async (update) => {
             if (update.isAvailable) {
               await Updates.fetchUpdateAsync();
-              await Updates.reloadAsync();
             }
           })
           .catch((e) => console.error("Failed to check for updates", e));
