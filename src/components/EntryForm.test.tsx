@@ -1,8 +1,8 @@
 import { fireEvent, screen } from "@testing-library/react-native";
 
 import renderWithTheme from "@/test/renderWithTheme";
-import * as gestationalAge from "@/util/gestationalAge";
-import { computeDueDate } from "@/util/gestationalAge";
+import * as gestationalAge from "@/util";
+import { computeDueDate } from "@/util";
 
 import EntryForm from "./EntryForm";
 
