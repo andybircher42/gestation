@@ -156,7 +156,7 @@ export default function EntryList({
     const dir = sortDir === "asc" ? 1 : -1;
     if (sortBy === "dueDate") {
       copy.sort((a, b) => {
-        const dateDiff = -a.dueDate.localeCompare(b.dueDate);
+        const dateDiff = b.dueDate.localeCompare(a.dueDate);
         if (dateDiff !== 0) {
           return dir * dateDiff;
         }

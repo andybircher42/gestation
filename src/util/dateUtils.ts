@@ -141,6 +141,13 @@ export function formatDueDate(isoDate: string, now: Date = new Date()): string {
   return `${month} ${d} '${String(y).slice(-2)}`;
 }
 
+/** Formats a Date as a display date string (MM-DD-YYYY). */
+export function toDisplayDateString(date: Date): string {
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${m}-${d}-${date.getFullYear()}`;
+}
+
 /** Formats a Date as an ISO date string (YYYY-MM-DD). */
 export function toISODateString(date: Date): string {
   const y = date.getFullYear();

@@ -18,6 +18,7 @@ import {
   EntryForm,
   EntryList,
   HipaaAgreementModal,
+  InfoToast,
   ThemePickerModal,
   UndoToast,
 } from "@/components";
@@ -65,6 +66,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   const {
     entries,
     deletedEntry,
+    discardedCount,
     load,
     add,
     remove,
@@ -72,6 +74,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     seed,
     undo,
     dismissUndo,
+    dismissDiscarded,
   } = useEntries();
 
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -198,6 +201,17 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           entry={deletedEntry.entry}
           onUndo={undo}
           onDismiss={dismissUndo}
+        />
+      )}
+
+      {discardedCount > 0 && !deletedEntry && (
+        <InfoToast
+          message={
+            discardedCount === 1
+              ? "1 entry was corrupted and removed"
+              : `${discardedCount} entries were corrupted and removed`
+          }
+          onDismiss={dismissDiscarded}
         />
       )}
 

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { Entry, loadEntries, saveEntries } from "@/storage";
+import { Entry, loadEntriesSafe, saveEntries } from "@/storage";
 
 /**
  * Manages entry CRUD operations, persistence, and undo state.
@@ -12,6 +12,7 @@ export default function useEntries() {
     entry: Entry;
     previousEntries: Entry[];
   } | null>(null);
+  const [discardedCount, setDiscardedCount] = useState(0);
 
   /** Persists entries to AsyncStorage with error logging. */
   const persistEntries = (updated: Entry[]) => {
@@ -22,8 +23,9 @@ export default function useEntries() {
 
   /** Hydrates entries from AsyncStorage. Call once during app initialization. */
   const load = useCallback(async () => {
-    const stored = await loadEntries();
-    setEntries(stored);
+    const result = await loadEntriesSafe();
+    setEntries(result.entries);
+    setDiscardedCount(result.discardedCount);
   }, []);
 
   const add = ({ name, dueDate }: { name: string; dueDate: string }) => {
@@ -70,9 +72,15 @@ export default function useEntries() {
     setDeletedEntry(null);
   }, []);
 
+  /** Clears the discarded-entry notification. */
+  const dismissDiscarded = useCallback(() => {
+    setDiscardedCount(0);
+  }, []);
+
   return {
     entries,
     deletedEntry,
+    discardedCount,
     load,
     add,
     remove,
@@ -80,5 +88,6 @@ export default function useEntries() {
     seed,
     undo,
     dismissUndo,
+    dismissDiscarded,
   };
 }
