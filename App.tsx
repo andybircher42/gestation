@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import {
@@ -12,6 +12,7 @@ import {
 import DevToolbar from "./src/components/DevToolbar";
 import EntryForm from "./src/components/EntryForm";
 import EntryList from "./src/components/EntryList";
+import UndoToast from "./src/components/UndoToast";
 import HipaaAgreementModal from "./src/components/HipaaAgreementModal";
 import {
   Entry,
@@ -27,6 +28,10 @@ export default function App() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [showAgreement, setShowAgreement] = useState(false);
   const [agreementLoaded, setAgreementLoaded] = useState(false);
+  const [deletedEntry, setDeletedEntry] = useState<{
+    entry: Entry;
+    previousEntries: Entry[];
+  } | null>(null);
 
   useEffect(() => {
     checkAgreement()
@@ -80,12 +85,30 @@ export default function App() {
   };
 
   const handleDelete = (id: string) => {
+    const entry = entries.find((e) => e.id === id);
     const newEntries = entries.filter((e) => e.id !== id);
     setEntries(newEntries);
     saveEntries(newEntries).catch((e) =>
       console.error("Failed to save entries", e),
     );
+    if (entry) {
+      setDeletedEntry({ entry, previousEntries: entries });
+    }
   };
+
+  const handleUndo = useCallback(() => {
+    if (deletedEntry) {
+      setEntries(deletedEntry.previousEntries);
+      saveEntries(deletedEntry.previousEntries).catch((e) =>
+        console.error("Failed to restore entries", e),
+      );
+      setDeletedEntry(null);
+    }
+  }, [deletedEntry]);
+
+  const handleDismissUndo = useCallback(() => {
+    setDeletedEntry(null);
+  }, []);
 
   const handleDeleteAll = () => {
     setEntries([]);
@@ -135,6 +158,14 @@ export default function App() {
         visible={showAgreement && agreementLoaded}
         onAccept={handleAcceptAgreement}
       />
+
+      {deletedEntry && (
+        <UndoToast
+          entry={deletedEntry.entry}
+          onUndo={handleUndo}
+          onDismiss={handleDismissUndo}
+        />
+      )}
 
       <StatusBar style="auto" />
     </KeyboardAvoidingView>
