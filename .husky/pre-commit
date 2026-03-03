@@ -1,4 +1,13 @@
 #!/usr/bin/env sh
+
+# Warn if the latest CI run on this branch failed
+branch=$(git branch --show-current)
+if gh run list --branch "$branch" --limit 1 --json conclusion --jq '.[0].conclusion' 2>/dev/null | grep -q "failure"; then
+  echo "⚠ WARNING: The last CI run on '$branch' failed. Check: gh run list --branch $branch"
+  echo "  Press Ctrl+C to abort, or wait 3s to continue..."
+  sleep 3
+fi
+
 npx lint-staged
 npx expo-doctor
 npm test
