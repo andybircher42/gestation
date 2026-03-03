@@ -4,7 +4,6 @@ import {
   Animated,
   FlatList,
   LayoutChangeEvent,
-  PanResponder,
   Pressable,
   StyleSheet,
   Text,
@@ -12,7 +11,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import useSwipeDismiss from "@/hooks/useSwipeDismiss";
 import { Entry } from "@/storage";
+import colors from "@/theme/colors";
 import { formatDueDate } from "@/util/dateUtils";
 import { gestationalAgeFromDueDate } from "@/util/gestationalAge";
 
@@ -23,18 +24,6 @@ const DEFAULT_DIR: Record<SortBy, SortDir> = {
   dueDate: "desc",
   name: "asc",
 };
-
-const SWIPE_THRESHOLD = 100;
-
-const ROW_COLORS = [
-  "#EF9A9A", // red
-  "#FFCC80", // orange
-  "#FFF176", // yellow
-  "#A5D6A7", // green
-  "#90CAF9", // blue
-  "#B39DDB", // indigo
-  "#CE93D8", // violet
-];
 
 interface EntryRowProps {
   item: Entry;
@@ -59,35 +48,11 @@ function EntryRow({
   onNameLayout,
 }: EntryRowProps) {
   const { weeks, days } = gestationalAgeFromDueDate(item.dueDate);
-  const translateX = useRef(new Animated.Value(0)).current;
-  const onDeleteRef = useRef(onDelete);
-  onDeleteRef.current = onDelete;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dx) > 5,
-      onPanResponderMove: (_, gestureState) => {
-        translateX.setValue(gestureState.dx);
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (Math.abs(gestureState.dx) > SWIPE_THRESHOLD) {
-          const direction = gestureState.dx > 0 ? 1 : -1;
-          Animated.timing(translateX, {
-            toValue: direction * 500,
-            duration: 200,
-            useNativeDriver: true,
-          }).start(() => onDeleteRef.current(item.id));
-        } else {
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    }),
-  ).current;
+  const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
+    axis: "x",
+    threshold: 100,
+    onDismiss: () => onDelete(item.id),
+  });
 
   return (
     <View style={styles.entryWrapper}>
@@ -99,10 +64,13 @@ function EntryRow({
         testID="entry-row"
         style={[
           styles.entry,
-          { backgroundColor: ROW_COLORS[colorIndex % ROW_COLORS.length] },
+          {
+            backgroundColor:
+              colors.rowColors[colorIndex % colors.rowColors.length],
+          },
           { transform: [{ translateX }] },
         ]}
-        {...panResponder.panHandlers}
+        {...panHandlers}
       >
         <Text
           style={[
@@ -304,17 +272,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#4a90d9",
+    borderColor: colors.primary,
     overflow: "hidden",
   },
   deleteAllButton: {
-    backgroundColor: "#ef4444",
+    backgroundColor: colors.destructive,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   deleteAllText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 13,
     fontWeight: "600",
   },
@@ -322,18 +290,18 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   sortButtonActive: {
-    backgroundColor: "#4a90d9",
+    backgroundColor: colors.primary,
   },
   sortText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#4a90d9",
+    color: colors.primary,
   },
   sortTextActive: {
-    color: "#fff",
+    color: colors.white,
   },
   list: {
     flex: 1,
@@ -344,7 +312,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyText: {
-    color: "#999",
+    color: colors.textTertiary,
     fontSize: 16,
   },
   entryWrapper: {
@@ -355,7 +323,7 @@ const styles = StyleSheet.create({
   },
   deleteBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#ef4444",
+    backgroundColor: colors.destructive,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -364,37 +332,37 @@ const styles = StyleSheet.create({
   entry: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     paddingVertical: 10,
     paddingHorizontal: 16,
   },
   entryName: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: colors.textPrimary,
   },
   entryAge: {
     fontSize: 14,
-    color: "#666",
+    color: colors.textSecondary,
     marginLeft: 8,
   },
   entryDueDate: {
     flex: 1,
     textAlign: "right",
     fontSize: 14,
-    color: "#666",
+    color: colors.textSecondary,
     marginRight: 12,
   },
   deleteButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.deleteButtonBg,
     justifyContent: "center",
     alignItems: "center",
   },
   deleteText: {
-    color: "#999",
+    color: colors.textTertiary,
     fontSize: 16,
     fontWeight: "600",
   },

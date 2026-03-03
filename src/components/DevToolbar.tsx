@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Entry } from "@/storage";
+import colors from "@/theme/colors";
 import { toISODateString } from "@/util/dateUtils";
 
 interface DevToolbarProps {
@@ -96,13 +97,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   devButton: {
-    backgroundColor: "#ff6b6b",
+    backgroundColor: colors.devButton,
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   devButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 11,
     fontWeight: "600",
   },

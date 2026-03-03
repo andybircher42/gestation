@@ -13,6 +13,13 @@ export default function useEntries() {
     previousEntries: Entry[];
   } | null>(null);
 
+  /** Persists entries to AsyncStorage with error logging. */
+  const persistEntries = (updated: Entry[]) => {
+    saveEntries(updated).catch((e) =>
+      console.error("Failed to save entries", e),
+    );
+  };
+
   /** Hydrates entries from AsyncStorage. Call once during app initialization. */
   const load = useCallback(async () => {
     const stored = await loadEntries();
@@ -27,18 +34,14 @@ export default function useEntries() {
     };
     const newEntries = [entry, ...entries];
     setEntries(newEntries);
-    saveEntries(newEntries).catch((e) =>
-      console.error("Failed to save entries", e),
-    );
+    persistEntries(newEntries);
   };
 
   const remove = (id: string) => {
     const entry = entries.find((e) => e.id === id);
     const newEntries = entries.filter((e) => e.id !== id);
     setEntries(newEntries);
-    saveEntries(newEntries).catch((e) =>
-      console.error("Failed to save entries", e),
-    );
+    persistEntries(newEntries);
     if (entry) {
       setDeletedEntry({ entry, previousEntries: entries });
     }
@@ -46,23 +49,19 @@ export default function useEntries() {
 
   const removeAll = () => {
     setEntries([]);
-    saveEntries([]).catch((e) => console.error("Failed to clear entries", e));
+    persistEntries([]);
   };
 
   const seed = (seeded: Entry[]) => {
     const newEntries = [...seeded, ...entries];
     setEntries(newEntries);
-    saveEntries(newEntries).catch((e) =>
-      console.error("Failed to save seeded entries", e),
-    );
+    persistEntries(newEntries);
   };
 
   const undo = useCallback(() => {
     if (deletedEntry) {
       setEntries(deletedEntry.previousEntries);
-      saveEntries(deletedEntry.previousEntries).catch((e) =>
-        console.error("Failed to restore entries", e),
-      );
+      persistEntries(deletedEntry.previousEntries);
       setDeletedEntry(null);
     }
   }, [deletedEntry]);

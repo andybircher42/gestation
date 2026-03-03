@@ -7,6 +7,8 @@ import {
   View,
 } from "react-native";
 
+import colors from "@/theme/colors";
+
 interface HipaaAgreementModalProps {
   visible: boolean;
   onAccept: () => void;
@@ -53,7 +55,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 24,
     width: "100%",
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#333",
+    color: colors.textPrimary,
     marginBottom: 16,
     textAlign: "center",
   },
@@ -71,18 +73,18 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 15,
-    color: "#444",
+    color: colors.textModal,
     lineHeight: 22,
     marginBottom: 12,
   },
   agreeButton: {
-    backgroundColor: "#4a90d9",
+    backgroundColor: colors.primary,
     borderRadius: 8,
     padding: 14,
     alignItems: "center",
   },
   agreeButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "600",
   },

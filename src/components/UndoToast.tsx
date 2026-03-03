@@ -1,13 +1,9 @@
-import { useEffect, useRef } from "react";
-import {
-  Animated,
-  PanResponder,
-  Pressable,
-  StyleSheet,
-  Text,
-} from "react-native";
+import { useEffect } from "react";
+import { Animated, Pressable, StyleSheet, Text } from "react-native";
 
+import useSwipeDismiss from "@/hooks/useSwipeDismiss";
 import { Entry } from "@/storage";
+import colors from "@/theme/colors";
 import { gestationalAgeFromDueDate } from "@/util/gestationalAge";
 
 interface UndoToastProps {
@@ -18,8 +14,6 @@ interface UndoToastProps {
 
 const TOAST_DURATION_MS = 5000;
 
-const SWIPE_THRESHOLD = 30;
-
 /** Toast shown after deleting an entry, allowing the user to undo the deletion. */
 export default function UndoToast({
   entry,
@@ -27,33 +21,14 @@ export default function UndoToast({
   onDismiss,
 }: UndoToastProps) {
   const { weeks, days } = gestationalAgeFromDueDate(entry.dueDate);
-  const translateY = useRef(new Animated.Value(0)).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 5,
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          translateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > SWIPE_THRESHOLD) {
-          Animated.timing(translateY, {
-            toValue: 200,
-            duration: 150,
-            useNativeDriver: true,
-          }).start(onDismiss);
-        } else {
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    }),
-  ).current;
+  const { animatedValue: translateY, panHandlers } = useSwipeDismiss({
+    axis: "y",
+    threshold: 30,
+    onDismiss,
+    positiveOnly: true,
+    overshoot: 200,
+    duration: 150,
+  });
 
   useEffect(() => {
     const timer = setTimeout(onDismiss, TOAST_DURATION_MS);
@@ -64,7 +39,7 @@ export default function UndoToast({
     <Animated.View
       style={[styles.container, { transform: [{ translateY }] }]}
       accessibilityLabel="Undo toast"
-      {...panResponder.panHandlers}
+      {...panHandlers}
     >
       <Text style={styles.message}>
         Deleted {entry.name} ({weeks}w {days}d)
@@ -86,7 +61,7 @@ const styles = StyleSheet.create({
     bottom: 32,
     left: 16,
     right: 16,
-    backgroundColor: "#333",
+    backgroundColor: colors.textPrimary,
     borderRadius: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -95,18 +70,18 @@ const styles = StyleSheet.create({
   },
   message: {
     flex: 1,
-    color: "#fff",
+    color: colors.white,
     fontSize: 14,
   },
   undoButton: {
     marginLeft: 12,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: "#4a90d9",
+    backgroundColor: colors.primary,
     borderRadius: 6,
   },
   undoText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 14,
     fontWeight: "600",
   },

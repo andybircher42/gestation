@@ -18,6 +18,7 @@ import HipaaAgreementModal from "@/components/HipaaAgreementModal";
 import UndoToast from "@/components/UndoToast";
 import useEntries from "@/hooks/useEntries";
 import { acceptAgreement, checkAgreement, resetAgreement } from "@/storage";
+import colors from "@/theme/colors";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const splashLogo = require("./assets/splash-icon.png");
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f3f3f1",
+    backgroundColor: colors.splashBackground,
   },
   splashLogo: {
     width: 280,
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
@@ -165,9 +166,9 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 16,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: colors.border,
     gap: 10,
     zIndex: 10,
     overflow: "visible",
@@ -180,13 +181,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 24,
     fontWeight: "700",
-    color: "#333",
+    color: colors.textPrimary,
   },
   appLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#4a90d9",
-    backgroundColor: "#e8f0fe",
+    color: colors.primary,
+    backgroundColor: colors.primaryLightBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,

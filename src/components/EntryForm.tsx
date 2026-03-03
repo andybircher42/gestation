@@ -12,6 +12,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 
+import colors from "@/theme/colors";
 import {
   formatDateInput,
   getDateBounds,
@@ -59,6 +60,16 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   const showWeeksError = weeksTouched && weeksError;
   const showDaysError = daysTouched && daysError;
   const showDateError = dateTouched && dateError;
+
+  /** Creates an onChangeText handler that accepts only digits for a numeric input. */
+  const makeNumericHandler =
+    (setValue: (v: string) => void, setTouched: (v: boolean) => void) =>
+    (text: string) => {
+      if (/^\d*$/.test(text)) {
+        setTouched(false);
+        setValue(text);
+      }
+    };
 
   const handleDateTextChange = (text: string) => {
     setDateTouched(false);
@@ -182,12 +193,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               accessibilityLabel="Weeks"
               placeholder={"0-42"}
               value={weeks}
-              onChangeText={(text) => {
-                if (/^\d*$/.test(text)) {
-                  setWeeksTouched(false);
-                  setWeeks(text);
-                }
-              }}
+              onChangeText={makeNumericHandler(setWeeks, setWeeksTouched)}
               onBlur={() => setWeeksTouched(true)}
               keyboardType="number-pad"
               maxLength={2}
@@ -206,12 +212,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               accessibilityLabel="Days"
               placeholder={"0-6"}
               value={days}
-              onChangeText={(text) => {
-                if (/^\d*$/.test(text)) {
-                  setDaysTouched(false);
-                  setDays(text);
-                }
-              }}
+              onChangeText={makeNumericHandler(setDays, setDaysTouched)}
               onBlur={() => setDaysTouched(true)}
               keyboardType="number-pad"
               maxLength={1}
@@ -303,50 +304,50 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
 const styles = StyleSheet.create({
   form: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: colors.border,
   },
   label: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#555",
+    color: colors.textLabel,
     marginBottom: 4,
   },
   nameInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.inputBorder,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 10,
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.inputBackground,
   },
   toggleRow: {
     flexDirection: "row",
     marginBottom: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#4a90d9",
+    borderColor: colors.primary,
     overflow: "hidden",
   },
   toggleButton: {
     flex: 1,
     paddingVertical: 8,
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   toggleButtonActive: {
-    backgroundColor: "#4a90d9",
+    backgroundColor: colors.primary,
   },
   toggleText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#4a90d9",
+    color: colors.primary,
   },
   toggleTextActive: {
-    color: "#fff",
+    color: colors.white,
   },
   ageRow: {
     flexDirection: "row",
@@ -357,11 +358,11 @@ const styles = StyleSheet.create({
   },
   numberInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.inputBorder,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.inputBackground,
   },
   dateInputRow: {
     flexDirection: "row",
@@ -370,29 +371,29 @@ const styles = StyleSheet.create({
   dateTextInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.inputBorder,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.inputBackground,
   },
   calendarButton: {
     borderWidth: 1,
-    borderColor: "#4a90d9",
+    borderColor: colors.primary,
     borderRadius: 8,
     paddingHorizontal: 12,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   calendarButtonText: {
     fontSize: 22,
   },
   inputError: {
-    borderColor: "#ef4444",
+    borderColor: colors.destructive,
   },
   errorText: {
-    color: "#ef4444",
+    color: colors.destructive,
     fontSize: 13,
     marginTop: 4,
     marginBottom: 8,
@@ -400,21 +401,21 @@ const styles = StyleSheet.create({
   preview: {
     marginTop: 8,
     fontSize: 15,
-    color: "#4a90d9",
+    color: colors.primary,
     fontWeight: "600",
   },
   addButton: {
-    backgroundColor: "#4a90d9",
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingHorizontal: 24,
     justifyContent: "center",
     alignItems: "center",
   },
   addButtonDisabled: {
-    backgroundColor: "#a0c4e8",
+    backgroundColor: colors.primaryDisabled,
   },
   addButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "600",
   },
