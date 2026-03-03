@@ -140,6 +140,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
       <TextInput
         style={styles.nameInput}
         placeholder={"First Name"}
+        placeholderTextColor={colors.textTertiary}
         accessibilityLabel="Name"
         value={name}
         onChangeText={setName}
@@ -194,6 +195,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               style={[styles.numberInput, showWeeksError && styles.inputError]}
               accessibilityLabel="Weeks"
               placeholder={"0-42"}
+              placeholderTextColor={colors.textTertiary}
               value={weeks}
               onChangeText={makeNumericHandler(setWeeks, setWeeksTouched)}
               onBlur={() => setWeeksTouched(true)}
@@ -213,6 +215,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
               style={[styles.numberInput, showDaysError && styles.inputError]}
               accessibilityLabel="Days"
               placeholder={"0-6"}
+              placeholderTextColor={colors.textTertiary}
               value={days}
               onChangeText={makeNumericHandler(setDays, setDaysTouched)}
               onBlur={() => setDaysTouched(true)}
@@ -257,6 +260,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                   ]}
                   accessibilityLabel="Due date"
                   placeholder="MM-DD-YYYY"
+                  placeholderTextColor={colors.textTertiary}
                   value={dateText}
                   keyboardType="number-pad"
                   onChangeText={handleDateTextChange}
