@@ -1,8 +1,14 @@
 export { default as AppInfoModal } from "./AppInfoModal";
+export { default as BirthstoneIcon } from "./BirthstoneIcon";
+export { default as CalendarMonth } from "./CalendarMonth";
+export { default as CalendarView } from "./CalendarView";
 export { default as DevToolbar } from "./DevToolbar";
 export { default as EntryForm } from "./EntryForm";
 export { default as EntryList } from "./EntryList";
+export { default as Header } from "./Header";
 export { default as HipaaAgreementModal } from "./HipaaAgreementModal";
+export { default as HipaaDisclaimer } from "./HipaaDisclaimer";
 export { default as InfoToast } from "./InfoToast";
+export { default as PatientCard } from "./PatientCard";
 export { default as ThemePickerModal } from "./ThemePickerModal";
 export { default as UndoToast } from "./UndoToast";
