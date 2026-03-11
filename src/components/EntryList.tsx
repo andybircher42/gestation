@@ -10,6 +10,7 @@ import {
   Animated,
   FlatList,
   LayoutChangeEvent,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -189,6 +190,25 @@ export default function EntryList({
     return copy;
   }, [entries, sortBy, sortDir]);
 
+  const renderItem = useCallback(
+    ({ item, index }: { item: Entry; index: number }) => (
+      <EntryRow
+        item={item}
+        backgroundColor={rowColors[index % rowColors.length]}
+        textColor={colors.textEntryRow}
+        onDelete={onDelete}
+        nameWidth={maxNameWidth}
+        onNameLayout={handleNameLayout}
+        styles={styles}
+        deleteIconColor={colors.white}
+        deleteButtonColor={colors.textTertiary}
+      />
+    ),
+    [rowColors, colors, onDelete, maxNameWidth, handleNameLayout, styles],
+  );
+
+  const keyExtractor = useCallback((item: Entry) => item.id, []);
+
   return (
     <View style={styles.listContainer}>
       {entries.length > 0 && (
@@ -259,21 +279,10 @@ export default function EntryList({
       )}
       <FlatList
         data={sorted}
-        renderItem={({ item, index }) => (
-          <EntryRow
-            item={item}
-            backgroundColor={rowColors[index % rowColors.length]}
-            textColor={colors.textEntryRow}
-            onDelete={onDelete}
-            nameWidth={maxNameWidth}
-            onNameLayout={handleNameLayout}
-            styles={styles}
-            deleteIconColor={colors.white}
-            deleteButtonColor={colors.textTertiary}
-          />
-        )}
-        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
         style={styles.list}
+        removeClippedSubviews={Platform.OS === "android"}
         contentContainerStyle={
           entries.length === 0 ? styles.emptyList : undefined
         }
