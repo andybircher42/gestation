@@ -85,10 +85,14 @@ export function truncatedNormalPDF(
   low: number,
   high: number,
 ): number {
-  if (day < low || day > high) {return 0;}
+  if (day < low || day > high) {
+    return 0;
+  }
 
   const denom = normalCDF(high, mu, sigma) - normalCDF(low, mu, sigma);
-  if (denom === 0) {return 0;}
+  if (denom === 0) {
+    return 0;
+  }
 
   return normalPDF(day, mu, sigma) / denom;
 }
@@ -109,11 +113,17 @@ export function inductionAdjustedPDF(
   high: number,
   inductionDay: number,
 ): number {
-  if (day < low || day > high) {return 0;}
-  if (day > inductionDay) {return 0;}
+  if (day < low || day > high) {
+    return 0;
+  }
+  if (day > inductionDay) {
+    return 0;
+  }
 
   const denom = normalCDF(high, mu, sigma) - normalCDF(low, mu, sigma);
-  if (denom === 0) {return 0;}
+  if (denom === 0) {
+    return 0;
+  }
 
   const basePDF = normalPDF(day, mu, sigma) / denom;
 
@@ -146,12 +156,20 @@ export function conditionalProbability(
   high: number,
   inductionDay: number,
 ): number {
-  if (deliveryDay < low || deliveryDay > high) {return 0;}
-  if (deliveryDay <= currentGestationalDay) {return 0;}
-  if (deliveryDay > inductionDay) {return 0;}
+  if (deliveryDay < low || deliveryDay > high) {
+    return 0;
+  }
+  if (deliveryDay <= currentGestationalDay) {
+    return 0;
+  }
+  if (deliveryDay > inductionDay) {
+    return 0;
+  }
 
   const denom = normalCDF(high, mu, sigma) - normalCDF(low, mu, sigma);
-  if (denom === 0) {return 0;}
+  if (denom === 0) {
+    return 0;
+  }
 
   const pdfValue = inductionAdjustedPDF(
     deliveryDay,
@@ -182,7 +200,9 @@ export function conditionalProbability(
   }
 
   const survival = 1.0 - cdfAtCurrent;
-  if (survival <= 0) {return 0;}
+  if (survival <= 0) {
+    return 0;
+  }
 
   return pdfValue / survival;
 }
@@ -248,10 +268,14 @@ export function deliveryLoadForDate(
 
   for (const patient of patients) {
     const currentGA = gestationalDayForDate(patient.edd, today);
-    if (currentGA < LOW || currentGA >= HIGH) {continue;}
+    if (currentGA >= HIGH) {
+      continue;
+    }
 
     const targetGA = gestationalDayForDate(patient.edd, calendarDate);
-    if (targetGA <= currentGA) {continue;}
+    if (targetGA <= currentGA) {
+      continue;
+    }
 
     load += conditionalProbability(
       targetGA,
@@ -271,10 +295,18 @@ export function deliveryLoadForDate(
  * Map a numeric delivery load to a hex color string.
  */
 export function colorForLoad(load: number): string {
-  if (load <= 0) {return COLOR_NONE;}
-  if (load <= 0.02) {return COLOR_LOW;}
-  if (load <= 0.05) {return COLOR_MEDIUM;}
-  if (load <= 0.1) {return COLOR_HIGH;}
+  if (load < 0.005) {
+    return COLOR_NONE;
+  }
+  if (load <= 0.02) {
+    return COLOR_LOW;
+  }
+  if (load <= 0.05) {
+    return COLOR_MEDIUM;
+  }
+  if (load <= 0.1) {
+    return COLOR_HIGH;
+  }
   return COLOR_PEAK;
 }
 

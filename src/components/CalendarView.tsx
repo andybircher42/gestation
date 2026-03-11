@@ -15,11 +15,11 @@ interface CalendarViewProps {
 export default function CalendarView({ patients }: CalendarViewProps) {
   const today = useMemo(() => new Date(), []);
 
-  // Show current month + next 3 months
+  // Show current month + next 10 months
   const months = useMemo(() => {
     const result: { year: number; month: number; cells: DayCell[] }[] = [];
 
-    for (let offset = 0; offset < 4; offset++) {
+    for (let offset = 0; offset < 11; offset++) {
       const date = new Date(today.getFullYear(), today.getMonth() + offset, 1);
       const year = date.getFullYear();
       const month = date.getMonth();
