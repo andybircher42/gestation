@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import {
-  BackHandler,
   Modal,
   Pressable,
   ScrollView,
@@ -30,29 +29,31 @@ export default function HipaaAgreementModal({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={() => BackHandler.exitApp()}
+      onRequestClose={() => {}}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>A quick note</Text>
+          <Text style={styles.modalTitle}>Important Notice</Text>
           <ScrollView style={styles.modalScroll}>
             <Text style={styles.modalText}>
-              This app is not HIPAA compliant. Do not enter any Protected Health
-              Information (PHI) such as patient last names, medical record
-              numbers, or anything that could identify a patient.
+              This app is not HIPAA compliant. By using this app, you agree that
+              you will not enter any Protected Health Information (PHI) as
+              defined by HIPAA, including but not limited to patient last names,
+              medical record numbers, or any other information that could be
+              used to identify a patient.
             </Text>
             <Text style={styles.modalText}>
-              Data is stored locally on your device without encryption. This app
-              is for personal, non-clinical use only.
+              This app stores data locally on your device without encryption and
+              is intended for personal, non-clinical use only.
             </Text>
           </ScrollView>
           <Pressable
             style={styles.agreeButton}
             onPress={onAccept}
             accessibilityRole="button"
-            accessibilityLabel="Got it, continue to app"
+            accessibilityLabel="I agree, continue to app"
           >
-            <Text style={styles.agreeButtonText}>Got it</Text>
+            <Text style={styles.agreeButtonText}>I Agree</Text>
           </Pressable>
         </View>
       </View>

@@ -59,9 +59,9 @@ async function renderAppWithTheme(mode: string) {
 
 async function acceptHipaa() {
   await waitFor(() => {
-    expect(screen.getByText("Got it")).toBeTruthy();
+    expect(screen.getByText("I Agree")).toBeTruthy();
   });
-  fireEvent.press(screen.getByText("Got it"));
+  fireEvent.press(screen.getByText("I Agree"));
 }
 
 async function addEntry(name: string, weeks: string, days: string) {
