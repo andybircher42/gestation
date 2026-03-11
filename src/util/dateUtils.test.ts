@@ -11,19 +11,19 @@ import {
 } from "./dateUtils";
 
 describe("formatDueDate", () => {
-  it("formats same-year date as 'Mon D'", () => {
+  it("formats same-year date with full month name", () => {
     const now = new Date(2026, 2, 2);
-    expect(formatDueDate("2026-06-15", now)).toBe("Jun 15");
+    expect(formatDueDate("2026-06-15", now)).toBe("June 15");
   });
 
-  it('formats different-year date as "Mon D \'YY"', () => {
+  it("formats different-year date with full month and year suffix", () => {
     const now = new Date(2026, 2, 2);
-    expect(formatDueDate("2027-01-03", now)).toBe("Jan 3 '27");
+    expect(formatDueDate("2027-01-03", now)).toBe("January 3 '27");
   });
 
   it("formats past different-year date", () => {
     const now = new Date(2026, 2, 2);
-    expect(formatDueDate("2025-12-25", now)).toBe("Dec 25 '25");
+    expect(formatDueDate("2025-12-25", now)).toBe("December 25 '25");
   });
 
   it("returns the raw string for malformed input", () => {

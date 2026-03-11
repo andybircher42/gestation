@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 
 import { loadPatients, Patient, savePatients } from "@/storage";
+import { getBirthstone } from "@/util/birthstones";
 
 let patientIdCounter = 0;
 
@@ -31,7 +32,22 @@ export default function usePatients() {
   /** Hydrates patients from AsyncStorage. Call once during app initialization. */
   const load = useCallback(async () => {
     const result = await loadPatients();
-    setPatients(result.patients);
+    // Refresh birthstone colors from current spec (handles stale stored colors)
+    const refreshed = result.patients.map((p) => {
+      const month = parseInt(p.edd.split("-")[1], 10);
+      const current = getBirthstone(month);
+      if (
+        current.color !== p.birthstone.color ||
+        current.name !== p.birthstone.name
+      ) {
+        return {
+          ...p,
+          birthstone: { name: current.name, color: current.color },
+        };
+      }
+      return p;
+    });
+    setPatients(refreshed);
     setDiscardedCount(result.discardedCount);
   }, []);
 
@@ -55,6 +71,17 @@ export default function usePatients() {
         const updated = [patient, ...prev];
         persistPatients(updated);
         return updated;
+      });
+    },
+    [persistPatients],
+  );
+
+  const update = useCallback(
+    (updated: Patient) => {
+      setPatients((prev) => {
+        const next = prev.map((p) => (p.id === updated.id ? updated : p));
+        persistPatients(next);
+        return next;
       });
     },
     [persistPatients],
@@ -98,6 +125,7 @@ export default function usePatients() {
     discardedCount,
     load,
     add,
+    update,
     remove,
     undo,
     dismissUndo,

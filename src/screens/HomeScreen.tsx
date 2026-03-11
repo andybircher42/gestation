@@ -24,7 +24,7 @@ type Tab = "patients" | "calendar";
  *
  */
 export default function HomeScreen({ navigation, route }: Props) {
-  const { patients, load, add, remove } = usePatients();
+  const { patients, load, add, update, remove } = usePatients();
   const [activeTab, setActiveTab] = useState<Tab>("patients");
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -43,10 +43,27 @@ export default function HomeScreen({ navigation, route }: Props) {
         edd: newPatient.edd,
         birthstone: newPatient.birthstone,
       });
-      // Clear the param so it doesn't re-add on re-render
       navigation.setParams({ newPatient: undefined });
     }
   }, [route.params?.newPatient, isLoaded, add, navigation]);
+
+  // Handle updated patient from edit flow
+  useEffect(() => {
+    const updatedPatient = route.params?.updatedPatient;
+    if (updatedPatient && isLoaded) {
+      update(updatedPatient);
+      navigation.setParams({ updatedPatient: undefined });
+    }
+  }, [route.params?.updatedPatient, isLoaded, update, navigation]);
+
+  // Handle removed patient from ViewPatient
+  useEffect(() => {
+    const removedId = route.params?.removedPatientId;
+    if (removedId && isLoaded) {
+      remove(removedId);
+      navigation.setParams({ removedPatientId: undefined } as never);
+    }
+  }, [route.params?.removedPatientId, isLoaded, remove, navigation]);
 
   const handleAddPatient = () => {
     navigation.navigate("AddPatient", { patientCount: patients.length });
@@ -75,7 +92,13 @@ export default function HomeScreen({ navigation, route }: Props) {
     return (
       <PatientCard
         patient={item}
-        onPress={() => {}}
+        onPress={(p, origin) =>
+          navigation.navigate("ViewPatient", {
+            patient: p,
+            allPatients: patients,
+            tileOrigin: origin,
+          })
+        }
         onLongPress={() => handleDeletePatient(item)}
       />
     );
@@ -154,28 +177,28 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   gridRow: {
-    justifyContent: "space-between",
+    gap: 12,
     marginBottom: 12,
   },
   addCard: {
     width: 175,
-    height: 140,
+    aspectRatio: 1,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#391b59",
-    borderStyle: "dashed",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.2)",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    gap: 4,
   },
   addIcon: {
-    fontSize: 32,
+    fontSize: 64,
+    lineHeight: 64,
     color: "#391b59",
     fontWeight: "300",
   },
   addText: {
-    fontFamily: "DMSans-Regular",
-    fontSize: 14,
+    fontFamily: "DMSans-Bold",
+    fontSize: 12,
     color: "#391b59",
   },
   tabBar: {

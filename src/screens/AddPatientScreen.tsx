@@ -44,10 +44,15 @@ function generatePatientId(): string {
 // Shared layout: progress bar + content + bottom buttons
 // ---------------------------------------------------------------------------
 
+const KEYBOARD_OFFSET = Platform.OS === "web" ? 316 : 0;
+
 interface StepLayoutProps {
   step: 1 | 2 | 3;
   insets: { top: number };
   onBack: () => void;
+  onStepTap?: (step: 1 | 2 | 3) => void;
+  contentFade?: Animated.Value;
+  floatButtons?: boolean;
   children: ReactNode;
   buttons: ReactNode;
 }
@@ -56,6 +61,9 @@ function StepLayout({
   step,
   insets,
   onBack,
+  onStepTap,
+  contentFade,
+  floatButtons,
   children,
   buttons,
 }: StepLayoutProps) {
@@ -68,12 +76,13 @@ function StepLayout({
         </Pressable>
         <View style={styles.stepPills}>
           {STEP_LABELS.map((label, i) => {
-            const stepNum = i + 1;
+            const stepNum = (i + 1) as 1 | 2 | 3;
             const isActive = stepNum === step;
             const isCompleted = stepNum < step;
             return (
-              <View
+              <Pressable
                 key={label}
+                onPress={() => onStepTap?.(stepNum)}
                 style={[
                   styles.pill,
                   isActive && styles.pillActive,
@@ -91,7 +100,7 @@ function StepLayout({
                 >
                   {label}
                 </Text>
-              </View>
+              </Pressable>
             );
           })}
         </View>
@@ -101,9 +110,36 @@ function StepLayout({
         style={styles.content}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.contentArea}>{children}</View>
-        <View style={styles.buttonArea}>{buttons}</View>
+        <Animated.View
+          style={[
+            styles.contentArea,
+            contentFade ? { opacity: contentFade } : undefined,
+          ]}
+        >
+          {children}
+        </Animated.View>
+        {!floatButtons && (
+          <Animated.View
+            style={[
+              styles.buttonArea,
+              contentFade ? { opacity: contentFade } : undefined,
+            ]}
+          >
+            {buttons}
+          </Animated.View>
+        )}
       </KeyboardAvoidingView>
+      {floatButtons && (
+        <Animated.View
+          style={[
+            styles.buttonArea,
+            styles.buttonAreaFloat,
+            contentFade ? { opacity: contentFade } : undefined,
+          ]}
+        >
+          {buttons}
+        </Animated.View>
+      )}
       <StatusBar style="dark" />
     </View>
   );
@@ -137,21 +173,98 @@ function QuestionStep({ question, error, children }: QuestionStepProps) {
  *
  */
 export default function AddPatientScreen({ navigation, route }: Props) {
+  const editPatient = route.params?.editPatient;
+  const isEditMode = !!editPatient;
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(editPatient?.name ?? "");
   const [inputMode, setInputMode] = useState<InputMode>("dueDate");
-  const [dueDateText, setDueDateText] = useState("");
+  const [dueDateText, setDueDateText] = useState(() => {
+    if (!editPatient) {
+      return "";
+    }
+    const [, m, d] = editPatient.edd.split("-");
+    return `${m}/${d}`;
+  });
   const [weeks, setWeeks] = useState("");
   const [days, setDays] = useState("");
   const [error, setError] = useState("");
 
   // Computed values for step 3
-  const [finalEdd, setFinalEdd] = useState("");
-  const [finalBirthstone, setFinalBirthstone] = useState<Birthstone>({
-    name: "Garnet",
-    color: "#d6216e",
+  const [finalEdd, setFinalEdd] = useState(editPatient?.edd ?? "");
+  const [finalBirthstone, setFinalBirthstone] = useState<Birthstone>(
+    editPatient?.birthstone ?? { name: "Garnet", color: "#d6216e" },
+  );
+
+  // Track highest step reached (for tappable pills)
+  const [maxStepReached, setMaxStepReached] = useState<1 | 2 | 3>(
+    isEditMode ? 3 : 1,
+  );
+
+  // Fade between steps
+  const contentFade = useRef(new Animated.Value(1)).current;
+
+  // Step 3 card spin animation
+  const hasSeenStep3 = useRef(false);
+  const cardSpinX = useRef(new Animated.Value(0)).current;
+  const cardSpinY = useRef(new Animated.Value(0)).current;
+  const cardFadeIn = useRef(new Animated.Value(0)).current;
+
+  const playCardSpin = () => {
+    cardSpinX.setValue(0);
+    cardSpinY.setValue(0);
+    cardFadeIn.setValue(0);
+    Animated.parallel([
+      Animated.timing(cardSpinX, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardSpinY, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cardFadeIn, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const cardRotateX = cardSpinX.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["90deg", "0deg"],
+  });
+  const cardRotateY = cardSpinY.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["90deg", "0deg"],
   });
 
+  const changeStep = (next: 1 | 2 | 3) => {
+    Animated.timing(contentFade, {
+      toValue: 0,
+      duration: 100,
+      useNativeDriver: true,
+    }).start(() => {
+      setStep(next);
+      Animated.timing(contentFade, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }).start(() => {
+        if (next === 3) {
+          if (!hasSeenStep3.current) {
+            hasSeenStep3.current = true;
+            playCardSpin();
+          }
+        }
+      });
+    });
+  };
+
+  const nameInputRef = useRef<TextInput>(null);
   const patientCount = route.params?.patientCount ?? 0;
   const insets = useSafeAreaInsets();
 
@@ -182,12 +295,26 @@ export default function AddPatientScreen({ navigation, route }: Props) {
     }).start();
   }, [hasDateInput, step2ButtonOpacity]);
 
+  // Focus name input when on step 1 (handles edit mode navigation)
+  useEffect(() => {
+    if (step === 1) {
+      setTimeout(() => nameInputRef.current?.focus(), 150);
+    }
+  }, [step]);
+
   const handleBack = () => {
     if (step === 1) {
       navigation.goBack();
     } else {
-      setStep((step - 1) as 1 | 2);
+      changeStep((step - 1) as 1 | 2);
       setError("");
+    }
+  };
+
+  const handleStepTap = (target: 1 | 2 | 3) => {
+    if (target <= maxStepReached && target !== step) {
+      setError("");
+      changeStep(target);
     }
   };
 
@@ -197,7 +324,8 @@ export default function AddPatientScreen({ navigation, route }: Props) {
       return;
     }
     setError("");
-    setStep(2);
+    changeStep(2);
+    setMaxStepReached((prev) => Math.max(prev, 2) as 1 | 2 | 3);
   };
 
   const handleStep2Next = () => {
@@ -252,18 +380,23 @@ export default function AddPatientScreen({ navigation, route }: Props) {
     setError("");
     setFinalEdd(edd);
     setFinalBirthstone(getBirthstoneForDate(edd));
-    setStep(3);
+    changeStep(3);
+    setMaxStepReached(3);
   };
 
   const buildPatient = (): Patient => ({
-    id: generatePatientId(),
+    id: editPatient?.id ?? generatePatientId(),
     name: name.trim(),
     edd: finalEdd,
     birthstone: finalBirthstone,
   });
 
   const handleDone = () => {
-    navigation.navigate("Home", { newPatient: buildPatient() });
+    if (isEditMode) {
+      navigation.navigate("Home", { updatedPatient: buildPatient() });
+    } else {
+      navigation.navigate("Home", { newPatient: buildPatient() });
+    }
   };
 
   const handleAddAnother = () => {
@@ -275,6 +408,8 @@ export default function AddPatientScreen({ navigation, route }: Props) {
       setWeeks("");
       setDays("");
       setError("");
+      hasSeenStep3.current = false;
+      cardFadeIn.setValue(0);
       navigation.navigate("AddPatient", { patientCount: patientCount + 1 });
     }, 100);
   };
@@ -404,6 +539,9 @@ export default function AddPatientScreen({ navigation, route }: Props) {
         step={1}
         insets={insets}
         onBack={handleBack}
+        onStepTap={handleStepTap}
+        contentFade={contentFade}
+        floatButtons
         buttons={arrowButton(handleStep1Next, step1ButtonOpacity, hasName)}
       >
         <QuestionStep
@@ -411,6 +549,7 @@ export default function AddPatientScreen({ navigation, route }: Props) {
           error={error}
         >
           <TextInput
+            ref={nameInputRef}
             style={styles.fieldInput}
             value={name}
             onChangeText={(t) => {
@@ -437,6 +576,9 @@ export default function AddPatientScreen({ navigation, route }: Props) {
         step={2}
         insets={insets}
         onBack={handleBack}
+        onStepTap={handleStepTap}
+        contentFade={contentFade}
+        floatButtons
         buttons={arrowButton(handleStep2Next, step2ButtonOpacity, hasDateInput)}
       >
         <QuestionStep question={questionText} error={error}>
@@ -452,35 +594,49 @@ export default function AddPatientScreen({ navigation, route }: Props) {
       step={3}
       insets={insets}
       onBack={handleBack}
+      onStepTap={handleStepTap}
       buttons={
         <>
           <Pressable style={styles.primaryButton} onPress={handleDone}>
             <Text style={styles.primaryButtonText}>Done</Text>
           </Pressable>
-          <Pressable style={styles.secondaryButton} onPress={handleAddAnother}>
-            <Text style={styles.secondaryButtonText}>Add Another Patient</Text>
-          </Pressable>
+          {!isEditMode && (
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={handleAddAnother}
+            >
+              <Text style={styles.secondaryButtonText}>
+                Add Another Patient
+              </Text>
+            </Pressable>
+          )}
         </>
       }
     >
       <View style={styles.confirmContent}>
-        <View
+        <Animated.View
           style={[
             styles.confirmCard,
             { backgroundColor: finalBirthstone.color },
+            {
+              opacity: cardFadeIn,
+              transform: [
+                { perspective: 800 },
+                { rotateX: cardRotateX },
+                { rotateY: cardRotateY },
+              ],
+            },
           ]}
         >
-          <View style={styles.confirmGemShadow}>
-            <BirthstoneIcon
-              image={getBirthstoneImage(finalBirthstone.name)}
-              size={148}
-            />
-          </View>
+          <BirthstoneIcon
+            image={getBirthstoneImage(finalBirthstone.name)}
+            size={148}
+          />
           <View style={styles.confirmTextGroup}>
             <Text style={styles.confirmTitle}>{name}&rsquo;s Baby</Text>
             <Text style={styles.confirmDetail}>{formatDueDate(finalEdd)}</Text>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </StepLayout>
   );
@@ -508,6 +664,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
     gap: 8,
+  },
+  buttonAreaFloat: {
+    position: "absolute",
+    bottom: KEYBOARD_OFFSET,
+    left: 0,
+    right: 0,
   },
 
   // Progress bar
@@ -628,15 +790,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    height: 327,
+    aspectRatio: 1,
     gap: 16,
-  },
-  confirmGemShadow: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.55,
-    shadowRadius: 32,
-    elevation: 16,
   },
   confirmTextGroup: {
     alignItems: "center",

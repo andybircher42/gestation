@@ -348,13 +348,13 @@ describe("EntryList", () => {
   it("renders due date in the row", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-06-15" })]);
 
-    expect(screen.getByText("Jun 15")).toBeTruthy();
+    expect(screen.getByText("June 15")).toBeTruthy();
   });
 
   it("renders due date with year suffix when different year", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2027-01-03" })]);
 
-    expect(screen.getByText("Jan 3 '27")).toBeTruthy();
+    expect(screen.getByText("January 3 '27")).toBeTruthy();
   });
 
   it("assigns rainbow background colors to rows in order", () => {

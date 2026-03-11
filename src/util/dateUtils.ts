@@ -116,25 +116,25 @@ export function formatDateInput(
   return `${month}-${day}-${parts.year}`;
 }
 
-const SHORT_MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
+const LONG_MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
   "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
-/** Formats an ISO date string for display: "Jun 15" (same year) or "Jun 15 '26" (different year). */
+/** Formats an ISO date string for display: "June 15" (same year) or "June 15 '26" (different year). */
 export function formatDueDate(isoDate: string, now: Date = new Date()): string {
   const [y, m, d] = isoDate.split("-").map(Number);
-  const month = SHORT_MONTHS[m - 1];
+  const month = LONG_MONTHS[m - 1];
   if (!month || isNaN(d) || isNaN(y)) {
     return isoDate;
   }
