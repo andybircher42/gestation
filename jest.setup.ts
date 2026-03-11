@@ -28,7 +28,3 @@ jest.mock("vexo-analytics", () => ({
   vexo: jest.fn(),
   identifyDevice: jest.fn().mockResolvedValue(undefined),
 }));
-
-jest.mock("@/util/buildVersion", () => ({
-  checkForNewerBuild: jest.fn().mockResolvedValue({ isOutdated: false }),
-}));

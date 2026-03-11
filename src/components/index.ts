@@ -6,4 +6,3 @@ export { default as HipaaAgreementModal } from "./HipaaAgreementModal";
 export { default as InfoToast } from "./InfoToast";
 export { default as ThemePickerModal } from "./ThemePickerModal";
 export { default as UndoToast } from "./UndoToast";
-export { default as UpdateBuildToast } from "./UpdateBuildToast";

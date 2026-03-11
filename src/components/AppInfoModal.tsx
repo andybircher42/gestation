@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import {
-  Linking,
   Modal,
   Platform,
   Pressable,
@@ -15,28 +14,13 @@ import * as Updates from "expo-updates";
 
 import { ColorTokens, useTheme } from "@/theme";
 
-interface BuildStatus {
-  isOutdated: boolean;
-  latestVersion?: string;
-  latestBuildId?: string;
-}
-
-const EAS_BUILD_BASE_URL =
-  "https://expo.dev/accounts/andybircher/projects/in-due-time/builds";
-const HELP_URL = "https://andybircher42.github.io/gestation/";
-
 interface AppInfoModalProps {
   visible: boolean;
   onClose: () => void;
-  buildStatus?: BuildStatus;
 }
 
 /** Centered overlay modal that displays basic app information (name and version). */
-export default function AppInfoModal({
-  visible,
-  onClose,
-  buildStatus,
-}: AppInfoModalProps) {
+export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -108,37 +92,7 @@ export default function AppInfoModal({
               color={colors.textTertiary}
             />
           </Pressable>
-          {buildStatus != null && buildStatus.isOutdated && (
-            <View style={styles.statusRow}>
-              <Pressable
-                onPress={() => {
-                  const url = buildStatus.latestBuildId
-                    ? `${EAS_BUILD_BASE_URL}/${buildStatus.latestBuildId}`
-                    : EAS_BUILD_BASE_URL;
-                  Linking.openURL(url).catch(() => {});
-                }}
-                accessibilityLabel="Download new build"
-                accessibilityRole="link"
-              >
-                <Text style={[styles.detailText, styles.outdatedText]}>
-                  New build available (v{buildStatus.latestVersion})
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => Linking.openURL(HELP_URL).catch(() => {})}
-                accessibilityLabel="How to update"
-                accessibilityRole="link"
-              >
-                <Text style={[styles.detailText, styles.helpLink]}>Help</Text>
-              </Pressable>
-            </View>
-          )}
-          {buildStatus != null && !buildStatus.isOutdated && (
-            <Text style={[styles.detailText, styles.lastDetail]}>
-              Up to date
-            </Text>
-          )}
-          {buildStatus == null && <View style={styles.lastDetail} />}
+          <View style={styles.lastDetail} />
           <Pressable
             style={styles.closeButton}
             onPress={onClose}
@@ -197,23 +151,8 @@ function createStyles(colors: ColorTokens) {
       color: colors.textTertiary,
       marginBottom: 4,
     },
-    statusRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      marginBottom: 20,
-    },
     lastDetail: {
       marginBottom: 20,
-    },
-    outdatedText: {
-      color: colors.primary,
-      fontWeight: "600",
-      textDecorationLine: "underline",
-    },
-    helpLink: {
-      color: colors.textTertiary,
-      textDecorationLine: "underline",
     },
     closeButton: {
       backgroundColor: colors.primary,

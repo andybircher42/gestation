@@ -23,7 +23,6 @@ import {
   InfoToast,
   ThemePickerModal,
   UndoToast,
-  UpdateBuildToast,
 } from "@/components";
 import { useEntries, useThemePreference } from "@/hooks";
 import {
@@ -33,7 +32,6 @@ import {
   resetAgreement,
 } from "@/storage";
 import { ColorTokens, ThemeProvider, useTheme } from "@/theme";
-import { checkForNewerBuild } from "@/util";
 
 import headerLogoLight from "./assets/icon.png";
 import headerLogoDark from "./assets/icon-dark.png";
@@ -77,12 +75,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   const [pickerAnchor, setPickerAnchor] = useState({ top: 0, right: 0 });
   const settingsRef = useRef<View>(null);
   const isLoadingRef = useRef(true);
-  const [newerBuild, setNewerBuild] = useState<{
-    latestVersion: string;
-    latestBuildId?: string;
-  } | null>(null);
-  const [buildToastDismissed, setBuildToastDismissed] = useState(false);
-
   useEffect(() => {
     isLoadingRef.current = isLoading;
   }, [isLoading]);
@@ -162,17 +154,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           })
           .catch((e) => console.error("Failed to check for updates", e));
       }
-
-      checkForNewerBuild()
-        .then((result) => {
-          if (mounted && result.isOutdated && result.latestVersion) {
-            setNewerBuild({
-              latestVersion: result.latestVersion,
-              latestBuildId: result.latestBuildId,
-            });
-          }
-        })
-        .catch(() => {});
     }
     void init();
 
@@ -277,15 +258,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
         <AppInfoModal
           visible={showAppInfo}
           onClose={() => setShowAppInfo(false)}
-          buildStatus={
-            newerBuild
-              ? {
-                  isOutdated: true,
-                  latestVersion: newerBuild.latestVersion,
-                  latestBuildId: newerBuild.latestBuildId,
-                }
-              : { isOutdated: false }
-          }
         />
 
         {deletedEntry && (
@@ -293,14 +265,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
             entry={deletedEntry.entry}
             onUndo={undo}
             onDismiss={dismissUndo}
-          />
-        )}
-
-        {newerBuild && !buildToastDismissed && !deletedEntry && (
-          <UpdateBuildToast
-            latestVersion={newerBuild.latestVersion}
-            latestBuildId={newerBuild.latestBuildId}
-            onDismiss={() => setBuildToastDismissed(true)}
           />
         )}
 

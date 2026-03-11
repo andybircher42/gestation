@@ -1,4 +1,3 @@
-export { checkForNewerBuild } from "./buildVersion";
 export {
   expandTwoDigitYear,
   formatDateInput,
