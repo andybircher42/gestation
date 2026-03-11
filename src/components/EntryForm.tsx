@@ -138,7 +138,11 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
   const handleDateChange = useCallback(
     (_event: DateTimePickerEvent, selected?: Date) => {
-      setShowPicker(Platform.OS === "ios");
+      // TODO: Refactor date picker into DatePicker.ios.tsx / DatePicker.android.tsx platform files
+      // Android native dialog auto-closes on selection; iOS stays open
+      if (Platform.OS !== "ios") {
+        setShowPicker(false);
+      }
       if (selected) {
         setDueDate(selected);
         setDateText(toDisplayDateString(selected));
@@ -146,6 +150,11 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     },
     [],
   );
+
+  const handlePickerDone = () => {
+    setShowPicker(false);
+    setDateTouched(true);
+  };
 
   return (
     <View style={styles.form}>
@@ -328,14 +337,24 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
             </Text>
           )}
           {showPicker && (
-            <DateTimePicker
-              value={dueDate ?? new Date()}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-              minimumDate={dateBounds.min}
-              maximumDate={dateBounds.max}
-            />
+            <View>
+              <DateTimePicker
+                value={dueDate ?? new Date()}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={handleDateChange}
+                minimumDate={dateBounds.min}
+                maximumDate={dateBounds.max}
+              />
+              {Platform.OS === "ios" && (
+                <Pressable
+                  style={styles.pickerDoneButton}
+                  onPress={handlePickerDone}
+                >
+                  <Text style={styles.pickerDoneText}>Done</Text>
+                </Pressable>
+              )}
+            </View>
           )}
         </View>
       )}
@@ -445,6 +464,17 @@ function createStyles(colors: ColorTokens) {
       marginTop: 8,
       fontSize: 15,
       color: colors.primary,
+      fontWeight: "600",
+    },
+    pickerDoneButton: {
+      alignSelf: "flex-end",
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      marginTop: 4,
+    },
+    pickerDoneText: {
+      color: colors.primary,
+      fontSize: 16,
       fontWeight: "600",
     },
     addButton: {
