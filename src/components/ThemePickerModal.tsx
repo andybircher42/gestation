@@ -208,7 +208,7 @@ function createStyles(colors: ColorTokens) {
     row: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 11,
+      minHeight: 44,
     },
     rowIcon: {
       marginRight: 12,

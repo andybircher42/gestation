@@ -73,8 +73,18 @@ const EntryRow = React.memo(function EntryRow({
   return (
     <View style={styles.entryWrapper}>
       <View style={styles.deleteBackground} testID="delete-background">
-        <Ionicons name="trash-outline" size={22} color={deleteIconColor} />
-        <Ionicons name="trash-outline" size={22} color={deleteIconColor} />
+        <Ionicons
+          name="trash-outline"
+          size={22}
+          color={deleteIconColor}
+          accessible={false}
+        />
+        <Ionicons
+          name="trash-outline"
+          size={22}
+          color={deleteIconColor}
+          accessible={false}
+        />
       </View>
       <Animated.View
         testID="entry-row"

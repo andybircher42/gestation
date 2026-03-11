@@ -222,7 +222,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
             onPress={openThemePicker}
             accessibilityLabel="Theme settings"
             accessibilityRole="button"
-            hitSlop={8}
+            hitSlop={10}
           >
             <Ionicons
               name="settings-outline"

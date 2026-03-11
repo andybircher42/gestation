@@ -53,6 +53,7 @@ export default function UndoToast({
         onPress={onUndo}
         style={styles.undoButton}
         accessibilityRole="button"
+        accessibilityLabel={`Undo delete ${entry.name}`}
       >
         <Text style={styles.undoText}>Undo</Text>
       </Pressable>

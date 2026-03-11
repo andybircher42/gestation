@@ -35,7 +35,11 @@ export default function EntryFormModal({ onAdd }: EntryFormModalProps) {
         onRequestClose={close}
       >
         <View style={styles.modalOverlay}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={close} />
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={close}
+            accessible={false}
+          />
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Add Entry</Text>
