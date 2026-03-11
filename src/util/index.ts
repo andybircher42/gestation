@@ -4,7 +4,6 @@ export {
   getBirthstone,
   getBirthstoneForDate,
 } from "./birthstones";
-export { checkForNewerBuild } from "./buildVersion";
 export {
   expandTwoDigitYear,
   formatDateInput,
