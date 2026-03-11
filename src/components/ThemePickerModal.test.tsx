@@ -20,7 +20,7 @@ describe("ThemePickerModal", () => {
   it("renders all 4 option labels when visible", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} />);
 
-    expect(screen.getByText("Choose Theme")).toBeTruthy();
+    expect(screen.getByText("Appearance")).toBeTruthy();
     expect(screen.getByText("System")).toBeTruthy();
     expect(screen.getByText("Light")).toBeTruthy();
     expect(screen.getByText("Dark")).toBeTruthy();

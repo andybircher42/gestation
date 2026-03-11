@@ -61,7 +61,7 @@ const EntryFormModal = forwardRef<EntryFormModalHandle, EntryFormModalProps>(
           />
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Entry</Text>
+              <Text style={styles.modalTitle}>Add someone</Text>
               <Pressable
                 onPress={close}
                 accessibilityRole="button"

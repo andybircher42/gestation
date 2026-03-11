@@ -10,26 +10,26 @@ describe("HipaaAgreementModal", () => {
       <HipaaAgreementModal visible={true} onAccept={jest.fn()} />,
     );
 
-    expect(screen.getByText("Before You Start")).toBeTruthy();
+    expect(screen.getByText("A quick note")).toBeTruthy();
     expect(screen.getByText(/not HIPAA compliant/)).toBeTruthy();
-    expect(screen.getByText("I Understand")).toBeTruthy();
+    expect(screen.getByText("Got it")).toBeTruthy();
   });
 
-  it('calls onAccept when "I Understand" pressed', () => {
+  it('calls onAccept when "Got it" pressed', () => {
     const onAccept = jest.fn();
     renderWithTheme(<HipaaAgreementModal visible={true} onAccept={onAccept} />);
 
-    fireEvent.press(screen.getByText("I Understand"));
+    fireEvent.press(screen.getByText("Got it"));
     expect(onAccept).toHaveBeenCalledTimes(1);
   });
 
-  it('"I Understand" button has accessible role and label', () => {
+  it('"Got it" button has accessible role and label', () => {
     renderWithTheme(
       <HipaaAgreementModal visible={true} onAccept={jest.fn()} />,
     );
 
     expect(
-      screen.getByRole("button", { name: "I understand, continue to app" }),
+      screen.getByRole("button", { name: "Got it, continue to app" }),
     ).toBeTruthy();
   });
 
@@ -38,6 +38,6 @@ describe("HipaaAgreementModal", () => {
       <HipaaAgreementModal visible={false} onAccept={jest.fn()} />,
     );
 
-    expect(screen.queryByText("Before You Start")).toBeNull();
+    expect(screen.queryByText("A quick note")).toBeNull();
   });
 });

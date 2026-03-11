@@ -83,7 +83,7 @@ export default function ThemePickerModal({
           accessibilityLabel="Close theme picker"
         />
         <View style={[styles.dropdown, dropdownPosition]}>
-          <Text style={styles.title}>Choose Theme</Text>
+          <Text style={styles.title}>Appearance</Text>
           {THEME_OPTIONS.map(({ mode, label, icon }) => (
             <Pressable
               key={mode}

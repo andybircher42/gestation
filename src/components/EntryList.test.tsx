@@ -73,7 +73,7 @@ describe("EntryList", () => {
   it("shows empty state with guidance when no entries", () => {
     renderList([]);
     expect(screen.getByText("Ready when you are")).toBeTruthy();
-    expect(screen.getByText("Tap Add above to start tracking")).toBeTruthy();
+    expect(screen.getByText("Tap Add someone to get started")).toBeTruthy();
   });
 
   it("renders entry name and formatted age", () => {
@@ -103,14 +103,14 @@ describe("EntryList", () => {
       makeEntry({ id: "abc", name: "Baby", dueDate: "2026-10-31" }),
     ]);
 
-    fireEvent.press(screen.getByLabelText("Delete Baby"));
+    fireEvent.press(screen.getByLabelText("Remove Baby"));
     expect(onDelete).toHaveBeenCalledWith("abc");
   });
 
   it("delete button has accessible role and label", () => {
     renderList([makeEntry({ id: "1", name: "Baby A" })]);
 
-    const deleteButton = screen.getByLabelText("Delete Baby A");
+    const deleteButton = screen.getByLabelText("Remove Baby A");
     expect(deleteButton).toBeTruthy();
     expect(deleteButton.props.accessibilityRole).toBe("button");
   });
@@ -294,39 +294,39 @@ describe("EntryList", () => {
 
     expect(screen.queryByText(/Due Date/)).toBeNull();
     expect(screen.queryByText(/Name/)).toBeNull();
-    expect(screen.queryByText("Delete All")).toBeNull();
+    expect(screen.queryByText("Remove all")).toBeNull();
   });
 
-  it("shows Delete All button when entries exist", () => {
+  it("shows Remove all button when entries exist", () => {
     renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    expect(screen.getByText("Delete All")).toBeTruthy();
+    expect(screen.getByText("Remove all")).toBeTruthy();
   });
 
-  it("shows confirmation dialog when Delete All is pressed", () => {
+  it("shows confirmation dialog when Remove all is pressed", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    fireEvent.press(screen.getByText("Delete All"));
+    fireEvent.press(screen.getByText("Remove all"));
 
     expect(alertSpy).toHaveBeenCalledWith(
-      "Delete All Entries",
-      expect.stringContaining("permanently remove all"),
+      "Remove everyone?",
+      expect.stringContaining("remove all"),
       expect.any(Array),
     );
   });
 
-  it("calls onDeleteAll when user confirms deletion", () => {
+  it("calls onDeleteAll when user confirms removal", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const { onDeleteAll } = renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    fireEvent.press(screen.getByText("Delete All"));
+    fireEvent.press(screen.getByText("Remove all"));
 
     const buttons = alertSpy.mock.calls[0][2] as Array<{
       text: string;
       onPress?: () => void;
     }>;
-    buttons.find((b) => b.text === "Delete All")?.onPress?.();
+    buttons.find((b) => b.text === "Remove all")?.onPress?.();
 
     expect(onDeleteAll).toHaveBeenCalledTimes(1);
   });
@@ -335,7 +335,7 @@ describe("EntryList", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const { onDeleteAll } = renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    fireEvent.press(screen.getByText("Delete All"));
+    fireEvent.press(screen.getByText("Remove all"));
 
     const buttons = alertSpy.mock.calls[0][2] as Array<{
       text: string;

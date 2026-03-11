@@ -132,7 +132,7 @@ const EntryRow = React.memo(function EntryRow({
           style={styles.deleteButton}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel={`Delete ${item.name}`}
+          accessibilityLabel={`Remove ${item.name}`}
         >
           <Ionicons name="trash-outline" size={16} color={deleteButtonColor} />
         </Pressable>
@@ -242,10 +242,10 @@ export default function EntryList({
         style={styles.addButton}
         onPress={onAddPress}
         accessibilityRole="button"
-        accessibilityLabel="Add new entry"
+        accessibilityLabel="Add someone new"
       >
         <Ionicons name="add" size={24} color={colors.primary} />
-        <Text style={styles.addButtonText}>Add a patient</Text>
+        <Text style={styles.addButtonText}>Add someone</Text>
       </Pressable>
       {entries.length > 0 && (
         <View style={styles.toolbarRow}>
@@ -294,12 +294,12 @@ export default function EntryList({
             style={styles.deleteAllButton}
             onPress={() =>
               Alert.alert(
-                "Delete All Entries",
-                `This will permanently remove all ${entries.length} entries. This cannot be undone.`,
+                "Remove everyone?",
+                `This will remove all ${entries.length} people you're tracking. You can't undo this.`,
                 [
                   { text: "Cancel", style: "cancel" },
                   {
-                    text: "Delete All",
+                    text: "Remove all",
                     style: "destructive",
                     onPress: onDeleteAll,
                   },
@@ -307,9 +307,9 @@ export default function EntryList({
               )
             }
             accessibilityRole="button"
-            accessibilityLabel="Delete all"
+            accessibilityLabel="Remove all"
           >
-            <Text style={styles.deleteAllText}>Delete All</Text>
+            <Text style={styles.deleteAllText}>Remove all</Text>
           </Pressable>
         </View>
       )}
@@ -331,7 +331,7 @@ export default function EntryList({
             />
             <Text style={styles.emptyTitle}>Ready when you are</Text>
             <Text style={styles.emptySubtitle}>
-              Tap Add above to start tracking
+              Tap Add someone to get started
             </Text>
           </View>
         }

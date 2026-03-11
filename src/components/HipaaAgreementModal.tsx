@@ -33,7 +33,7 @@ export default function HipaaAgreementModal({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Before You Start</Text>
+          <Text style={styles.modalTitle}>A quick note</Text>
           <ScrollView style={styles.modalScroll}>
             <Text style={styles.modalText}>
               This app is not HIPAA compliant. Do not enter any Protected Health
@@ -49,9 +49,9 @@ export default function HipaaAgreementModal({
             style={styles.agreeButton}
             onPress={onAccept}
             accessibilityRole="button"
-            accessibilityLabel="I understand, continue to app"
+            accessibilityLabel="Got it, continue to app"
           >
-            <Text style={styles.agreeButtonText}>I Understand</Text>
+            <Text style={styles.agreeButtonText}>Got it</Text>
           </Pressable>
         </View>
       </View>

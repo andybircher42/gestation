@@ -59,13 +59,13 @@ async function renderAppWithTheme(mode: string) {
 
 async function acceptHipaa() {
   await waitFor(() => {
-    expect(screen.getByText("I Understand")).toBeTruthy();
+    expect(screen.getByText("Got it")).toBeTruthy();
   });
-  fireEvent.press(screen.getByText("I Understand"));
+  fireEvent.press(screen.getByText("Got it"));
 }
 
 async function addEntry(name: string, weeks: string, days: string) {
-  fireEvent.press(screen.getByLabelText("Add new entry"));
+  fireEvent.press(screen.getByLabelText("Add someone new"));
   fireEvent.press(screen.getByText("Gestational Age"));
   fireEvent.changeText(screen.getByLabelText("Name"), name);
   fireEvent.changeText(screen.getByLabelText("Weeks"), weeks);
@@ -113,10 +113,10 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Delete Baby"));
+    fireEvent.press(screen.getByLabelText("Remove Baby"));
 
     await waitFor(() => {
-      expect(screen.getByText(/Deleted Baby/)).toBeTruthy();
+      expect(screen.getByText(/Removed Baby/)).toBeTruthy();
       expect(screen.getByText("Undo")).toBeTruthy();
     });
   });
@@ -126,7 +126,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Delete Baby"));
+    fireEvent.press(screen.getByLabelText("Remove Baby"));
 
     await waitFor(() => {
       expect(screen.getByText("Undo")).toBeTruthy();
@@ -145,7 +145,7 @@ describe("App", () => {
     await acceptHipaa();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Delete Baby"));
+    fireEvent.press(screen.getByLabelText("Remove Baby"));
 
     await waitFor(() => {
       expect(screen.getByTestId("undo-toast")).toBeTruthy();

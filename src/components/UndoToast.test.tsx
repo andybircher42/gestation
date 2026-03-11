@@ -35,7 +35,7 @@ describe("UndoToast", () => {
 
   it("displays the deleted entry details", () => {
     renderToast();
-    expect(screen.getByText("Deleted Baby A (12w 3d)")).toBeTruthy();
+    expect(screen.getByText("Removed Baby A (12w 3d)")).toBeTruthy();
   });
 
   it("is announced by screen readers as an alert", () => {
@@ -44,7 +44,7 @@ describe("UndoToast", () => {
     expect(toast.props.accessibilityRole).toBe("alert");
     expect(toast.props.accessibilityLiveRegion).toBe("polite");
     expect(toast.props.accessibilityLabel).toBe(
-      "Deleted Baby A, 12 weeks 3 days",
+      "Removed Baby A, 12 weeks 3 days",
     );
   });
 

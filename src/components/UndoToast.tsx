@@ -42,18 +42,18 @@ export default function UndoToast({
       style={[styles.container, { transform: [{ translateY }] }]}
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
-      accessibilityLabel={`Deleted ${entry.name}, ${weeks} weeks ${days} days`}
+      accessibilityLabel={`Removed ${entry.name}, ${weeks} weeks ${days} days`}
       testID="undo-toast"
       {...panHandlers}
     >
       <Text style={styles.message}>
-        Deleted {entry.name} ({weeks}w {days}d)
+        Removed {entry.name} ({weeks}w {days}d)
       </Text>
       <Pressable
         onPress={onUndo}
         style={styles.undoButton}
         accessibilityRole="button"
-        accessibilityLabel={`Undo delete ${entry.name}`}
+        accessibilityLabel={`Undo removing ${entry.name}`}
       >
         <Text style={styles.undoText}>Undo</Text>
       </Pressable>
