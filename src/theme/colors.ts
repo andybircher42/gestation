@@ -29,7 +29,7 @@ const lightColors = {
 const darkColors: ColorTokens = {
   primary: "#3a84cc",
   primaryDisabled: "#2d5a88",
-  primaryLightBg: "#1a2a3e",
+  primaryLightBg: "#213f60",
   destructive: "#dc2626",
   devButton: "#ff6b6b",
   textPrimary: "#e0e0e0",
