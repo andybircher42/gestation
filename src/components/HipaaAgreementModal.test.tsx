@@ -13,6 +13,7 @@ describe("HipaaAgreementModal", () => {
     expect(screen.getByText("Important Notice")).toBeTruthy();
     expect(screen.getByText(/not HIPAA compliant/)).toBeTruthy();
     expect(screen.getByText("I Agree")).toBeTruthy();
+    expect(screen.getByText("Disagree, exit app")).toBeTruthy();
   });
 
   it('calls onAccept when "I Agree" pressed', () => {
@@ -30,6 +31,16 @@ describe("HipaaAgreementModal", () => {
 
     expect(
       screen.getByRole("button", { name: "I agree, continue to app" }),
+    ).toBeTruthy();
+  });
+
+  it('"Disagree" button has accessible role and label', () => {
+    renderWithTheme(
+      <HipaaAgreementModal visible={true} onAccept={jest.fn()} />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Disagree and exit app" }),
     ).toBeTruthy();
   });
 

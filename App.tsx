@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  DevSettings,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -175,7 +176,12 @@ function AppContent({ loadThemePreference }: AppContentProps) {
 
   const handleResetAgreement = () => {
     resetAgreement()
-      .then(() => setShowAgreement(true))
+      .then(() => {
+        setShowAgreement(true);
+        if (__DEV__) {
+          DevSettings.reload();
+        }
+      })
       .catch((e) => console.error("Failed to reset agreement", e));
   };
 

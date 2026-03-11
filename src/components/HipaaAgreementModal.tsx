@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import {
+  BackHandler,
   Modal,
   Pressable,
   ScrollView,
@@ -55,6 +56,14 @@ export default function HipaaAgreementModal({
           >
             <Text style={styles.agreeButtonText}>I Agree</Text>
           </Pressable>
+          <Pressable
+            style={styles.disagreeButton}
+            onPress={() => BackHandler.exitApp()}
+            accessibilityRole="button"
+            accessibilityLabel="Disagree and exit app"
+          >
+            <Text style={styles.disagreeButtonText}>Disagree, exit app</Text>
+          </Pressable>
         </View>
       </View>
     </Modal>
@@ -104,6 +113,15 @@ function createStyles(colors: ColorTokens) {
       color: colors.white,
       fontSize: 16,
       fontWeight: "600",
+    },
+    disagreeButton: {
+      marginTop: 12,
+      padding: 10,
+      alignItems: "center",
+    },
+    disagreeButtonText: {
+      color: colors.textTertiary,
+      fontSize: 14,
     },
   });
 }
