@@ -24,12 +24,11 @@ describe("color palettes", () => {
     expect(darkRowColors).toHaveLength(7);
   });
 
-  it("monoRowColors has 7 entries", () => {
-    expect(monoRowColors).toHaveLength(7);
+  it("monoRowColors has 4 entries", () => {
+    expect(monoRowColors).toHaveLength(4);
   });
 
-  it("all row color arrays have the same length", () => {
+  it("light and dark row color arrays have the same length", () => {
     expect(lightRowColors.length).toBe(darkRowColors.length);
-    expect(lightRowColors.length).toBe(monoRowColors.length);
   });
 });

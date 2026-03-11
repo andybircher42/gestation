@@ -50,7 +50,7 @@ interface EntryListProps {
   entries: Entry[];
   onDelete: (id: string) => void;
   onDeleteAll: () => void;
-  onEmptyPress?: () => void;
+  onAddPress?: () => void;
 }
 
 /** Individual entry row with swipe-to-delete support. */
@@ -146,7 +146,7 @@ export default function EntryList({
   entries,
   onDelete,
   onDeleteAll,
-  onEmptyPress,
+  onAddPress,
 }: EntryListProps) {
   const { colors, rowColors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -238,6 +238,15 @@ export default function EntryList({
 
   return (
     <View style={styles.listContainer}>
+      <Pressable
+        style={styles.addButton}
+        onPress={onAddPress}
+        accessibilityRole="button"
+        accessibilityLabel="Add new entry"
+      >
+        <Ionicons name="add" size={24} color={colors.primary} />
+        <Text style={styles.addButtonText}>Add a patient</Text>
+      </Pressable>
       {entries.length > 0 && (
         <View style={styles.toolbarRow}>
           <View style={styles.sortRow}>
@@ -315,16 +324,15 @@ export default function EntryList({
         }
         ListEmptyComponent={
           <View style={styles.emptyContent}>
-            <Pressable
-              style={styles.emptyIconCircle}
-              onPress={onEmptyPress}
-              accessibilityRole="button"
-              accessibilityLabel="Add first entry"
-            >
-              <Ionicons name="add" size={32} color={colors.primary} />
-            </Pressable>
+            <Ionicons
+              name="calendar-outline"
+              size={48}
+              color={colors.textTertiary}
+            />
             <Text style={styles.emptyTitle}>Ready when you are</Text>
-            <Text style={styles.emptySubtitle}>Tap + to start tracking</Text>
+            <Text style={styles.emptySubtitle}>
+              Tap Add above to start tracking
+            </Text>
           </View>
         }
       />
@@ -354,14 +362,30 @@ function createStyles(colors: ColorTokens) {
       overflow: "hidden",
     },
     deleteAllButton: {
-      backgroundColor: colors.destructive,
-      borderRadius: 8,
       paddingHorizontal: 12,
       paddingVertical: 8,
     },
     deleteAllText: {
-      color: colors.white,
+      color: colors.textTertiary,
       fontSize: 14,
+      fontWeight: "600",
+    },
+    addButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      marginHorizontal: 16,
+      marginTop: 12,
+      paddingVertical: 14,
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: colors.primary,
+      borderStyle: "dashed",
+      gap: 6,
+    },
+    addButtonText: {
+      color: colors.primary,
+      fontSize: 16,
       fontWeight: "600",
     },
     sortButton: {
@@ -392,17 +416,6 @@ function createStyles(colors: ColorTokens) {
     emptyContent: {
       alignItems: "center",
       gap: 8,
-    },
-    emptyIconCircle: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      borderWidth: 2,
-      borderColor: colors.primary,
-      borderStyle: "dashed",
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: 4,
     },
     emptyTitle: {
       color: colors.textPrimary,

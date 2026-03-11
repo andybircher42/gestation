@@ -244,7 +244,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           entries={entries}
           onDelete={remove}
           onDeleteAll={removeAll}
-          onEmptyPress={() => formModalRef.current?.open()}
+          onAddPress={() => formModalRef.current?.open()}
         />
         <EntryFormModal ref={formModalRef} onAdd={add} />
         <HipaaAgreementModal

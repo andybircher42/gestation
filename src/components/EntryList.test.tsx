@@ -73,7 +73,7 @@ describe("EntryList", () => {
   it("shows empty state with guidance when no entries", () => {
     renderList([]);
     expect(screen.getByText("Ready when you are")).toBeTruthy();
-    expect(screen.getByText("Tap + to start tracking")).toBeTruthy();
+    expect(screen.getByText("Tap Add above to start tracking")).toBeTruthy();
   });
 
   it("renders entry name and formatted age", () => {

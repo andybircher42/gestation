@@ -101,16 +101,8 @@ const darkRowColors = [
   "#6E3410",
 ] as const;
 
-/** Monochrome row colors (shades of gray). */
-const monoRowColors = [
-  "#d4d4d4",
-  "#bfbfbf",
-  "#aaaaaa",
-  "#c7c7c7",
-  "#b2b2b2",
-  "#9e9e9e",
-  "#d9d9d9",
-] as const;
+/** Monochrome row colors (wider gray spread for visual rhythm). */
+const monoRowColors = ["#f5f5f5", "#e0e0e0", "#cccccc", "#b8b8b8"] as const;
 
 /** Shape of the color token object. */
 export type ColorTokens = { [K in keyof typeof lightColors]: string };

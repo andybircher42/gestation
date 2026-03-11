@@ -70,7 +70,7 @@ async function addEntry(name: string, weeks: string, days: string) {
   fireEvent.changeText(screen.getByLabelText("Name"), name);
   fireEvent.changeText(screen.getByLabelText("Weeks"), weeks);
   fireEvent.changeText(screen.getByLabelText("Days"), days);
-  fireEvent.press(screen.getByText("Add"));
+  fireEvent.press(screen.getByLabelText("Add entry"));
   await waitFor(() => {
     expect(screen.getByText(name)).toBeTruthy();
   });
