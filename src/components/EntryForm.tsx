@@ -194,58 +194,68 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
       </View>
 
       {mode === "weeksDays" ? (
-        <View style={styles.ageRow}>
-          <View style={styles.inputWithHint}>
-            <Text style={styles.label}>Weeks</Text>
-            <TextInput
-              style={[styles.numberInput, showWeeksError && styles.inputError]}
-              accessibilityLabel="Weeks"
-              placeholder={"0-42"}
-              placeholderTextColor={colors.textTertiary}
-              value={weeks}
-              onChangeText={makeNumericHandler(setWeeks, setWeeksTouched)}
-              onBlur={() => setWeeksTouched(true)}
-              keyboardType="number-pad"
-              maxLength={2}
-              returnKeyType="next"
-            />
-            {showWeeksError && (
-              <Text style={styles.errorText} accessibilityLabel="Weeks error">
-                {weeksError}
-              </Text>
-            )}
+        <>
+          <View style={styles.ageRow}>
+            <View style={styles.inputWithHint}>
+              <Text style={styles.label}>Weeks</Text>
+              <TextInput
+                style={[
+                  styles.numberInput,
+                  showWeeksError && styles.inputError,
+                ]}
+                accessibilityLabel="Weeks"
+                placeholder={"0-42"}
+                placeholderTextColor={colors.textTertiary}
+                value={weeks}
+                onChangeText={makeNumericHandler(setWeeks, setWeeksTouched)}
+                onBlur={() => setWeeksTouched(true)}
+                keyboardType="number-pad"
+                maxLength={2}
+                returnKeyType="next"
+              />
+              {showWeeksError && (
+                <Text style={styles.errorText} accessibilityLabel="Weeks error">
+                  {weeksError}
+                </Text>
+              )}
+            </View>
+            <View style={styles.inputWithHint}>
+              <Text style={styles.label}>Days</Text>
+              <TextInput
+                style={[styles.numberInput, showDaysError && styles.inputError]}
+                accessibilityLabel="Days"
+                placeholder={"0-6"}
+                placeholderTextColor={colors.textTertiary}
+                value={days}
+                onChangeText={makeNumericHandler(setDays, setDaysTouched)}
+                onBlur={() => setDaysTouched(true)}
+                keyboardType="number-pad"
+                maxLength={1}
+                returnKeyType="done"
+              />
+              {showDaysError && (
+                <Text style={styles.errorText} accessibilityLabel="Days error">
+                  {daysError}
+                </Text>
+              )}
+            </View>
+            <Pressable
+              style={[styles.addButton, !canAdd && styles.addButtonDisabled]}
+              onPress={handleAdd}
+              disabled={!canAdd}
+              accessibilityRole="button"
+              accessibilityLabel="Add entry"
+              accessibilityState={{ disabled: !canAdd }}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </Pressable>
           </View>
-          <View style={styles.inputWithHint}>
-            <Text style={styles.label}>Days</Text>
-            <TextInput
-              style={[styles.numberInput, showDaysError && styles.inputError]}
-              accessibilityLabel="Days"
-              placeholder={"0-6"}
-              placeholderTextColor={colors.textTertiary}
-              value={days}
-              onChangeText={makeNumericHandler(setDays, setDaysTouched)}
-              onBlur={() => setDaysTouched(true)}
-              keyboardType="number-pad"
-              maxLength={1}
-              returnKeyType="done"
-            />
-            {showDaysError && (
-              <Text style={styles.errorText} accessibilityLabel="Days error">
-                {daysError}
-              </Text>
-            )}
-          </View>
-          <Pressable
-            style={[styles.addButton, !canAdd && styles.addButtonDisabled]}
-            onPress={handleAdd}
-            disabled={!canAdd}
-            accessibilityRole="button"
-            accessibilityLabel="Add entry"
-            accessibilityState={{ disabled: !canAdd }}
-          >
-            <Text style={styles.addButtonText}>Add</Text>
-          </Pressable>
-        </View>
+          {weeks && days && weeksValid && daysValid && (
+            <Text style={styles.preview} accessibilityLabel="Due date preview">
+              Due date: {toDisplayDateString(computeDueDate(w, d))}
+            </Text>
+          )}
+        </>
       ) : (
         <View>
           <View style={styles.ageRow}>

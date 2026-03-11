@@ -323,10 +323,8 @@ export default function EntryList({
             >
               <Ionicons name="add" size={32} color={colors.primary} />
             </Pressable>
-            <Text style={styles.emptyTitle}>No entries yet</Text>
-            <Text style={styles.emptySubtitle}>
-              Tap + to add your first entry
-            </Text>
+            <Text style={styles.emptyTitle}>Ready when you are</Text>
+            <Text style={styles.emptySubtitle}>Tap + to start tracking</Text>
           </View>
         }
       />

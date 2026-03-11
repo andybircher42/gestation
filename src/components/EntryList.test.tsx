@@ -72,8 +72,8 @@ afterEach(() => {
 describe("EntryList", () => {
   it("shows empty state with guidance when no entries", () => {
     renderList([]);
-    expect(screen.getByText("No entries yet")).toBeTruthy();
-    expect(screen.getByText("Tap + to add your first entry")).toBeTruthy();
+    expect(screen.getByText("Ready when you are")).toBeTruthy();
+    expect(screen.getByText("Tap + to start tracking")).toBeTruthy();
   });
 
   it("renders entry name and formatted age", () => {
