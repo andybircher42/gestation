@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -256,7 +257,11 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
                   onPress={() => setShowPicker(true)}
                   accessibilityLabel="Select due date"
                 >
-                  <Text style={styles.calendarButtonText}>📅</Text>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={22}
+                    color={colors.primary}
+                  />
                 </Pressable>
                 <TextInput
                   style={[
@@ -407,9 +412,6 @@ function createStyles(colors: ColorTokens) {
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: colors.contentBackground,
-    },
-    calendarButtonText: {
-      fontSize: 22,
     },
     inputError: {
       borderColor: colors.destructive,

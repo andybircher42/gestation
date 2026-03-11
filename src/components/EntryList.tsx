@@ -381,9 +381,9 @@ function createStyles(colors: ColorTokens) {
       marginRight: 12,
     },
     deleteButton: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       backgroundColor: colors.deleteButtonBg,
       justifyContent: "center",
       alignItems: "center",
