@@ -8,6 +8,7 @@ import React, {
 import {
   Alert,
   Animated,
+  Easing,
   FlatList,
   LayoutChangeEvent,
   Platform,
@@ -70,8 +71,18 @@ const EntryRow = React.memo(function EntryRow({
     onDismiss: () => onDelete(item.id),
   });
 
+  const fadeIn = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(fadeIn, {
+      toValue: 1,
+      duration: 300,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, [fadeIn]);
+
   return (
-    <View style={styles.entryWrapper}>
+    <Animated.View style={[styles.entryWrapper, { opacity: fadeIn }]}>
       <View style={styles.deleteBackground} testID="delete-background">
         <Ionicons
           name="trash-outline"
@@ -125,7 +136,7 @@ const EntryRow = React.memo(function EntryRow({
           <Ionicons name="trash-outline" size={16} color={deleteButtonColor} />
         </Pressable>
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 });
 

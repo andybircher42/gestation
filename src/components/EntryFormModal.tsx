@@ -1,5 +1,13 @@
-import { useCallback, useMemo, useRef, useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Animated,
+  Easing,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { ColorTokens, useTheme } from "@/theme";
@@ -16,6 +24,7 @@ export default function EntryFormModal({ onAdd }: EntryFormModalProps) {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [isOpen, setIsOpen] = useState(false);
   const formKey = useRef(0);
+  const fabScale = useRef(new Animated.Value(1)).current;
 
   const open = useCallback(() => {
     formKey.current += 1;
@@ -31,6 +40,17 @@ export default function EntryFormModal({ onAdd }: EntryFormModalProps) {
   );
 
   const close = useCallback(() => setIsOpen(false), []);
+
+  useEffect(() => {
+    Animated.timing(fabScale, {
+      toValue: isOpen ? 0 : 1,
+      duration: isOpen ? 150 : 250,
+      easing: isOpen
+        ? Easing.out(Easing.quad)
+        : Easing.out(Easing.bezier(0.25, 1, 0.5, 1)),
+      useNativeDriver: true,
+    }).start();
+  }, [isOpen, fabScale]);
 
   return (
     <>
@@ -62,7 +82,13 @@ export default function EntryFormModal({ onAdd }: EntryFormModalProps) {
           </View>
         </View>
       </Modal>
-      {!isOpen && (
+      <Animated.View
+        style={[
+          styles.fabContainer,
+          { transform: [{ scale: fabScale }], opacity: fabScale },
+        ]}
+        pointerEvents={isOpen ? "none" : "auto"}
+      >
         <Pressable
           style={styles.fab}
           onPress={open}
@@ -71,7 +97,7 @@ export default function EntryFormModal({ onAdd }: EntryFormModalProps) {
         >
           <Ionicons name="add" size={28} color={colors.white} />
         </Pressable>
-      )}
+      </Animated.View>
     </>
   );
 }
@@ -79,10 +105,13 @@ export default function EntryFormModal({ onAdd }: EntryFormModalProps) {
 /** Creates styles based on the active color palette. */
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
-    fab: {
+    fabContainer: {
       position: "absolute",
       bottom: 24,
       right: 20,
+      zIndex: 20,
+    },
+    fab: {
       width: 56,
       height: 56,
       borderRadius: 28,
@@ -94,7 +123,6 @@ function createStyles(colors: ColorTokens) {
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.25,
       shadowRadius: 6,
-      zIndex: 20,
     },
     modalOverlay: {
       flex: 1,
