@@ -79,6 +79,12 @@ async function completeOnboarding() {
   fireEvent.press(screen.getByText("Get Started"));
 }
 
+/** Pre-accept HIPAA + onboarding so the app goes straight to main UI. */
+async function skipToMainUI() {
+  await AsyncStorage.setItem("@hipaa_agreement_accepted", "true");
+  await AsyncStorage.setItem("@onboarding_complete", "true");
+}
+
 async function addEntry(name: string, weeks: string, days: string) {
   fireEvent.press(screen.getByLabelText("Add someone new"));
   fireEvent.press(screen.getByText("Gestational Age"));
@@ -94,6 +100,7 @@ async function addEntry(name: string, weeks: string, days: string) {
 describe("App", () => {
   // First render pays module-compilation cost; needs extended timeout.
   it("shows splash then renders title after loading", async () => {
+    await skipToMainUI();
     render(<App />);
     expect(screen.getByTestId("splash-logo")).toBeTruthy();
     expect(screen.queryByText("in due time")).toBeNull();
@@ -107,18 +114,22 @@ describe("App", () => {
     });
   }, 20_000);
 
-  it("shows HIPAA agreement on first launch", async () => {
+  it("shows HIPAA agreement over splash on first launch", async () => {
     await renderApp();
 
+    // Should still be on splash (splash-bg visible)
+    expect(screen.getByTestId("splash-bg")).toBeTruthy();
     await waitFor(() => {
       expect(screen.getAllByText(/HIPAA/).length).toBeGreaterThan(0);
     });
   });
 
-  it("shows onboarding after HIPAA acceptance", async () => {
+  it("shows onboarding over splash after HIPAA acceptance", async () => {
     await renderApp();
     await acceptHipaa();
 
+    // Should still be on splash
+    expect(screen.getByTestId("splash-bg")).toBeTruthy();
     await waitFor(() => {
       expect(
         screen.getByText("You'll support dozens of families this year."),
@@ -248,6 +259,7 @@ describe("App", () => {
   });
 
   it("uses dark logos in dark mode", async () => {
+    await skipToMainUI();
     await renderAppWithTheme("dark");
 
     await waitFor(() => {
@@ -259,6 +271,7 @@ describe("App", () => {
   });
 
   it("uses light logos in light mode", async () => {
+    await skipToMainUI();
     await renderAppWithTheme("light");
 
     await waitFor(() => {
@@ -270,6 +283,7 @@ describe("App", () => {
   });
 
   it("uses light logos in mono mode", async () => {
+    await skipToMainUI();
     await renderAppWithTheme("mono");
 
     await waitFor(() => {
@@ -330,6 +344,7 @@ describe("App", () => {
   });
 
   it("uses dark app background in dark mode", async () => {
+    await skipToMainUI();
     await renderAppWithTheme("dark");
 
     await waitFor(() => {
@@ -338,6 +353,7 @@ describe("App", () => {
   });
 
   it("uses light app background in light mode", async () => {
+    await skipToMainUI();
     await renderAppWithTheme("light");
 
     await waitFor(() => {
@@ -346,6 +362,7 @@ describe("App", () => {
   });
 
   it("uses light app background in mono mode", async () => {
+    await skipToMainUI();
     await renderAppWithTheme("mono");
 
     await waitFor(() => {

@@ -76,6 +76,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   const [showAgreement, setShowAgreement] = useState(false);
   const [agreementLoaded, setAgreementLoaded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const onboardingDoneRef = useRef(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showAppInfo, setShowAppInfo] = useState(false);
   const [pickerAnchor, setPickerAnchor] = useState({ top: 0, right: 0 });
@@ -146,6 +147,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       if (!mounted) {
         return;
       }
+      onboardingDoneRef.current = !!onboardingDone;
       if (!accepted) {
         setShowAgreement(true);
       } else if (!onboardingDone) {
@@ -182,7 +184,9 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     acceptAgreement()
       .then(() => {
         setShowAgreement(false);
-        setShowOnboarding(true);
+        if (!onboardingDoneRef.current) {
+          setShowOnboarding(true);
+        }
       })
       .catch((e) => console.error("Failed to save agreement", e));
   };
@@ -203,7 +207,10 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       .catch((e) => console.error("Failed to reset agreement", e));
   };
 
-  if (isLoading) {
+  // Stay on splash until HIPAA + onboarding are both resolved
+  const showSplash = isLoading || showAgreement || showOnboarding;
+
+  if (showSplash) {
     return (
       <ImageBackground
         source={splashBg}
@@ -216,6 +223,14 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           style={styles.splashLogo}
           resizeMode="contain"
           testID="splash-logo"
+        />
+        <HipaaAgreementModal
+          visible={showAgreement && agreementLoaded}
+          onAccept={handleAcceptAgreement}
+        />
+        <OnboardingOverlay
+          visible={showOnboarding && !showAgreement}
+          onComplete={handleOnboardingComplete}
         />
         <StatusBar style="auto" />
       </ImageBackground>
@@ -273,14 +288,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           onAddPress={() => formModalRef.current?.open()}
         />
         <EntryFormModal ref={formModalRef} onAdd={add} />
-        <HipaaAgreementModal
-          visible={showAgreement && agreementLoaded}
-          onAccept={handleAcceptAgreement}
-        />
-        <OnboardingOverlay
-          visible={showOnboarding && !showAgreement}
-          onComplete={handleOnboardingComplete}
-        />
         <ThemePickerModal
           visible={showThemePicker}
           currentMode={themeMode}
