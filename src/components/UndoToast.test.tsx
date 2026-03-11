@@ -5,6 +5,12 @@ import renderWithTheme from "@/test/renderWithTheme";
 
 import UndoToast from "./UndoToast";
 
+const mockInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => mockInsets,
+}));
+
 // dueDate 2026-09-11 → 12w3d when today is 2026-03-02
 const mockEntry: Entry = {
   id: "1",
@@ -79,5 +85,18 @@ describe("UndoToast", () => {
     });
 
     expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("applies safe area bottom inset to positioning", () => {
+    mockInsets.bottom = 34;
+    renderToast();
+
+    const toast = screen.getByTestId("undo-toast");
+    const flatStyle = Array.isArray(toast.props.style)
+      ? Object.assign({}, ...toast.props.style.flat())
+      : toast.props.style;
+    // max(34, 16) + 16 = 50
+    expect(flatStyle.bottom).toBe(50);
+    mockInsets.bottom = 0;
   });
 });

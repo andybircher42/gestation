@@ -4,6 +4,12 @@ import renderWithTheme from "@/test/renderWithTheme";
 
 import InfoToast from "./InfoToast";
 
+const mockInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => mockInsets,
+}));
+
 describe("InfoToast", () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -55,5 +61,20 @@ describe("InfoToast", () => {
     });
 
     expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  it("applies safe area bottom inset to positioning", () => {
+    mockInsets.bottom = 34;
+    renderWithTheme(
+      <InfoToast message="Safe area test" onDismiss={jest.fn()} />,
+    );
+
+    const toast = screen.getByLabelText("Safe area test");
+    const flatStyle = Array.isArray(toast.props.style)
+      ? Object.assign({}, ...toast.props.style.flat())
+      : toast.props.style;
+    // max(34, 16) + 16 = 50
+    expect(flatStyle.bottom).toBe(50);
+    mockInsets.bottom = 0;
   });
 });

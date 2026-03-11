@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { Animated, StyleSheet, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useSwipeDismiss } from "@/hooks";
 import { ColorTokens, useTheme } from "@/theme";
@@ -14,6 +15,7 @@ const TOAST_DURATION_MS = 5000;
 /** Simple informational toast with auto-dismiss and swipe-to-dismiss. */
 export default function InfoToast({ message, onDismiss }: InfoToastProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { animatedValue: translateY, panHandlers } = useSwipeDismiss({
     axis: "y",
@@ -31,7 +33,13 @@ export default function InfoToast({ message, onDismiss }: InfoToastProps) {
 
   return (
     <Animated.View
-      style={[styles.container, { transform: [{ translateY }] }]}
+      style={[
+        styles.container,
+        {
+          bottom: Math.max(insets.bottom, 16) + 16,
+          transform: [{ translateY }],
+        },
+      ]}
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive"
       accessibilityLabel={message}
@@ -47,7 +55,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: {
       position: "absolute",
-      bottom: 32,
+      // bottom is applied dynamically via useSafeAreaInsets
       left: 16,
       right: 16,
       backgroundColor: colors.toastBackground,

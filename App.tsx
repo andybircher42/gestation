@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
@@ -89,6 +90,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     setPersonality,
     setBrightness,
   } = useTheme();
+  const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(true);
   const [showAgreement, setShowAgreement] = useState(false);
   const [agreementLoaded, setAgreementLoaded] = useState(false);
@@ -273,7 +275,10 @@ function AppContent({ loadThemePreference }: AppContentProps) {
         style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.header}>
+        <View
+          style={[styles.header, { paddingTop: insets.top + 16 }]}
+          testID="app-header"
+        >
           <Image
             source={headerLogo}
             style={styles.headerLogo}
@@ -401,7 +406,7 @@ function createStyles(colors: ColorTokens) {
     header: {
       flexDirection: "row",
       alignItems: "center",
-      paddingTop: (Constants.statusBarHeight ?? 0) + 16,
+      // paddingTop is applied dynamically via useSafeAreaInsets
       paddingBottom: 16,
       paddingHorizontal: 20,
       backgroundColor: colors.contentBackground,
