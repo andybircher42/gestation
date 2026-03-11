@@ -68,7 +68,7 @@ export function generateSeedEntries(): Entry[] {
   });
 }
 
-/** Dev-only toolbar with Seed Data and Reset HIPAA buttons. */
+/** Dev-only toolbar with Seed Data, Reset HIPAA, and Form Mode buttons. */
 export default function DevToolbar({
   onSeedData,
   onResetAgreement,

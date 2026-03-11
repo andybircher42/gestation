@@ -17,7 +17,7 @@ import * as Updates from "expo-updates";
 import {
   AppInfoModal,
   DevToolbar,
-  EntryForm,
+  EntryFormModal,
   EntryList,
   HipaaAgreementModal,
   InfoToast,
@@ -90,6 +90,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       setShowThemePicker(true);
     });
   }, []);
+
   const {
     entries,
     deletedEntry,
@@ -237,12 +238,12 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           )}
         </View>
 
-        <EntryForm onAdd={add} />
         <EntryList
           entries={entries}
           onDelete={remove}
           onDeleteAll={removeAll}
         />
+        <EntryFormModal onAdd={add} />
         <HipaaAgreementModal
           visible={showAgreement && agreementLoaded}
           onAccept={handleAcceptAgreement}

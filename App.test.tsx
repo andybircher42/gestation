@@ -65,6 +65,7 @@ async function acceptHipaa() {
 }
 
 async function addEntry(name: string, weeks: string, days: string) {
+  fireEvent.press(screen.getByLabelText("Add new entry"));
   fireEvent.press(screen.getByText("Gestational Age"));
   fireEvent.changeText(screen.getByLabelText("Name"), name);
   fireEvent.changeText(screen.getByLabelText("Weeks"), weeks);
