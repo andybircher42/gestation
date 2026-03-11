@@ -5,6 +5,7 @@ export { default as CalendarView } from "./CalendarView";
 export { default as DevToolbar } from "./DevToolbar";
 export { default as EntryForm } from "./EntryForm";
 export { default as EntryList } from "./EntryList";
+export { default as GestationalAgeInput } from "./GestationalAgeInput";
 export { default as Header } from "./Header";
 export { default as HipaaAgreementModal } from "./HipaaAgreementModal";
 export { default as HipaaDisclaimer } from "./HipaaDisclaimer";

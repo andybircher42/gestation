@@ -1,7 +1,7 @@
-import { StyleSheet, View } from "react-native";
+import { Image, ImageSourcePropType, StyleSheet } from "react-native";
 
 interface BirthstoneIconProps {
-  color: string;
+  image: ImageSourcePropType;
   size?: number;
 }
 
@@ -9,27 +9,18 @@ interface BirthstoneIconProps {
  *
  */
 export default function BirthstoneIcon({
-  color,
+  image,
   size = 40,
 }: BirthstoneIconProps) {
   return (
-    <View
-      style={[
-        styles.gem,
-        {
-          width: size,
-          height: size,
-          backgroundColor: color,
-          transform: [{ rotate: "45deg" }],
-          borderRadius: size * 0.2,
-        },
-      ]}
+    <Image
+      source={image}
+      style={[styles.gem, { width: size, height: size }]}
+      resizeMode="contain"
     />
   );
 }
 
 const styles = StyleSheet.create({
-  gem: {
-    opacity: 0.9,
-  },
+  gem: {},
 });

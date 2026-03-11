@@ -91,23 +91,6 @@ export default function HomeScreen({ navigation, route }: Props) {
     <View style={styles.container}>
       <Header patientCount={patients.length} />
 
-      <View style={styles.body}>
-        {activeTab === "patients" ? (
-          <FlatList
-            data={gridData}
-            renderItem={renderPatientItem}
-            keyExtractor={(item) =>
-              typeof item === "string" ? "add-btn" : item.id
-            }
-            numColumns={2}
-            contentContainerStyle={styles.grid}
-            columnWrapperStyle={styles.gridRow}
-          />
-        ) : (
-          <CalendarView patients={patients} />
-        )}
-      </View>
-
       {/* Tab Bar */}
       <View style={styles.tabBar}>
         <Pressable
@@ -136,6 +119,23 @@ export default function HomeScreen({ navigation, route }: Props) {
             Calendar
           </Text>
         </Pressable>
+      </View>
+
+      <View style={styles.body}>
+        {activeTab === "patients" ? (
+          <FlatList
+            data={gridData}
+            renderItem={renderPatientItem}
+            keyExtractor={(item) =>
+              typeof item === "string" ? "add-btn" : item.id
+            }
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            columnWrapperStyle={styles.gridRow}
+          />
+        ) : (
+          <CalendarView patients={patients} />
+        )}
       </View>
       <StatusBar style="light" />
     </View>
@@ -180,28 +180,27 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-    paddingBottom: 20, // safe area
+    justifyContent: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#b2b2b2",
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
   },
   tabActive: {
-    borderBottomColor: "#391b59",
+    borderBottomColor: "#303030",
   },
   tabText: {
     fontFamily: "DMSans-Regular",
-    fontSize: 14,
-    color: "#999",
+    fontSize: 16,
+    color: "#767676",
   },
   tabTextActive: {
-    fontFamily: "DMSans-Bold",
-    color: "#391b59",
+    color: "#303030",
   },
 });

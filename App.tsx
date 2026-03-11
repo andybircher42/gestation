@@ -7,6 +7,7 @@ import AppNavigator from "@/navigation/AppNavigator";
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 const FONTS = {
+  "Fraunces-Regular": require("./assets/fonts/Fraunces-Regular.ttf") as string,
   "Fraunces-Bold": require("./assets/fonts/Fraunces-Bold.ttf") as string,
   "DMSans-Regular": require("./assets/fonts/DMSans-Regular.ttf") as string,
   "DMSans-Bold": require("./assets/fonts/DMSans-Bold.ttf") as string,

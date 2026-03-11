@@ -15,6 +15,20 @@ interface CalendarViewProps {
 export default function CalendarView({ patients }: CalendarViewProps) {
   const today = useMemo(() => new Date(), []);
 
+  // Build a map of ISO date -> patients with that EDD
+  const dueDateMap = useMemo(() => {
+    const map = new Map<string, typeof patients>();
+    for (const p of patients) {
+      const existing = map.get(p.edd);
+      if (existing) {
+        existing.push(p);
+      } else {
+        map.set(p.edd, [p]);
+      }
+    }
+    return map;
+  }, [patients]);
+
   // Show current month + next 10 months
   const months = useMemo(() => {
     const result: { year: number; month: number; cells: DayCell[] }[] = [];
@@ -38,6 +52,7 @@ export default function CalendarView({ patients }: CalendarViewProps) {
           day: dayNum,
           color: entry.color,
           load: entry.load,
+          duePatients: dueDateMap.get(entry.date) ?? [],
         };
       });
 
@@ -45,7 +60,7 @@ export default function CalendarView({ patients }: CalendarViewProps) {
     }
 
     return result;
-  }, [patients, today]);
+  }, [patients, today, dueDateMap]);
 
   if (patients.length === 0) {
     return (

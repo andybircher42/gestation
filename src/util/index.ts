@@ -3,6 +3,7 @@ export {
   BIRTHSTONES,
   getBirthstone,
   getBirthstoneForDate,
+  getBirthstoneImage,
 } from "./birthstones";
 export {
   expandTwoDigitYear,

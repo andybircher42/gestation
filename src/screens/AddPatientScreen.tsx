@@ -1,24 +1,28 @@
-import { useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
+  Animated,
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 
-import { BirthstoneIcon, Header } from "@/components";
+import { BirthstoneIcon, GestationalAgeInput } from "@/components";
 import { Patient } from "@/storage";
 import {
   Birthstone,
   computeDueDate,
   formatDueDate,
+  gestationalAgeFromDueDate,
   getBirthstoneForDate,
+  getBirthstoneImage,
   toISODateString,
 } from "@/util";
 
@@ -28,11 +32,106 @@ type Props = NativeStackScreenProps<RootStackParamList, "AddPatient">;
 
 type InputMode = "dueDate" | "gestationalAge";
 
+const STEP_LABELS = ["Name", "Due date", "Avatar"] as const;
+
 // Helper to generate patient ID
 let addPatientIdCounter = 0;
 function generatePatientId(): string {
   return `p-${Date.now()}-${addPatientIdCounter++}`;
 }
+
+// ---------------------------------------------------------------------------
+// Shared layout: progress bar + content + bottom buttons
+// ---------------------------------------------------------------------------
+
+interface StepLayoutProps {
+  step: 1 | 2 | 3;
+  insets: { top: number };
+  onBack: () => void;
+  children: ReactNode;
+  buttons: ReactNode;
+}
+
+function StepLayout({
+  step,
+  insets,
+  onBack,
+  children,
+  buttons,
+}: StepLayoutProps) {
+  return (
+    <View style={styles.container}>
+      {/* Progress indicator */}
+      <View style={[styles.progressBar, { paddingTop: insets.top + 12 }]}>
+        <Pressable onPress={onBack} style={styles.backButton}>
+          <Text style={styles.backArrow}>←</Text>
+        </Pressable>
+        <View style={styles.stepPills}>
+          {STEP_LABELS.map((label, i) => {
+            const stepNum = i + 1;
+            const isActive = stepNum === step;
+            const isCompleted = stepNum < step;
+            return (
+              <View
+                key={label}
+                style={[
+                  styles.pill,
+                  isActive && styles.pillActive,
+                  isCompleted && styles.pillCompleted,
+                  !isActive && !isCompleted && styles.pillFuture,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.pillText,
+                    isActive && styles.pillTextActive,
+                    isCompleted && styles.pillTextCompleted,
+                    !isActive && !isCompleted && styles.pillTextFuture,
+                  ]}
+                >
+                  {label}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+
+      <KeyboardAvoidingView
+        style={styles.content}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.contentArea}>{children}</View>
+        <View style={styles.buttonArea}>{buttons}</View>
+      </KeyboardAvoidingView>
+      <StatusBar style="dark" />
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared question + input layout (steps 1 & 2)
+// ---------------------------------------------------------------------------
+
+interface QuestionStepProps {
+  question: string;
+  error: string;
+  children: ReactNode; // the input field(s)
+}
+
+function QuestionStep({ question, error, children }: QuestionStepProps) {
+  return (
+    <View style={styles.questionStepContent}>
+      <Text style={styles.question}>{question}</Text>
+      {children}
+      {error !== "" && <Text style={styles.error}>{error}</Text>}
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main screen
+// ---------------------------------------------------------------------------
 
 /**
  *
@@ -54,6 +153,43 @@ export default function AddPatientScreen({ navigation, route }: Props) {
   });
 
   const patientCount = route.params?.patientCount ?? 0;
+  const insets = useSafeAreaInsets();
+
+  // Fade animation for step 1 arrow button
+  const step1ButtonOpacity = useRef(new Animated.Value(0)).current;
+  const hasName = name.trim().length > 0;
+
+  useEffect(() => {
+    Animated.timing(step1ButtonOpacity, {
+      toValue: hasName ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [hasName, step1ButtonOpacity]);
+
+  // Fade animation for step 2 arrow button
+  const step2ButtonOpacity = useRef(new Animated.Value(0)).current;
+  const hasDateInput =
+    inputMode === "dueDate"
+      ? dueDateText.length === 5 && dueDateText.charAt(2) === "/"
+      : weeks.length >= 2 && days.length >= 1;
+
+  useEffect(() => {
+    Animated.timing(step2ButtonOpacity, {
+      toValue: hasDateInput ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [hasDateInput, step2ButtonOpacity]);
+
+  const handleBack = () => {
+    if (step === 1) {
+      navigation.goBack();
+    } else {
+      setStep((step - 1) as 1 | 2);
+      setError("");
+    }
+  };
 
   const handleStep1Next = () => {
     if (name.trim().length === 0) {
@@ -68,35 +204,28 @@ export default function AddPatientScreen({ navigation, route }: Props) {
     let edd: string;
 
     if (inputMode === "dueDate") {
-      // Parse MM/DD or MM/DD/YYYY
-      const cleaned = dueDateText.replace(/\//g, "-");
-      const parts = cleaned.split("-");
-      if (parts.length < 2) {
-        setError("Enter date as MM/DD or MM/DD/YYYY");
+      const parts = dueDateText.split("/");
+      if (parts.length < 2 || parts[1].length === 0) {
+        setError("Enter date as MM/DD");
         return;
       }
       const month = parseInt(parts[0], 10);
       const day = parseInt(parts[1], 10);
-      let year: number;
-      if (parts.length >= 3 && parts[2].length > 0) {
-        year = parseInt(parts[2], 10);
-        if (year < 100) {year += 2000;}
-      } else {
-        // Default to current or next year based on whether date has passed
-        const now = new Date();
-        const thisYear = now.getFullYear();
-        const candidate = new Date(thisYear, month - 1, day);
-        year =
-          candidate <
-          new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-            ? thisYear + 1
-            : thisYear;
-      }
 
       if (month < 1 || month > 12 || day < 1 || day > 31) {
         setError("Invalid date");
         return;
       }
+
+      // Infer year: use current year, or next year if the date has passed
+      const now = new Date();
+      const thisYear = now.getFullYear();
+      const candidate = new Date(thisYear, month - 1, day);
+      const year =
+        candidate <
+        new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+          ? thisYear + 1
+          : thisYear;
 
       const date = new Date(year, month - 1, day);
       if (date.getMonth() !== month - 1 || date.getDate() !== day) {
@@ -106,7 +235,6 @@ export default function AddPatientScreen({ navigation, route }: Props) {
 
       edd = toISODateString(date);
     } else {
-      // GA mode
       const w = parseInt(weeks, 10);
       const d = parseInt(days || "0", 10);
       if (isNaN(w) || w < 0 || w > 42) {
@@ -127,26 +255,19 @@ export default function AddPatientScreen({ navigation, route }: Props) {
     setStep(3);
   };
 
+  const buildPatient = (): Patient => ({
+    id: generatePatientId(),
+    name: name.trim(),
+    edd: finalEdd,
+    birthstone: finalBirthstone,
+  });
+
   const handleDone = () => {
-    const patient: Patient = {
-      id: generatePatientId(),
-      name: name.trim(),
-      edd: finalEdd,
-      birthstone: finalBirthstone,
-    };
-    // Pass patient back via route params callback or navigation
-    navigation.navigate("Home", { newPatient: patient });
+    navigation.navigate("Home", { newPatient: buildPatient() });
   };
 
   const handleAddAnother = () => {
-    const patient: Patient = {
-      id: generatePatientId(),
-      name: name.trim(),
-      edd: finalEdd,
-      birthstone: finalBirthstone,
-    };
-    navigation.navigate("Home", { newPatient: patient });
-    // Reset and go back to step 1 after a short delay
+    navigation.navigate("Home", { newPatient: buildPatient() });
     setTimeout(() => {
       setStep(1);
       setName("");
@@ -158,21 +279,11 @@ export default function AddPatientScreen({ navigation, route }: Props) {
     }, 100);
   };
 
-  // Format due date input with auto-slashes
   const handleDueDateChange = (text: string) => {
-    // Remove non-numeric except /
-    const cleaned = text.replace(/[^0-9/]/g, "");
-    // Auto-add slash after MM
+    const cleaned = text.replace(/[^0-9/]/g, "").slice(0, 5);
     if (
       cleaned.length === 2 &&
       !cleaned.includes("/") &&
-      dueDateText.length < text.length
-    ) {
-      setDueDateText(cleaned + "/");
-    } else if (
-      cleaned.length === 5 &&
-      cleaned.charAt(2) === "/" &&
-      !cleaned.substring(3).includes("/") &&
       dueDateText.length < text.length
     ) {
       setDueDateText(cleaned + "/");
@@ -183,159 +294,204 @@ export default function AddPatientScreen({ navigation, route }: Props) {
   };
 
   const toggleInputMode = () => {
-    setInputMode((prev) => (prev === "dueDate" ? "gestationalAge" : "dueDate"));
+    if (inputMode === "dueDate") {
+      // Convert MM/DD → gestational age if complete
+      if (dueDateText.length === 5 && dueDateText.charAt(2) === "/") {
+        const parts = dueDateText.split("/");
+        const month = parseInt(parts[0], 10);
+        const day = parseInt(parts[1], 10);
+        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const now = new Date();
+          const thisYear = now.getFullYear();
+          const candidate = new Date(thisYear, month - 1, day);
+          const year =
+            candidate <
+            new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+              ? thisYear + 1
+              : thisYear;
+          const edd = toISODateString(new Date(year, month - 1, day));
+          const ga = gestationalAgeFromDueDate(edd);
+          setWeeks(String(ga.weeks).padStart(2, "0"));
+          setDays(String(ga.days));
+        }
+      } else {
+        setWeeks("");
+        setDays("");
+      }
+      setInputMode("gestationalAge");
+    } else {
+      // Convert GA → due date if weeks is entered
+      if (weeks.length > 0) {
+        const w = parseInt(weeks, 10);
+        const d = parseInt(days || "0", 10);
+        if (!isNaN(w) && w >= 0 && w <= 42 && !isNaN(d) && d >= 0 && d <= 6) {
+          const dueDate = computeDueDate(w, d);
+          const m = String(dueDate.getMonth() + 1).padStart(2, "0");
+          const dd = String(dueDate.getDate()).padStart(2, "0");
+          setDueDateText(`${m}/${dd}`);
+        }
+      } else {
+        setDueDateText("");
+      }
+      setInputMode("dueDate");
+    }
     setError("");
   };
 
-  return (
-    <View style={styles.container}>
-      <Header patientCount={patientCount} />
-      <KeyboardAvoidingView
-        style={styles.content}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          {step === 1 && (
-            <View style={styles.stepContainer}>
-              <Text style={styles.question}>
-                What is your{"\n"}patient's name?
-              </Text>
-              <TextInput
-                style={styles.textInput}
-                value={name}
-                onChangeText={(t) => {
-                  setName(t);
-                  setError("");
-                }}
-                placeholder="First name"
-                placeholderTextColor="#999"
-                autoFocus
-                returnKeyType="next"
-                onSubmitEditing={handleStep1Next}
-              />
-              {error !== "" && <Text style={styles.error}>{error}</Text>}
-              <Pressable
-                style={[
-                  styles.button,
-                  name.trim().length === 0 && styles.buttonDisabled,
-                ]}
-                onPress={handleStep1Next}
-                disabled={name.trim().length === 0}
-              >
-                <Text style={styles.buttonText}>Next</Text>
-              </Pressable>
-            </View>
-          )}
+  // --- Arrow button (shared by steps 1 & 2) ---
+  const arrowButton = (
+    onPress: () => void,
+    opacity: Animated.Value,
+    enabled: boolean,
+  ) => (
+    <Animated.View
+      style={{ opacity, width: "100%" }}
+      pointerEvents={enabled ? "auto" : "none"}
+    >
+      <Pressable style={styles.arrowButton} onPress={onPress}>
+        <Text style={styles.arrowButtonText}>→</Text>
+      </Pressable>
+    </Animated.View>
+  );
 
-          {step === 2 && (
-            <View style={styles.stepContainer}>
-              <Text style={styles.question}>
-                {inputMode === "dueDate"
-                  ? `What is ${name}'s\ndue date?`
-                  : `What is ${name}'s\ngestational age?`}
-              </Text>
-
-              {inputMode === "dueDate" ? (
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={[styles.textInput, styles.dateInput]}
-                    value={dueDateText}
-                    onChangeText={handleDueDateChange}
-                    placeholder="MM/DD"
-                    placeholderTextColor="#999"
-                    keyboardType="number-pad"
-                    autoFocus
-                    maxLength={10}
-                  />
-                  <Pressable
-                    style={styles.swapButton}
-                    onPress={toggleInputMode}
-                  >
-                    <Text style={styles.swapIcon}>⇄</Text>
-                  </Pressable>
-                </View>
-              ) : (
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={[styles.textInput, styles.gaInput]}
-                    value={weeks}
-                    onChangeText={(t) => {
-                      setWeeks(t.replace(/[^0-9]/g, ""));
-                      setError("");
-                    }}
-                    placeholder="WW"
-                    placeholderTextColor="#999"
-                    keyboardType="number-pad"
-                    autoFocus
-                    maxLength={2}
-                  />
-                  <Text style={styles.gaLabel}>w</Text>
-                  <TextInput
-                    style={[styles.textInput, styles.gaInput]}
-                    value={days}
-                    onChangeText={(t) => {
-                      setDays(t.replace(/[^0-9]/g, ""));
-                      setError("");
-                    }}
-                    placeholder="DD"
-                    placeholderTextColor="#999"
-                    keyboardType="number-pad"
-                    maxLength={1}
-                  />
-                  <Text style={styles.gaLabel}>d</Text>
-                  <Pressable
-                    style={styles.swapButton}
-                    onPress={toggleInputMode}
-                  >
-                    <Text style={styles.swapIcon}>⇄</Text>
-                  </Pressable>
-                </View>
-              )}
-
-              {error !== "" && <Text style={styles.error}>{error}</Text>}
-              <Pressable style={styles.button} onPress={handleStep2Next}>
-                <Text style={styles.buttonText}>Next</Text>
-              </Pressable>
-            </View>
-          )}
-
-          {step === 3 && (
-            <View style={styles.stepContainer}>
-              <View style={styles.confirmGem}>
-                <BirthstoneIcon color={finalBirthstone.color} size={64} />
-              </View>
-              <Text style={styles.confirmTitle}>{name}'s baby</Text>
-              <Text style={styles.confirmDetail}>
-                Due {formatDueDate(finalEdd)}
-              </Text>
-              <Text style={styles.confirmDetail}>{finalBirthstone.name}</Text>
-
-              <View style={styles.confirmButtons}>
-                <Pressable style={styles.button} onPress={handleDone}>
-                  <Text style={styles.buttonText}>Done</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.secondaryButton]}
-                  onPress={handleAddAnother}
-                >
-                  <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-                    Add Another Patient
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-      <StatusBar style="light" />
+  // --- Date input field ---
+  const dueDateInput = (
+    <View style={styles.inputRow}>
+      <TextInput
+        style={styles.fieldInput}
+        value={dueDateText}
+        onChangeText={handleDueDateChange}
+        placeholder="MM/DD"
+        placeholderTextColor="rgba(0,0,0,0.1)"
+        keyboardType="number-pad"
+        autoFocus
+        maxLength={5}
+      />
+      <Pressable style={styles.swapButton} onPress={toggleInputMode}>
+        <MaterialIcons name="swap-calls" size={28} color="#391b59" />
+      </Pressable>
     </View>
+  );
+
+  // --- GA input (same inputRow wrapper as due date) ---
+  const gaInput = (
+    <View style={styles.inputRow}>
+      <GestationalAgeInput
+        weeks={weeks}
+        days={days}
+        onChangeWeeks={(w) => {
+          setWeeks(w);
+          setError("");
+        }}
+        onChangeDays={(d) => {
+          setDays(d);
+          setError("");
+        }}
+      />
+      <Pressable style={styles.swapButton} onPress={toggleInputMode}>
+        <MaterialIcons name="swap-calls" size={28} color="#391b59" />
+      </Pressable>
+    </View>
+  );
+
+  // =========================================================================
+  // Render
+  // =========================================================================
+
+  if (step === 1) {
+    return (
+      <StepLayout
+        step={1}
+        insets={insets}
+        onBack={handleBack}
+        buttons={arrowButton(handleStep1Next, step1ButtonOpacity, hasName)}
+      >
+        <QuestionStep
+          question={`What is your patient's\nfirst name?`}
+          error={error}
+        >
+          <TextInput
+            style={styles.fieldInput}
+            value={name}
+            onChangeText={(t) => {
+              setName(t);
+              setError("");
+            }}
+            autoFocus
+            returnKeyType="next"
+            onSubmitEditing={handleStep1Next}
+          />
+        </QuestionStep>
+      </StepLayout>
+    );
+  }
+
+  if (step === 2) {
+    const questionText =
+      inputMode === "dueDate"
+        ? `What is ${name}'s\ndue date?`
+        : `What is the gestational age\nof ${name}'s baby?`;
+
+    return (
+      <StepLayout
+        step={2}
+        insets={insets}
+        onBack={handleBack}
+        buttons={arrowButton(handleStep2Next, step2ButtonOpacity, hasDateInput)}
+      >
+        <QuestionStep question={questionText} error={error}>
+          {inputMode === "dueDate" ? dueDateInput : gaInput}
+        </QuestionStep>
+      </StepLayout>
+    );
+  }
+
+  // Step 3: Avatar / confirmation
+  return (
+    <StepLayout
+      step={3}
+      insets={insets}
+      onBack={handleBack}
+      buttons={
+        <>
+          <Pressable style={styles.primaryButton} onPress={handleDone}>
+            <Text style={styles.primaryButtonText}>Done</Text>
+          </Pressable>
+          <Pressable style={styles.secondaryButton} onPress={handleAddAnother}>
+            <Text style={styles.secondaryButtonText}>Add Another Patient</Text>
+          </Pressable>
+        </>
+      }
+    >
+      <View style={styles.confirmContent}>
+        <View
+          style={[
+            styles.confirmCard,
+            { backgroundColor: finalBirthstone.color },
+          ]}
+        >
+          <View style={styles.confirmGemShadow}>
+            <BirthstoneIcon
+              image={getBirthstoneImage(finalBirthstone.name)}
+              size={148}
+            />
+          </View>
+          <View style={styles.confirmTextGroup}>
+            <Text style={styles.confirmTitle}>{name}&rsquo;s Baby</Text>
+            <Text style={styles.confirmDetail}>{formatDueDate(finalEdd)}</Text>
+          </View>
+        </View>
+      </View>
+    </StepLayout>
   );
 }
 
+// ---------------------------------------------------------------------------
+// Styles
+// ---------------------------------------------------------------------------
+
 const styles = StyleSheet.create({
+  // Shell
   container: {
     flex: 1,
     backgroundColor: "#f0f1d6",
@@ -343,66 +499,100 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "center",
-    padding: 24,
+  contentArea: {
+    flex: 1,
+    paddingHorizontal: 28,
+    paddingTop: 48,
   },
-  stepContainer: {
+  buttonArea: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 8,
+  },
+
+  // Progress bar
+  progressBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 12,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
     alignItems: "center",
   },
-  question: {
-    fontFamily: "DMSans-Bold",
+  backArrow: {
     fontSize: 24,
     color: "#391b59",
-    textAlign: "center",
-    marginBottom: 32,
-    lineHeight: 32,
   },
-  textInput: {
-    fontFamily: "DMSans-Regular",
-    fontSize: 18,
-    color: "#333",
+  stepPills: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  pill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  pillActive: {
+    backgroundColor: "#391b59",
+  },
+  pillCompleted: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: "#fff",
+    borderColor: "#391b59",
+  },
+  pillFuture: {
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.1)",
+  },
+  pillText: {
+    fontFamily: "DMSans-Bold",
+    fontSize: 18,
+  },
+  pillTextActive: {
+    color: "#f0f1d6",
+  },
+  pillTextCompleted: {
+    color: "#391b59",
+  },
+  pillTextFuture: {
+    color: "rgba(0,0,0,0.1)",
+  },
+
+  // Shared question + input layout
+  questionStepContent: {
+    alignItems: "flex-start",
     width: "100%",
-    maxWidth: 300,
   },
-  dateInput: {
-    flex: 1,
+  question: {
+    fontFamily: "Fraunces-Regular",
+    fontSize: 24,
+    color: "#391b59",
+    textAlign: "left",
+    marginBottom: 32,
   },
+  fieldInput: {
+    fontFamily: "DMSans-Bold",
+    fontSize: 48,
+    color: "#391b59",
+    textAlign: "left",
+    width: "100%",
+    outlineStyle: "none",
+  } as never,
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    justifyContent: "space-between",
     width: "100%",
-    maxWidth: 300,
-  },
-  gaInput: {
-    width: 70,
-    textAlign: "center",
-    flex: 0,
-  },
-  gaLabel: {
-    fontFamily: "DMSans-Regular",
-    fontSize: 18,
-    color: "#391b59",
+    flexWrap: "nowrap",
   },
   swapButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#391b59",
+    padding: 8,
     justifyContent: "center",
     alignItems: "center",
-  },
-  swapIcon: {
-    fontSize: 20,
-    color: "#fff",
   },
   error: {
     fontFamily: "DMSans-Regular",
@@ -410,49 +600,86 @@ const styles = StyleSheet.create({
     color: "#dc2626",
     marginTop: 8,
   },
-  button: {
-    backgroundColor: "#391b59",
+
+  // Arrow button (steps 1 & 2)
+  arrowButton: {
+    width: "100%",
+    height: 64,
     borderRadius: 16,
-    paddingHorizontal: 48,
-    paddingVertical: 16,
-    marginTop: 24,
-    minWidth: 200,
+    backgroundColor: "#391b59",
+    justifyContent: "center",
     alignItems: "center",
   },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonText: {
+  arrowButtonText: {
     fontFamily: "DMSans-Bold",
-    fontSize: 16,
+    fontSize: 18,
     color: "#ffffff",
   },
-  secondaryButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#391b59",
+
+  // Confirmation (step 3) — content
+  confirmContent: {
+    flex: 1,
+    alignItems: "center",
+    marginHorizontal: -6, // 28px contentArea padding → 22px effective margin
   },
-  secondaryButtonText: {
-    color: "#391b59",
+  confirmCard: {
+    borderRadius: 12,
+    paddingVertical: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 327,
+    gap: 16,
   },
-  confirmGem: {
-    marginBottom: 24,
+  confirmGemShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.55,
+    shadowRadius: 32,
+    elevation: 16,
+  },
+  confirmTextGroup: {
+    alignItems: "center",
+    gap: 4,
+    width: "100%",
   },
   confirmTitle: {
     fontFamily: "Fraunces-Bold",
-    fontSize: 28,
-    color: "#391b59",
-    marginBottom: 8,
+    fontSize: 35,
+    color: "#ffffff",
+    textAlign: "center",
   },
   confirmDetail: {
-    fontFamily: "DMSans-Regular",
-    fontSize: 16,
-    color: "#391b59",
-    marginBottom: 4,
+    fontFamily: "DMSans-Bold",
+    fontSize: 18,
+    color: "#ffffff",
+    textAlign: "center",
   },
-  confirmButtons: {
-    marginTop: 32,
-    gap: 12,
+
+  // Buttons (step 3)
+  primaryButton: {
+    width: "100%",
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: "#391b59",
+    justifyContent: "center",
     alignItems: "center",
+  },
+  primaryButtonText: {
+    fontFamily: "DMSans-Bold",
+    fontSize: 18,
+    color: "#ffffff",
+  },
+  secondaryButton: {
+    width: "100%",
+    height: 64,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  secondaryButtonText: {
+    fontFamily: "DMSans-Bold",
+    fontSize: 18,
+    color: "#391b59",
   },
 });

@@ -27,11 +27,14 @@ const LOW = 140;
 const HIGH = 301;
 const INDUCTION_DAY = 287; // 41w0d
 
-const COLOR_NONE = "#F0F4F8";
-const COLOR_LOW = "#A8D5A2";
-const COLOR_MEDIUM = "#F9C74F";
-const COLOR_HIGH = "#F4845F";
-const COLOR_PEAK = "#C1121F";
+// Heat-map: single color (#391B59) with opacity scaled linearly.
+// Max opacity 40% at load >= 0.10 (10% combined delivery probability).
+const HEAT_COLOR_R = 0x39;
+const HEAT_COLOR_G = 0x1b;
+const HEAT_COLOR_B = 0x59;
+const MAX_OPACITY = 0.4;
+const MAX_LOAD = 0.1; // load at which opacity caps out
+const MIN_LOAD = 0.005; // below this, no color shown
 
 // ---- Math helpers ---------------------------------------------------------
 
@@ -292,22 +295,18 @@ export function deliveryLoadForDate(
 }
 
 /**
- * Map a numeric delivery load to a hex color string.
+ * Map a numeric delivery load to an rgba color string.
+ *
+ * Uses #391B59 with opacity linearly scaled from 0 to 40%.
+ * Fixed scale: load 0.10 (10%) = 40% opacity. Loads below 0.005 are transparent.
  */
 export function colorForLoad(load: number): string {
-  if (load < 0.005) {
-    return COLOR_NONE;
+  if (load < MIN_LOAD) {
+    return "transparent";
   }
-  if (load <= 0.02) {
-    return COLOR_LOW;
-  }
-  if (load <= 0.05) {
-    return COLOR_MEDIUM;
-  }
-  if (load <= 0.1) {
-    return COLOR_HIGH;
-  }
-  return COLOR_PEAK;
+  const t = Math.min(load / MAX_LOAD, 1);
+  const alpha = (t * MAX_OPACITY).toFixed(3);
+  return `rgba(${HEAT_COLOR_R},${HEAT_COLOR_G},${HEAT_COLOR_B},${alpha})`;
 }
 
 /**

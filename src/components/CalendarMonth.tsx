@@ -1,11 +1,17 @@
 import { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { Patient } from "@/engine/probabilityEngine";
+import { getBirthstoneImage } from "@/util";
+
+import BirthstoneIcon from "./BirthstoneIcon";
+
 export interface DayCell {
   date: string; // ISO YYYY-MM-DD
   day: number; // day of month (1-31)
   color: string; // heat map color
   load: number; // numeric probability load
+  duePatients: Patient[]; // patients with EDD on this date
 }
 
 interface CalendarMonthProps {
@@ -62,8 +68,9 @@ export default function CalendarMonth({
       const cell = cellMap.get(d) ?? {
         date: "",
         day: d,
-        color: "#F0F4F8",
+        color: "transparent",
         load: 0,
+        duePatients: [],
       };
       currentRow.push(cell);
       if (currentRow.length === 7) {
@@ -106,14 +113,34 @@ export default function CalendarMonth({
               ]}
             >
               {cell && (
-                <Text
-                  style={[
-                    styles.dayText,
-                    cell.load > 0.05 && styles.dayTextHighContrast,
-                  ]}
-                >
-                  {cell.day}
-                </Text>
+                <>
+                  <Text style={styles.dayText}>{cell.day}</Text>
+                  {cell.duePatients.length > 0 && (
+                    <View style={styles.iconsRow}>
+                      {cell.duePatients.length <= 3 ? (
+                        cell.duePatients.map((p) => (
+                          <BirthstoneIcon
+                            key={p.id}
+                            image={getBirthstoneImage(p.birthstone.name)}
+                            size={12}
+                          />
+                        ))
+                      ) : (
+                        <>
+                          <BirthstoneIcon
+                            image={getBirthstoneImage(
+                              cell.duePatients[0].birthstone.name,
+                            )}
+                            size={12}
+                          />
+                          <Text style={styles.overflowText}>
+                            +{cell.duePatients.length - 1}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  )}
+                </>
               )}
             </View>
           ))}
@@ -152,18 +179,26 @@ const styles = StyleSheet.create({
   dayCell: {
     flex: 1,
     aspectRatio: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
     margin: 1,
     borderRadius: 4,
+    padding: 2,
   },
   dayText: {
     fontFamily: "DMSans-Regular",
-    fontSize: 12,
+    fontSize: 10,
     color: "#333",
   },
-  dayTextHighContrast: {
-    color: "#fff",
-    fontWeight: "700",
+  iconsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    marginTop: 1,
+  },
+  overflowText: {
+    fontFamily: "DMSans-Bold",
+    fontSize: 8,
+    color: "#391b59",
   },
 });

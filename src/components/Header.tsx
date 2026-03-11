@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HeaderProps {
   patientCount: number;
@@ -8,11 +9,14 @@ interface HeaderProps {
  *
  */
 export default function Header({ patientCount }: HeaderProps) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
       <Text style={styles.title}>In Due Time</Text>
       <Text style={styles.subtitle}>
-        Supporting {patientCount} {patientCount === 1 ? "patient" : "patients"}
+        Supporting <Text style={styles.count}>{patientCount}</Text>{" "}
+        {patientCount === 1 ? "patient" : "patients"}
       </Text>
     </View>
   );
@@ -23,21 +27,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#391b59",
     borderTopLeftRadius: 36,
     borderTopRightRadius: 36,
-    paddingTop: 16,
     paddingBottom: 16,
-    paddingHorizontal: 20,
-    flexDirection: "row",
+    paddingHorizontal: 24,
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
+    gap: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 8,
   },
   title: {
     fontFamily: "Fraunces-Bold",
-    fontSize: 20,
+    fontSize: 24,
     color: "#ffffff",
+    fontWeight: "700",
   },
   subtitle: {
     fontFamily: "DMSans-Regular",
     fontSize: 14,
-    color: "rgba(255,255,255,0.7)",
+    color: "#ffffff",
+  },
+  count: {
+    fontFamily: "DMSans-Bold",
+    fontWeight: "900",
   },
 });

@@ -2,7 +2,11 @@ import { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Patient } from "@/storage";
-import { formatDueDate, gestationalAgeFromDueDate } from "@/util";
+import {
+  formatDueDate,
+  gestationalAgeFromDueDate,
+  getBirthstoneImage,
+} from "@/util";
 
 import BirthstoneIcon from "./BirthstoneIcon";
 
@@ -38,7 +42,10 @@ export default function PatientCard({
       accessibilityLabel={`${patient.name}, ${ga.weeks} weeks ${ga.days} days`}
     >
       <View style={styles.gemContainer}>
-        <BirthstoneIcon color="rgba(255,255,255,0.3)" size={36} />
+        <BirthstoneIcon
+          image={getBirthstoneImage(patient.birthstone.name)}
+          size={36}
+        />
       </View>
       <Text style={styles.name} numberOfLines={1}>
         {patient.name}
