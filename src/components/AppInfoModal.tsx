@@ -148,7 +148,7 @@ function createStyles(colors: ColorTokens) {
       minHeight: 44,
     },
     detailText: {
-      fontSize: 13,
+      fontSize: 14,
       color: colors.textTertiary,
       marginBottom: 4,
     },

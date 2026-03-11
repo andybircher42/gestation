@@ -273,8 +273,8 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           <InfoToast
             message={
               discardedCount === 1
-                ? "1 entry was corrupted and removed"
-                : `${discardedCount} entries were corrupted and removed`
+                ? "1 entry was corrupted and deleted"
+                : `${discardedCount} entries were corrupted and deleted`
             }
             onDismiss={dismissDiscarded}
           />

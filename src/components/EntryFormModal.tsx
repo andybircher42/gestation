@@ -110,7 +110,7 @@ function createStyles(colors: ColorTokens) {
       paddingBottom: 4,
     },
     modalTitle: {
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: "700",
       color: colors.textPrimary,
     },

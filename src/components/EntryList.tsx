@@ -341,7 +341,7 @@ function createStyles(colors: ColorTokens) {
     },
     deleteAllText: {
       color: colors.white,
-      fontSize: 13,
+      fontSize: 14,
       fontWeight: "600",
     },
     sortButton: {
