@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { ColorTokens, useTheme } from "@/theme";
+import { lineHeight } from "@/util";
 
 interface HipaaAgreementModalProps {
   visible: boolean;
@@ -89,7 +90,7 @@ function createStyles(colors: ColorTokens) {
     modalText: {
       fontSize: 15,
       color: colors.textModal,
-      lineHeight: 22,
+      lineHeight: lineHeight(22),
       marginBottom: 12,
     },
     agreeButton: {

@@ -9,6 +9,7 @@ export {
   toDisplayDateString,
   toISODateString,
 } from "./dateUtils";
+export { lineHeight } from "./fontMetrics";
 export {
   computeDueDate,
   computeGestationalAge,
