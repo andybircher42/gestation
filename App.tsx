@@ -24,6 +24,7 @@ import {
   ThemePickerModal,
   UndoToast,
 } from "@/components";
+import { type EntryFormModalHandle } from "@/components/EntryFormModal";
 import { useEntries, useThemePreference } from "@/hooks";
 import {
   acceptAgreement,
@@ -74,6 +75,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   const [showAppInfo, setShowAppInfo] = useState(false);
   const [pickerAnchor, setPickerAnchor] = useState({ top: 0, right: 0 });
   const settingsRef = useRef<View>(null);
+  const formModalRef = useRef<EntryFormModalHandle>(null);
   const isLoadingRef = useRef(true);
   useEffect(() => {
     isLoadingRef.current = isLoading;
@@ -242,8 +244,9 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           entries={entries}
           onDelete={remove}
           onDeleteAll={removeAll}
+          onEmptyPress={() => formModalRef.current?.open()}
         />
-        <EntryFormModal onAdd={add} />
+        <EntryFormModal ref={formModalRef} onAdd={add} />
         <HipaaAgreementModal
           visible={showAgreement && agreementLoaded}
           onAccept={handleAcceptAgreement}

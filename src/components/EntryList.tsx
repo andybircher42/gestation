@@ -50,6 +50,7 @@ interface EntryListProps {
   entries: Entry[];
   onDelete: (id: string) => void;
   onDeleteAll: () => void;
+  onEmptyPress?: () => void;
 }
 
 /** Individual entry row with swipe-to-delete support. */
@@ -145,6 +146,7 @@ export default function EntryList({
   entries,
   onDelete,
   onDeleteAll,
+  onEmptyPress,
 }: EntryListProps) {
   const { colors, rowColors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -313,12 +315,17 @@ export default function EntryList({
         }
         ListEmptyComponent={
           <View style={styles.emptyContent}>
-            <View style={styles.emptyIconCircle}>
+            <Pressable
+              style={styles.emptyIconCircle}
+              onPress={onEmptyPress}
+              accessibilityRole="button"
+              accessibilityLabel="Add first entry"
+            >
               <Ionicons name="add" size={32} color={colors.primary} />
-            </View>
+            </Pressable>
             <Text style={styles.emptyTitle}>No entries yet</Text>
             <Text style={styles.emptySubtitle}>
-              Tap the + button to add your first entry
+              Tap + to add your first entry
             </Text>
           </View>
         }
