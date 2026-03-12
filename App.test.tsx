@@ -44,6 +44,8 @@ afterEach(() => {
 
 async function renderApp() {
   render(<App />);
+  // Flush async init so splash timer starts
+  await act(async () => {});
   await act(async () => {
     jest.advanceTimersByTime(2000);
   });
@@ -52,6 +54,7 @@ async function renderApp() {
 async function renderAppWithTheme(mode: string) {
   await AsyncStorage.setItem("@theme_mode", mode);
   render(<App />);
+  await act(async () => {});
   await act(async () => {
     jest.advanceTimersByTime(2000);
   });
@@ -65,6 +68,11 @@ async function acceptHipaa() {
 }
 
 async function completeOnboarding() {
+  // Flush acceptAgreement promise, then advance past the splash pause
+  await act(async () => {});
+  await act(async () => {
+    jest.advanceTimersByTime(2000);
+  });
   await waitFor(() => {
     expect(
       screen.getByText("You'll support dozens of families this year."),
@@ -105,6 +113,8 @@ describe("App", () => {
     expect(screen.getByTestId("splash-logo")).toBeTruthy();
     expect(screen.queryByText("in due time")).toBeNull();
 
+    // Flush init so splash timer starts, then advance past it
+    await act(async () => {});
     await act(async () => {
       jest.advanceTimersByTime(2000);
     });
@@ -128,8 +138,16 @@ describe("App", () => {
     await renderApp();
     await acceptHipaa();
 
-    // Should still be on splash
+    // Flush acceptAgreement promise chain
+    await act(async () => {});
+
+    // Should still be on splash during the pause
     expect(screen.getByTestId("splash-bg")).toBeTruthy();
+
+    // Advance past the splash pause
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
     await waitFor(() => {
       expect(
         screen.getByText("You'll support dozens of families this year."),
@@ -141,6 +159,12 @@ describe("App", () => {
     await AsyncStorage.setItem("@onboarding_complete", "true");
     await renderApp();
     await acceptHipaa();
+
+    // Flush acceptAgreement promise, then advance past post-HIPAA splash timer
+    await act(async () => {});
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
 
     await waitFor(() => {
       expect(screen.getByLabelText("Add someone new")).toBeTruthy();
@@ -383,6 +407,7 @@ describe("App", () => {
     });
 
     it("reloads if update is fetched while still on splash screen", async () => {
+      await skipToMainUI();
       Updates.checkForUpdateAsync.mockResolvedValue({ isAvailable: true });
       Updates.fetchUpdateAsync.mockResolvedValue({});
       Updates.reloadAsync.mockResolvedValue(undefined);
@@ -395,6 +420,7 @@ describe("App", () => {
     });
 
     it("does not reload if update finishes after splash screen ends", async () => {
+      await skipToMainUI();
       let resolveFetch!: () => void;
       Updates.checkForUpdateAsync.mockResolvedValue({ isAvailable: true });
       Updates.fetchUpdateAsync.mockImplementation(
@@ -423,6 +449,7 @@ describe("App", () => {
     });
 
     it("does not fetch or reload when no update is available", async () => {
+      await skipToMainUI();
       Updates.checkForUpdateAsync.mockResolvedValue({ isAvailable: false });
 
       render(<App />);

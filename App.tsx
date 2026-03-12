@@ -117,9 +117,8 @@ function AppContent({ loadThemePreference }: AppContentProps) {
 
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), SPLASH_DURATION_MS);
-    return () => clearTimeout(timer);
+  const startSplashTimer = useCallback(() => {
+    setTimeout(() => setIsLoading(false), SPLASH_DURATION_MS);
   }, []);
 
   useEffect(() => {
@@ -149,9 +148,14 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       }
       onboardingDoneRef.current = !!onboardingDone;
       if (!accepted) {
+        // HIPAA needed — splash timer will start after acceptance
         setShowAgreement(true);
       } else if (!onboardingDone) {
         setShowOnboarding(true);
+        startSplashTimer();
+      } else {
+        // Returning user — start splash timer immediately
+        startSplashTimer();
       }
       setAgreementLoaded(true);
 
@@ -185,7 +189,10 @@ function AppContent({ loadThemePreference }: AppContentProps) {
       .then(() => {
         setShowAgreement(false);
         if (!onboardingDoneRef.current) {
-          setShowOnboarding(true);
+          // Brief splash pause before onboarding begins
+          setTimeout(() => setShowOnboarding(true), SPLASH_DURATION_MS);
+        } else {
+          startSplashTimer();
         }
       })
       .catch((e) => console.error("Failed to save agreement", e));
@@ -193,6 +200,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    setIsLoading(false);
   };
 
   const handleResetAgreement = () => {
