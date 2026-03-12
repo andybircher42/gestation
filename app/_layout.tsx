@@ -3,8 +3,6 @@ import { Image, ImageBackground, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import * as Updates from "expo-updates";
-import { identifyDevice, vexo } from "vexo-analytics";
 
 import { HipaaAgreementModal, OnboardingOverlay } from "@/components";
 import { useThemePreference } from "@/hooks";
@@ -24,8 +22,17 @@ import splashLogoDark from "../assets/splash-icon-dark.png";
 
 const SPLASH_DURATION_MS = 2000;
 
+let identifyDevice: ((id: string) => void) | undefined;
+
 if (!__DEV__) {
-  vexo("0c9372e4-1c7e-4051-a9aa-48801f7cef4b");
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const vexoModule = require("vexo-analytics");
+    vexoModule.vexo("0c9372e4-1c7e-4051-a9aa-48801f7cef4b");
+    identifyDevice = vexoModule.identifyDevice;
+  } catch {
+    // vexo-analytics not available (e.g. Expo Go)
+  }
 }
 
 /** Root layout that wraps all routes with providers. */
@@ -118,18 +125,26 @@ function RootGate({ loadThemePreference }: RootGateProps) {
 
       if (!__DEV__) {
         if (deviceId) {
-          identifyDevice(deviceId);
+          identifyDevice?.(deviceId);
         }
-        Updates.checkForUpdateAsync()
-          .then(async (update) => {
-            if (update.isAvailable) {
-              await Updates.fetchUpdateAsync();
-              if (isLoadingRef.current) {
-                await Updates.reloadAsync();
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const Updates = require("expo-updates");
+          Updates.checkForUpdateAsync()
+            .then(async (update: { isAvailable: boolean }) => {
+              if (update.isAvailable) {
+                await Updates.fetchUpdateAsync();
+                if (isLoadingRef.current) {
+                  await Updates.reloadAsync();
+                }
               }
-            }
-          })
-          .catch((e) => reportError("Failed to check for updates", e));
+            })
+            .catch((e: unknown) =>
+              reportError("Failed to check for updates", e),
+            );
+        } catch {
+          // expo-updates not available (e.g. Expo Go)
+        }
       }
     }
 

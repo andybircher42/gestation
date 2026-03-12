@@ -10,7 +10,14 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
-import * as Updates from "expo-updates";
+
+let Updates: { updateId: string | null } | undefined;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Updates = require("expo-updates");
+} catch {
+  // Not available in Expo Go
+}
 
 import { Brightness, ColorTokens, Personality, useTheme } from "@/theme";
 
@@ -32,7 +39,7 @@ const BUG_REPORT_BASE_URL =
 function buildBugReportUrl(): string {
   const version = Constants.expoConfig?.version ?? "unknown";
   const buildId = (Constants.expoConfig?.extra?.easBuildId as string) || "";
-  const updateId = Updates.updateId;
+  const updateId = Updates?.updateId ?? null;
 
   let appVersion = `${version} (${buildId.slice(0, 8)})`;
   if (updateId != null) {

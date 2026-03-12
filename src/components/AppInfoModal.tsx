@@ -10,7 +10,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import Constants from "expo-constants";
-import * as Updates from "expo-updates";
+
+let Updates: { updateId: string | null; isEmbeddedLaunch: boolean } | undefined;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Updates = require("expo-updates");
+} catch {
+  // Not available in Expo Go
+}
 
 import { ColorTokens, useTheme } from "@/theme";
 
@@ -53,10 +60,10 @@ export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
               color={colors.textTertiary}
             />
           </Pressable>
-          {Updates.updateId != null && !Updates.isEmbeddedLaunch && (
+          {Updates?.updateId != null && !Updates?.isEmbeddedLaunch && (
             <Pressable
               style={styles.copyRow}
-              onPress={() => Clipboard.setStringAsync(Updates.updateId!)}
+              onPress={() => Clipboard.setStringAsync(Updates!.updateId!)}
               accessibilityLabel="Copy update ID"
               accessibilityRole="button"
             >
