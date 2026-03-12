@@ -23,8 +23,12 @@ import splashLogoDark from "../assets/splash-icon-dark.png";
 const SPLASH_DURATION_MS = 2000;
 
 if (!__DEV__) {
+  Alert.alert("Debug", "__DEV__ is false, attempting Vexo init");
   void import("vexo-analytics")
-    .then(({ vexo }) => vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8"))
+    .then(({ vexo }) => {
+      Alert.alert("Debug", "Vexo module loaded, calling vexo()");
+      vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8");
+    })
     .catch((e) => Alert.alert("Vexo Init Failed", String(e?.message ?? e)));
 }
 
