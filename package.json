@@ -12,6 +12,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "bundle-check": "expo export --platform ios --output-dir /tmp/expo-bundle-check && rm -rf /tmp/expo-bundle-check",
     "prepare": "husky"
   },
   "dependencies": {
