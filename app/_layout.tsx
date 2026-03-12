@@ -24,7 +24,7 @@ const SPLASH_DURATION_MS = 2000;
 
 if (!__DEV__) {
   void import("vexo-analytics").then(({ vexo }) =>
-    vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8"),
+    vexo("a64ff2ba-7f25-4bf3-a943-beba35fa1235"),
   );
 }
 
@@ -99,7 +99,9 @@ function RootGate({ loadThemePreference }: RootGateProps) {
         }),
       ]);
 
-      if (!mounted) {return;}
+      if (!mounted) {
+        return;
+      }
 
       onboardingDoneRef.current = !!onboardingDone;
 
@@ -142,7 +144,9 @@ function RootGate({ loadThemePreference }: RootGateProps) {
 
   // Start splash timer when entering splash phase
   useEffect(() => {
-    if (phase !== "splash") {return;}
+    if (phase !== "splash") {
+      return;
+    }
     const timer = setTimeout(() => {
       isLoadingRef.current = false;
       setPhase("ready");
