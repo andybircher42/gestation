@@ -464,8 +464,9 @@ function createStyles(colors: ColorTokens) {
     },
     modeSwitchText: {
       fontSize: 14,
-      color: colors.textTertiary,
+      color: colors.primary,
       marginTop: 10,
+      textDecorationLine: "underline",
     },
     ageRow: {
       flexDirection: "row",
