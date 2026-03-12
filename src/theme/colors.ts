@@ -32,7 +32,13 @@ export interface PersonalityPalette {
 }
 
 /** Available theme personality styles. */
-export type Personality = "classic" | "warm" | "mono";
+export type Personality =
+  | "classic"
+  | "warm"
+  | "elegant"
+  | "playful"
+  | "modern"
+  | "mono";
 
 /** Available brightness modes. */
 export type Brightness = "system" | "light" | "dark";
@@ -190,6 +196,234 @@ const warmDarkRowColors = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// Elegant & Premium (deep plum/burgundy with refined neutrals)
+// ---------------------------------------------------------------------------
+
+const elegantLightColors: ColorTokens = {
+  primary: "#7B2D5F",
+  primaryDisabled: "#B88AA6",
+  primaryLightBg: "#F5ECF2",
+  destructive: "#B33A3A",
+  devButton: "#ff6b6b",
+  textPrimary: "#2A1F2D",
+  textSecondary: "#5C4D60",
+  textTertiary: "#7D7080",
+  textLabel: "#4A3D4E",
+  textModal: "#3A2D3E",
+  textEntryRow: "#2A1F2D",
+  white: "#fff",
+  background: "#F8F5F7",
+  splashBackground: "#F8F5F7",
+  inputBackground: "#FDFBFC",
+  border: "#E4DDE2",
+  inputBorder: "#D8D0D6",
+  deleteButtonBg: "#F0EAF0",
+  modalOverlay: "rgba(20, 10, 20, 0.5)",
+  contentBackground: "#FFFCFE",
+  shadow: "#2A1F2D",
+  toastBackground: "#2A1F2D",
+  toastText: "#F8F5F7",
+};
+
+const elegantDarkColors: ColorTokens = {
+  primary: "#D48AB8",
+  primaryDisabled: "#7A4A68",
+  primaryLightBg: "#3D2235",
+  destructive: "#EF5555",
+  devButton: "#ff6b6b",
+  textPrimary: "#E8E0E5",
+  textSecondary: "#B5A8B2",
+  textTertiary: "#8A7D88",
+  textLabel: "#C8BCC5",
+  textModal: "#D5CAD2",
+  textEntryRow: "#E8E0E5",
+  white: "#fff",
+  background: "#1A141A",
+  splashBackground: "#1A141A",
+  inputBackground: "#2C222C",
+  border: "#3D303D",
+  inputBorder: "#4D3F4D",
+  deleteButtonBg: "#3D303D",
+  modalOverlay: "rgba(0, 0, 0, 0.7)",
+  contentBackground: "#241C24",
+  shadow: "#000",
+  toastBackground: "#E8E0E5",
+  toastText: "#1A141A",
+};
+
+const elegantLightRowColors = [
+  "#F0D0E0",
+  "#C8DCC8",
+  "#C8D8F0",
+  "#D8C8E8",
+  "#E8C0D8",
+  "#E8C0C0",
+  "#E8D0B8",
+] as const;
+
+const elegantDarkRowColors = [
+  "#5A2848",
+  "#2A4D2A",
+  "#1A3A6A",
+  "#3A2858",
+  "#4A1E48",
+  "#5A1C1C",
+  "#5A3020",
+] as const;
+
+// ---------------------------------------------------------------------------
+// Playful & Joyful (coral/teal with bright, energetic accents)
+// ---------------------------------------------------------------------------
+
+const playfulLightColors: ColorTokens = {
+  primary: "#E0605A",
+  primaryDisabled: "#E8A8A5",
+  primaryLightBg: "#FFF0EF",
+  destructive: "#D43D3D",
+  devButton: "#ff6b6b",
+  textPrimary: "#2D2A3A",
+  textSecondary: "#5A5568",
+  textTertiary: "#7A7588",
+  textLabel: "#4A4558",
+  textModal: "#3A3548",
+  textEntryRow: "#2D2A3A",
+  white: "#fff",
+  background: "#FFF8F5",
+  splashBackground: "#FFF8F5",
+  inputBackground: "#FFFCFA",
+  border: "#F0E0DD",
+  inputBorder: "#E8D5D0",
+  deleteButtonBg: "#F8ECEA",
+  modalOverlay: "rgba(20, 10, 15, 0.45)",
+  contentBackground: "#FFFEFB",
+  shadow: "#2D2A3A",
+  toastBackground: "#2D2A3A",
+  toastText: "#FFF8F5",
+};
+
+const playfulDarkColors: ColorTokens = {
+  primary: "#F08078",
+  primaryDisabled: "#8B4A48",
+  primaryLightBg: "#3D2020",
+  destructive: "#EF5555",
+  devButton: "#ff6b6b",
+  textPrimary: "#F0E8E5",
+  textSecondary: "#C0B5B0",
+  textTertiary: "#908580",
+  textLabel: "#D0C5C0",
+  textModal: "#E0D5D0",
+  textEntryRow: "#F0E8E5",
+  white: "#fff",
+  background: "#1C1618",
+  splashBackground: "#1C1618",
+  inputBackground: "#2E2428",
+  border: "#402E32",
+  inputBorder: "#503E42",
+  deleteButtonBg: "#402E32",
+  modalOverlay: "rgba(0, 0, 0, 0.7)",
+  contentBackground: "#261E22",
+  shadow: "#000",
+  toastBackground: "#F0E8E5",
+  toastText: "#1C1618",
+};
+
+const playfulLightRowColors = [
+  "#FFD8A8",
+  "#A8E8C8",
+  "#A8D8F8",
+  "#D0B8F0",
+  "#F0B8D8",
+  "#F0B0B0",
+  "#F8D0A0",
+] as const;
+
+const playfulDarkRowColors = [
+  "#6B4810",
+  "#1E5040",
+  "#1A3A6A",
+  "#3A2060",
+  "#5A1E50",
+  "#6B1C1C",
+  "#6B3810",
+] as const;
+
+// ---------------------------------------------------------------------------
+// Modern & Minimal (slate blue with clean, sharp neutrals)
+// ---------------------------------------------------------------------------
+
+const modernLightColors: ColorTokens = {
+  primary: "#4A6FA5",
+  primaryDisabled: "#8AAAD0",
+  primaryLightBg: "#EEF2F8",
+  destructive: "#D04040",
+  devButton: "#ff6b6b",
+  textPrimary: "#1A1D24",
+  textSecondary: "#4A4E58",
+  textTertiary: "#6A6E78",
+  textLabel: "#3A3E48",
+  textModal: "#2A2E38",
+  textEntryRow: "#1A1D24",
+  white: "#fff",
+  background: "#F4F5F7",
+  splashBackground: "#F4F5F7",
+  inputBackground: "#FAFBFC",
+  border: "#DFE1E6",
+  inputBorder: "#D2D4D9",
+  deleteButtonBg: "#ECEDF0",
+  modalOverlay: "rgba(10, 12, 18, 0.5)",
+  contentBackground: "#FFFFFF",
+  shadow: "#1A1D24",
+  toastBackground: "#1A1D24",
+  toastText: "#F4F5F7",
+};
+
+const modernDarkColors: ColorTokens = {
+  primary: "#6A9AD8",
+  primaryDisabled: "#3D5A80",
+  primaryLightBg: "#1E2A3D",
+  destructive: "#EF5555",
+  devButton: "#ff6b6b",
+  textPrimary: "#E2E4E8",
+  textSecondary: "#A0A4B0",
+  textTertiary: "#787C88",
+  textLabel: "#B8BCC5",
+  textModal: "#C8CCD5",
+  textEntryRow: "#E2E4E8",
+  white: "#fff",
+  background: "#12141A",
+  splashBackground: "#12141A",
+  inputBackground: "#22242C",
+  border: "#30323A",
+  inputBorder: "#40424A",
+  deleteButtonBg: "#30323A",
+  modalOverlay: "rgba(0, 0, 0, 0.7)",
+  contentBackground: "#1A1C22",
+  shadow: "#000",
+  toastBackground: "#E2E4E8",
+  toastText: "#12141A",
+};
+
+const modernLightRowColors = [
+  "#E0E8F8",
+  "#C8E8D8",
+  "#B8D8F0",
+  "#D0C8E8",
+  "#E0C0D8",
+  "#E8C8C8",
+  "#E0D8C8",
+] as const;
+
+const modernDarkRowColors = [
+  "#2A3A58",
+  "#1E4838",
+  "#1A3A60",
+  "#302858",
+  "#481E48",
+  "#581C1C",
+  "#483018",
+] as const;
+
+// ---------------------------------------------------------------------------
 // Mono (B&W — same palette for light and dark)
 // ---------------------------------------------------------------------------
 
@@ -234,6 +468,18 @@ export const palettes: Record<Personality, PersonalityPalette> = {
   warm: {
     light: { colors: warmLightColors, rowColors: warmLightRowColors },
     dark: { colors: warmDarkColors, rowColors: warmDarkRowColors },
+  },
+  elegant: {
+    light: { colors: elegantLightColors, rowColors: elegantLightRowColors },
+    dark: { colors: elegantDarkColors, rowColors: elegantDarkRowColors },
+  },
+  playful: {
+    light: { colors: playfulLightColors, rowColors: playfulLightRowColors },
+    dark: { colors: playfulDarkColors, rowColors: playfulDarkRowColors },
+  },
+  modern: {
+    light: { colors: modernLightColors, rowColors: modernLightRowColors },
+    dark: { colors: modernDarkColors, rowColors: modernDarkRowColors },
   },
   mono: {
     light: { colors: monoColors, rowColors: monoRowColors },

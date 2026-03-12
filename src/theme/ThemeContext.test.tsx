@@ -92,6 +92,60 @@ describe("ThemeContext", () => {
     );
   });
 
+  it("provides elegant light colors when elegant+light", () => {
+    render(
+      <ThemeProvider
+        personality="elegant"
+        brightness="light"
+        setPersonality={noopSet}
+        setBrightness={noopSet}
+      >
+        <TestConsumer />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByTestId("bg").props.children).toBe(
+      palettes.elegant.light.colors.background,
+    );
+    expect(screen.getByTestId("personality").props.children).toBe("elegant");
+  });
+
+  it("provides playful dark colors when playful+dark", () => {
+    render(
+      <ThemeProvider
+        personality="playful"
+        brightness="dark"
+        setPersonality={noopSet}
+        setBrightness={noopSet}
+      >
+        <TestConsumer />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByTestId("bg").props.children).toBe(
+      palettes.playful.dark.colors.background,
+    );
+    expect(screen.getByTestId("personality").props.children).toBe("playful");
+  });
+
+  it("provides modern light colors when modern+light", () => {
+    render(
+      <ThemeProvider
+        personality="modern"
+        brightness="light"
+        setPersonality={noopSet}
+        setBrightness={noopSet}
+      >
+        <TestConsumer />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByTestId("bg").props.children).toBe(
+      palettes.modern.light.colors.background,
+    );
+    expect(screen.getByTestId("personality").props.children).toBe("modern");
+  });
+
   it("provides mono colors when mono+light", () => {
     render(
       <ThemeProvider

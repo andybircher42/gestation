@@ -8,7 +8,14 @@ const BRIGHTNESS_KEY = "@theme_brightness";
 /** Legacy key from the single-axis theme system. */
 const LEGACY_MODE_KEY = "@theme_mode";
 
-const VALID_PERSONALITIES: Personality[] = ["classic", "warm", "mono"];
+const VALID_PERSONALITIES: Personality[] = [
+  "classic",
+  "warm",
+  "elegant",
+  "playful",
+  "modern",
+  "mono",
+];
 const VALID_BRIGHTNESSES: Brightness[] = ["system", "light", "dark"];
 
 /**

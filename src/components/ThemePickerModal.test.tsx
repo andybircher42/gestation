@@ -25,6 +25,9 @@ describe("ThemePickerModal", () => {
     expect(screen.getByText("Style")).toBeTruthy();
     expect(screen.getByText("Classic")).toBeTruthy();
     expect(screen.getByText("Warm")).toBeTruthy();
+    expect(screen.getByText("Elegant")).toBeTruthy();
+    expect(screen.getByText("Playful")).toBeTruthy();
+    expect(screen.getByText("Modern")).toBeTruthy();
     expect(screen.getByText("B&W")).toBeTruthy();
 
     expect(screen.getByText("Brightness")).toBeTruthy();

@@ -58,6 +58,9 @@ const STYLE_OPTIONS: {
 }[] = [
   { value: "classic", label: "Classic", icon: "color-palette-outline" },
   { value: "warm", label: "Warm", icon: "flame-outline" },
+  { value: "elegant", label: "Elegant", icon: "diamond-outline" },
+  { value: "playful", label: "Playful", icon: "heart-outline" },
+  { value: "modern", label: "Modern", icon: "cube-outline" },
   { value: "mono", label: "B&W", icon: "ellipse-outline" },
 ];
 
