@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Image, ImageBackground, StyleSheet } from "react-native";
+import { Alert, Image, ImageBackground, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -23,9 +23,9 @@ import splashLogoDark from "../assets/splash-icon-dark.png";
 const SPLASH_DURATION_MS = 2000;
 
 if (!__DEV__) {
-  void import("vexo-analytics").then(({ vexo }) =>
-    vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8"),
-  );
+  void import("vexo-analytics")
+    .then(({ vexo }) => vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8"))
+    .catch((e) => Alert.alert("Vexo Init Failed", String(e?.message ?? e)));
 }
 
 /** Root layout that wraps all routes with providers. */
