@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import { calendarHeatMap } from "@/engine/probabilityEngine";
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
+import { lineHeight } from "@/util";
 
 import CalendarMonth, { DayCell } from "./CalendarMonth";
 
@@ -73,8 +75,14 @@ export default function CalendarView({ entries }: CalendarViewProps) {
   if (entries.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>
-          Add someone to see delivery{"\n"}probability on the calendar
+        <Ionicons
+          name="calendar-outline"
+          size={48}
+          color={colors.textTertiary}
+        />
+        <Text style={styles.emptyTitle}>No one to show yet</Text>
+        <Text style={styles.emptySubtitle}>
+          Switch to the list view to add someone
         </Text>
       </View>
     );
@@ -112,12 +120,18 @@ function createStyles(colors: ColorTokens) {
       justifyContent: "center",
       alignItems: "center",
       padding: 32,
+      gap: 8,
     },
-    emptyText: {
+    emptyTitle: {
       fontSize: 16,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    emptySubtitle: {
+      fontSize: 14,
       color: colors.textTertiary,
       textAlign: "center",
-      lineHeight: 24,
+      lineHeight: lineHeight(20),
     },
   });
 }

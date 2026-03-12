@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
-import { getBirthstoneImage } from "@/util";
+import { getBirthstoneImage, lineHeight } from "@/util";
 
 import BirthstoneIcon from "./BirthstoneIcon";
 
@@ -122,7 +122,7 @@ export default function CalendarMonth({
                             image={getBirthstoneImage(
                               e.birthstone?.name ?? "Garnet",
                             )}
-                            size={12}
+                            size={14}
                           />
                         ))
                       ) : (
@@ -131,7 +131,7 @@ export default function CalendarMonth({
                             image={getBirthstoneImage(
                               cell.dueEntries[0].birthstone?.name ?? "Garnet",
                             )}
-                            size={12}
+                            size={14}
                           />
                           <Text style={styles.overflowText}>
                             +{cell.dueEntries.length - 1}
@@ -172,7 +172,8 @@ function createStyles(colors: ColorTokens) {
       flex: 1,
       textAlign: "center",
       fontWeight: "700",
-      fontSize: 11,
+      fontSize: 12,
+      lineHeight: lineHeight(16),
       color: colors.textTertiary,
     },
     weekRow: {
@@ -185,10 +186,11 @@ function createStyles(colors: ColorTokens) {
       alignItems: "flex-start",
       margin: 1,
       borderRadius: 4,
-      padding: 2,
+      padding: 3,
     },
     dayText: {
-      fontSize: 10,
+      fontSize: 12,
+      lineHeight: lineHeight(14),
       color: colors.textPrimary,
     },
     iconsRow: {
@@ -199,7 +201,8 @@ function createStyles(colors: ColorTokens) {
     },
     overflowText: {
       fontWeight: "700",
-      fontSize: 8,
+      fontSize: 10,
+      lineHeight: lineHeight(12),
       color: colors.primary,
     },
   });
