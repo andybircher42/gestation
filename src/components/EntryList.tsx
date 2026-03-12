@@ -24,8 +24,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
-import { formatDueDate, gestationalAgeFromDueDate } from "@/util";
+import {
+  formatDueDate,
+  gestationalAgeFromDueDate,
+  getBirthstoneImage,
+} from "@/util";
 
+import BirthstoneIcon from "./BirthstoneIcon";
 import EntryForm from "./EntryForm";
 
 if (
@@ -138,6 +143,12 @@ const EntryRow = React.memo(function EntryRow({
         <Text style={[styles.entryDueDate, { color: textColor }]}>
           {formatDueDate(item.dueDate)}
         </Text>
+        {item.birthstone && (
+          <BirthstoneIcon
+            image={getBirthstoneImage(item.birthstone.name)}
+            size={24}
+          />
+        )}
         <Pressable
           onPress={() => onDelete(item.id)}
           style={styles.deleteButton}
@@ -538,6 +549,7 @@ function createStyles(colors: ColorTokens) {
       alignItems: "center",
       paddingVertical: 10,
       paddingHorizontal: 16,
+      gap: 6,
     },
     entryName: {
       fontSize: 16,

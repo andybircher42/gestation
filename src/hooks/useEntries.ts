@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 
 import { Entry, loadEntries, saveEntries } from "@/storage";
+import { getBirthstoneForDate } from "@/util/birthstones";
 
 let idCounter = 0;
 
@@ -46,6 +47,7 @@ export default function useEntries() {
         id: generateId(),
         name,
         dueDate,
+        birthstone: getBirthstoneForDate(dueDate),
       };
       setEntries((prev) => {
         const updated = [entry, ...prev];

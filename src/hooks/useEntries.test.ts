@@ -55,6 +55,16 @@ describe("useEntries", () => {
     });
   });
 
+  it("add auto-calculates birthstone from due date month", () => {
+    const result = setup();
+    // July due date → Ruby birthstone
+    addEntry(result, "Baby", "2026-07-04");
+
+    expect(result.current.entries[0].birthstone).toBeDefined();
+    expect(result.current.entries[0].birthstone!.name).toBe("Ruby");
+    expect(result.current.entries[0].birthstone!.color).toBe("#E53935");
+  });
+
   it("remove deletes an entry and sets deletedEntry", () => {
     const result = setup();
     const id = addEntry(result);

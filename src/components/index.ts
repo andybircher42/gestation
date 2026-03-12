@@ -1,4 +1,5 @@
 export { default as AppInfoModal } from "./AppInfoModal";
+export { default as BirthstoneIcon } from "./BirthstoneIcon";
 export { default as DevToolbar } from "./DevToolbar";
 export { default as EntryForm } from "./EntryForm";
 export { default as EntryList } from "./EntryList";

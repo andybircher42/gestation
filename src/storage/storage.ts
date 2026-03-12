@@ -1,11 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
 
+import { Birthstone, getBirthstoneForDate } from "@/util/birthstones";
+
 /** A single gestation tracking entry. */
 export interface Entry {
   id: string;
   name: string;
   dueDate: string;
+  birthstone?: Birthstone;
 }
 
 const STORAGE_KEY = "@gestation_entries";
@@ -107,16 +110,35 @@ export const loadEntries = async (): Promise<LoadResult> => {
 
   const entries: Entry[] = [];
   let discardedCount = 0;
+  let needsMigration = false;
 
   for (const item of parsed) {
     if (isValidEntry(item)) {
-      entries.push({ id: item.id, name: item.name, dueDate: item.dueDate });
+      const obj = item as unknown as Record<string, unknown>;
+      const birthstone =
+        obj.birthstone != null &&
+        typeof obj.birthstone === "object" &&
+        typeof (obj.birthstone as Record<string, unknown>).name === "string" &&
+        typeof (obj.birthstone as Record<string, unknown>).color === "string"
+          ? (obj.birthstone as Birthstone)
+          : undefined;
+
+      if (!birthstone) {
+        needsMigration = true;
+      }
+
+      entries.push({
+        id: item.id,
+        name: item.name,
+        dueDate: item.dueDate,
+        birthstone: birthstone ?? getBirthstoneForDate(item.dueDate),
+      });
     } else {
       discardedCount++;
     }
   }
 
-  if (discardedCount > 0) {
+  if (discardedCount > 0 || needsMigration) {
     await saveEntries(entries);
   }
 
