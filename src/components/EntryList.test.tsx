@@ -14,21 +14,27 @@ function makeEntry(
   return { dueDate: "2026-06-15", ...fields };
 }
 
-/** Renders EntryList with defaults for onDelete/onDeleteAll. Returns the mocks. */
+/** Renders EntryList with defaults for onDelete/onDeleteAll/onAdd. Returns the mocks. */
 function renderList(
   entries: Entry[],
-  overrides: { onDelete?: jest.Mock; onDeleteAll?: jest.Mock } = {},
+  overrides: {
+    onDelete?: jest.Mock;
+    onDeleteAll?: jest.Mock;
+    onAdd?: jest.Mock;
+  } = {},
 ) {
   const onDelete = overrides.onDelete ?? jest.fn();
   const onDeleteAll = overrides.onDeleteAll ?? jest.fn();
+  const onAdd = overrides.onAdd ?? jest.fn();
   renderWithTheme(
     <EntryList
       entries={entries}
       onDelete={onDelete}
       onDeleteAll={onDeleteAll}
+      onAdd={onAdd}
     />,
   );
-  return { onDelete, onDeleteAll };
+  return { onDelete, onDeleteAll, onAdd };
 }
 
 /** Three entries with different due dates for sort tests. */
@@ -404,5 +410,41 @@ describe("EntryList", () => {
     ]);
 
     expect(screen.getAllByTestId("delete-background")).toHaveLength(2);
+  });
+
+  it("shows inline form when Add someone is pressed", () => {
+    renderList([]);
+
+    fireEvent.press(screen.getByLabelText("Add someone new"));
+
+    expect(screen.getByLabelText("Name")).toBeTruthy();
+    expect(screen.getByLabelText("Add this person")).toBeTruthy();
+  });
+
+  it("hides inline form when close button is pressed", () => {
+    renderList([]);
+
+    fireEvent.press(screen.getByLabelText("Add someone new"));
+    expect(screen.getByLabelText("Name")).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText("Close form"));
+    expect(screen.queryByLabelText("Name")).toBeNull();
+  });
+
+  it("hides inline form after adding an entry", () => {
+    const onAdd = jest.fn();
+    renderList([], { onAdd });
+
+    fireEvent.press(screen.getByLabelText("Add someone new"));
+
+    // Switch to gestational age mode and fill in
+    fireEvent.press(screen.getByText("Gestational Age"));
+    fireEvent.changeText(screen.getByLabelText("Name"), "Baby");
+    fireEvent.changeText(screen.getByLabelText("Weeks"), "20");
+    fireEvent.changeText(screen.getByLabelText("Days"), "3");
+    fireEvent.press(screen.getByLabelText("Add this person"));
+
+    expect(onAdd).toHaveBeenCalledTimes(1);
+    expect(screen.queryByLabelText("Name")).toBeNull();
   });
 });

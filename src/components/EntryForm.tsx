@@ -368,8 +368,6 @@ function createStyles(colors: ColorTokens) {
     form: {
       backgroundColor: colors.contentBackground,
       padding: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
     },
     label: {
       fontSize: 13,

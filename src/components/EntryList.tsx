@@ -10,11 +10,13 @@ import {
   Animated,
   Easing,
   FlatList,
+  LayoutAnimation,
   LayoutChangeEvent,
   Platform,
   Pressable,
   StyleSheet,
   Text,
+  UIManager,
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +25,15 @@ import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
 import { formatDueDate, gestationalAgeFromDueDate } from "@/util";
+
+import EntryForm from "./EntryForm";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 type SortBy = "dueDate" | "name";
 type SortDir = "asc" | "desc";
@@ -50,7 +61,7 @@ interface EntryListProps {
   entries: Entry[];
   onDelete: (id: string) => void;
   onDeleteAll: () => void;
-  onAddPress?: () => void;
+  onAdd: (entry: { name: string; dueDate: string }) => void;
 }
 
 /** Individual entry row with swipe-to-delete support. */
@@ -146,7 +157,7 @@ export default function EntryList({
   entries,
   onDelete,
   onDeleteAll,
-  onAddPress,
+  onAdd,
 }: EntryListProps) {
   const { colors, rowColors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -155,6 +166,27 @@ export default function EntryList({
   const [sortDir, setSortDir] = useState<SortDir>(DEFAULT_DIR.dueDate);
   const nameWidths = useRef(new Map<string, number>());
   const [maxNameWidth, setMaxNameWidth] = useState(0);
+  const [showForm, setShowForm] = useState(false);
+  const formKey = useRef(0);
+
+  const toggleForm = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setShowForm((prev) => {
+      if (!prev) {
+        formKey.current += 1;
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleAdd = useCallback(
+    (entry: { name: string; dueDate: string }) => {
+      onAdd(entry);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setShowForm(false);
+    },
+    [onAdd],
+  );
 
   const handleNameLayout = useCallback((id: string, width: number) => {
     nameWidths.current.set(id, width);
@@ -238,15 +270,32 @@ export default function EntryList({
 
   return (
     <View style={styles.listContainer}>
-      <Pressable
-        style={styles.addButton}
-        onPress={onAddPress}
-        accessibilityRole="button"
-        accessibilityLabel="Add someone new"
-      >
-        <Ionicons name="add" size={24} color={colors.primary} />
-        <Text style={styles.addButtonText}>Add someone</Text>
-      </Pressable>
+      {showForm ? (
+        <View style={styles.inlineFormContainer}>
+          <View style={styles.inlineFormHeader}>
+            <Text style={styles.inlineFormTitle}>Add someone</Text>
+            <Pressable
+              onPress={toggleForm}
+              accessibilityRole="button"
+              accessibilityLabel="Close form"
+              hitSlop={8}
+            >
+              <Ionicons name="close" size={24} color={colors.textTertiary} />
+            </Pressable>
+          </View>
+          <EntryForm key={formKey.current} onAdd={handleAdd} />
+        </View>
+      ) : (
+        <Pressable
+          style={styles.addButton}
+          onPress={toggleForm}
+          accessibilityRole="button"
+          accessibilityLabel="Add someone new"
+        >
+          <Ionicons name="add" size={24} color={colors.primary} />
+          <Text style={styles.addButtonText}>Add someone</Text>
+        </Pressable>
+      )}
       {entries.length > 0 && (
         <View style={styles.toolbarRow}>
           <View style={styles.sortRow}>
@@ -325,7 +374,7 @@ export default function EntryList({
         ListEmptyComponent={
           <Pressable
             style={styles.emptyContent}
-            onPress={onAddPress}
+            onPress={toggleForm}
             accessibilityRole="button"
             accessibilityLabel="Get started, add someone"
           >
@@ -392,6 +441,28 @@ function createStyles(colors: ColorTokens) {
       color: colors.primary,
       fontSize: 16,
       fontWeight: "600",
+    },
+    inlineFormContainer: {
+      marginHorizontal: 16,
+      marginTop: 12,
+      borderRadius: 12,
+      backgroundColor: colors.contentBackground,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: "hidden",
+    },
+    inlineFormHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 4,
+    },
+    inlineFormTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.textPrimary,
     },
     sortButton: {
       flex: 1,
