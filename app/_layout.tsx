@@ -24,7 +24,7 @@ const SPLASH_DURATION_MS = 2000;
 
 if (!__DEV__) {
   void import("vexo-analytics").then(({ vexo }) =>
-    vexo("a64ff2ba-7f25-4bf3-a943-beba35fa1235"),
+    vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8"),
   );
 }
 
