@@ -167,6 +167,7 @@ export default function EntryList({
   const nameWidths = useRef(new Map<string, number>());
   const [maxNameWidth, setMaxNameWidth] = useState(0);
   const [showForm, setShowForm] = useState(false);
+  const [batchMode, setBatchMode] = useState(false);
   const formKey = useRef(0);
 
   const toggleForm = useCallback(() => {
@@ -174,9 +175,15 @@ export default function EntryList({
     setShowForm((prev) => {
       if (!prev) {
         formKey.current += 1;
+        setBatchMode(false);
       }
       return !prev;
     });
+  }, []);
+
+  const toggleBatchMode = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setBatchMode((prev) => !prev);
   }, []);
 
   const handleAdd = useCallback(
@@ -270,16 +277,32 @@ export default function EntryList({
     <View style={styles.listContainer}>
       {showForm ? (
         <View style={styles.inlineFormContainer}>
-          <Pressable
-            style={styles.closeButton}
-            onPress={toggleForm}
-            accessibilityRole="button"
-            accessibilityLabel="Close form"
-            hitSlop={8}
-          >
-            <Ionicons name="close" size={24} color={colors.textTertiary} />
-          </Pressable>
-          <EntryForm key={formKey.current} onAdd={handleAdd} />
+          <View style={styles.formToolbar}>
+            <Pressable
+              onPress={toggleBatchMode}
+              accessibilityRole="button"
+              accessibilityLabel={
+                batchMode ? "Switch to single entry" : "Switch to batch entry"
+              }
+            >
+              <Text style={styles.batchToggleText}>
+                {batchMode ? "Add one at a time" : "Add multiple"}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={toggleForm}
+              accessibilityRole="button"
+              accessibilityLabel="Close form"
+              hitSlop={8}
+            >
+              <Ionicons name="close" size={24} color={colors.textTertiary} />
+            </Pressable>
+          </View>
+          <EntryForm
+            key={formKey.current}
+            onAdd={handleAdd}
+            batch={batchMode}
+          />
         </View>
       ) : (
         <Pressable
@@ -447,11 +470,17 @@ function createStyles(colors: ColorTokens) {
       borderColor: colors.border,
       overflow: "hidden",
     },
-    closeButton: {
-      alignSelf: "flex-end",
+    formToolbar: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       paddingHorizontal: 16,
       paddingTop: 12,
-      paddingBottom: 0,
+    },
+    batchToggleText: {
+      fontSize: 14,
+      color: colors.primary,
+      textDecorationLine: "underline",
     },
     sortButton: {
       flex: 1,

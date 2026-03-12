@@ -35,6 +35,7 @@ type InputMode = "weeksDays" | "dueDate";
 
 interface EntryFormProps {
   onAdd: (entry: { name: string; dueDate: string }) => void;
+  batch: boolean;
 }
 
 if (
@@ -45,7 +46,7 @@ if (
 }
 
 /** Form for adding a new gestation entry with name, weeks, and days fields. */
-export default function EntryForm({ onAdd }: EntryFormProps) {
+export default function EntryForm({ onAdd, batch }: EntryFormProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -68,7 +69,6 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Batch mode state
-  const [batch, setBatch] = useState(false);
   const [batchText, setBatchText] = useState("");
   const [batchErrors, setBatchErrors] = useState<BatchEntryError[]>([]);
   const [showHelp, setShowHelp] = useState(false);
@@ -260,26 +260,11 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     setDateTouched(true);
   };
 
-  const toggleBatch = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setBatch((prev) => !prev);
-    setBatchErrors([]);
-    setShowHelp(false);
-  };
-
   const canBatchAdd = batchText.trim().length > 0;
 
   if (batch) {
     return (
       <View style={styles.form}>
-        <Pressable
-          onPress={toggleBatch}
-          accessibilityRole="button"
-          accessibilityLabel="Switch to single entry"
-        >
-          <Text style={styles.modeSwitchTextTop}>Add one at a time</Text>
-        </Pressable>
-
         <View style={styles.batchHeader}>
           <Text style={styles.label}>Add multiple people</Text>
           <Pressable
@@ -305,13 +290,8 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
             accessibilityLabel="Format help"
           >
             <Text style={styles.helpTitle}>Separate entries with commas</Text>
-            <Text style={styles.helpExample}>Due date formats:</Text>
             <Text style={styles.helpCode}>
-              Alice 6/14, Bob 6-14-2026, Carol 6/14/26
-            </Text>
-            <Text style={styles.helpExample}>Gestational age formats:</Text>
-            <Text style={styles.helpCode}>
-              Alice 35w5d, Bob 35w 5d, Carol 20w3d
+              Alice 6/14, Bob 35w5d, Carol 6-14-26
             </Text>
           </View>
         )}
@@ -376,14 +356,6 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
 
   return (
     <View style={styles.form}>
-      <Pressable
-        onPress={toggleBatch}
-        accessibilityRole="button"
-        accessibilityLabel="Switch to batch entry"
-      >
-        <Text style={styles.modeSwitchTextTop}>Add multiple at once</Text>
-      </Pressable>
-
       <TextInput
         style={styles.nameInput}
         placeholder="Who are you tracking?"
@@ -645,13 +617,6 @@ function createStyles(colors: ColorTokens) {
       marginTop: 10,
       textDecorationLine: "underline",
     },
-    modeSwitchTextTop: {
-      fontSize: 14,
-      color: colors.primary,
-      marginBottom: 10,
-      textDecorationLine: "underline",
-      alignSelf: "flex-end",
-    },
     ageRow: {
       flexDirection: "row",
       gap: 10,
@@ -767,11 +732,6 @@ function createStyles(colors: ColorTokens) {
       fontWeight: "600",
       color: colors.textPrimary,
       marginBottom: 6,
-    },
-    helpExample: {
-      fontSize: 12,
-      color: colors.textTertiary,
-      marginTop: 4,
     },
     helpCode: {
       fontSize: 12,

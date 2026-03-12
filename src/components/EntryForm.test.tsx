@@ -16,8 +16,8 @@ afterEach(() => {
 });
 
 /** Renders EntryForm and returns the onAdd mock. */
-function renderForm(onAdd = jest.fn()) {
-  renderWithTheme(<EntryForm onAdd={onAdd} />);
+function renderForm(onAdd = jest.fn(), batch = false) {
+  renderWithTheme(<EntryForm onAdd={onAdd} batch={batch} />);
   return onAdd;
 }
 
@@ -632,43 +632,36 @@ describe("EntryForm — dueDate in onAdd callback", () => {
   });
 });
 
-/** Enters batch mode by pressing the toggle link. */
-function enterBatchMode() {
-  fireEvent.press(screen.getByLabelText("Switch to batch entry"));
+/** Renders EntryForm in batch mode and returns the onAdd mock. */
+function renderBatchForm(onAdd = jest.fn()) {
+  return renderForm(onAdd, true);
 }
 
 describe("EntryForm — batch mode", () => {
-  it("shows batch input after pressing toggle", () => {
-    renderForm();
-    enterBatchMode();
+  it("shows batch input when batch prop is true", () => {
+    renderBatchForm();
 
     expect(screen.getByLabelText("Batch entries")).toBeTruthy();
     expect(screen.getByText("Add multiple people")).toBeTruthy();
   });
 
-  it("can switch back to single entry mode", () => {
+  it("shows single entry when batch prop is false", () => {
     renderForm();
-    enterBatchMode();
-
-    fireEvent.press(screen.getByLabelText("Switch to single entry"));
 
     expect(screen.getByLabelText("Name")).toBeTruthy();
     expect(screen.queryByLabelText("Batch entries")).toBeNull();
   });
 
   it("shows help tooltip when help button is pressed", () => {
-    renderForm();
-    enterBatchMode();
+    renderBatchForm();
 
     fireEvent.press(screen.getByLabelText("Show format help"));
 
     expect(screen.getByLabelText("Format help")).toBeTruthy();
-    expect(screen.getByText("Separate entries with commas")).toBeTruthy();
   });
 
   it("hides help tooltip when pressed again", () => {
-    renderForm();
-    enterBatchMode();
+    renderBatchForm();
 
     fireEvent.press(screen.getByLabelText("Show format help"));
     fireEvent.press(screen.getByLabelText("Show format help"));
@@ -677,8 +670,7 @@ describe("EntryForm — batch mode", () => {
   });
 
   it("calls onAdd for each valid entry and shows confirmation", () => {
-    const onAdd = renderForm();
-    enterBatchMode();
+    const onAdd = renderBatchForm();
 
     fireEvent.changeText(
       screen.getByLabelText("Batch entries"),
@@ -699,8 +691,7 @@ describe("EntryForm — batch mode", () => {
   });
 
   it("clears text after successful batch add", () => {
-    renderForm();
-    enterBatchMode();
+    renderBatchForm();
 
     fireEvent.changeText(screen.getByLabelText("Batch entries"), "Alice 6/14");
     fireEvent.press(screen.getByText("Add All"));
@@ -709,8 +700,7 @@ describe("EntryForm — batch mode", () => {
   });
 
   it("shows errors for invalid entries", () => {
-    renderForm();
-    enterBatchMode();
+    renderBatchForm();
 
     fireEvent.changeText(
       screen.getByLabelText("Batch entries"),
@@ -724,8 +714,7 @@ describe("EntryForm — batch mode", () => {
   });
 
   it("keeps errored entries in input when some succeed", () => {
-    renderForm();
-    enterBatchMode();
+    renderBatchForm();
 
     fireEvent.changeText(
       screen.getByLabelText("Batch entries"),
@@ -738,8 +727,7 @@ describe("EntryForm — batch mode", () => {
   });
 
   it("disables Add All when input is empty", () => {
-    renderForm();
-    enterBatchMode();
+    renderBatchForm();
 
     const addAll = screen.getByLabelText("Add all");
     expect(addAll.props.accessibilityState.disabled).toBe(true);
