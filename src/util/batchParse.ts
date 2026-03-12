@@ -1,5 +1,6 @@
 import {
   expandTwoDigitYear,
+  getDateBounds,
   inferYear,
   parseDateText,
   toISODateString,
@@ -57,6 +58,16 @@ export function parseBatchEntry(
       return { raw: trimmed, error: `Days must be 0\u20136` };
     }
     const dueDate = computeDueDate(weeks, days, now);
+    const { min, max } = getDateBounds(now);
+    if (dueDate < min) {
+      return { raw: trimmed, error: "Due date must be within the last month" };
+    }
+    if (dueDate > max) {
+      return {
+        raw: trimmed,
+        error: "Due date must be within the next 42 weeks",
+      };
+    }
     return {
       name,
       dueDate: toISODateString(dueDate),
@@ -115,6 +126,14 @@ function parseDateEntry(
   const date = parseDateText(dateStr, now);
   if (!date) {
     return { raw: trimmed, error: `${month}-${day} is not a valid date` };
+  }
+
+  const { min, max } = getDateBounds(now);
+  if (date < min) {
+    return { raw: trimmed, error: "Date must be within the last month" };
+  }
+  if (date > max) {
+    return { raw: trimmed, error: "Date must be within the next 42 weeks" };
   }
 
   const m = String(month).padStart(2, "0");

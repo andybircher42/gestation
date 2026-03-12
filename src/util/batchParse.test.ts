@@ -67,10 +67,11 @@ describe("parseBatchEntry", () => {
       );
     });
 
-    it("infers next year for past date (1/15)", () => {
+    it("rejects inferred next-year date that exceeds 42-week limit", () => {
+      // 1/15 infers 2027, which is > 42 weeks from March 2, 2026
       const result = parseBatchEntry("Alice 1/15", now);
-      expect(result).toEqual(
-        expect.objectContaining({ name: "Alice", dueDate: "2027-01-15" }),
+      expect("error" in result && result.error).toBe(
+        "Date must be within the next 42 weeks",
       );
     });
   });
@@ -122,6 +123,27 @@ describe("parseBatchEntry", () => {
     it("returns error for invalid date (Feb 30)", () => {
       const result = parseBatchEntry("Alice 2/30/2026", now);
       expect("error" in result).toBe(true);
+    });
+
+    it("returns error for date too far in the past", () => {
+      const result = parseBatchEntry("Alice 1/1/2026", now);
+      expect("error" in result && result.error).toBe(
+        "Date must be within the last month",
+      );
+    });
+
+    it("returns error for date too far in the future", () => {
+      // 42 weeks from March 2 = Dec 21, 2026; Dec 22 should fail
+      const result = parseBatchEntry("Alice 12/22/2026", now);
+      expect("error" in result && result.error).toBe(
+        "Date must be within the next 42 weeks",
+      );
+    });
+
+    it("accepts valid gestational age within bounds", () => {
+      // 0w0d = due date 280 days away (40 weeks), within 42-week limit
+      const result = parseBatchEntry("Alice 0w0d", now);
+      expect("dueDate" in result).toBe(true);
     });
   });
 });
