@@ -5,6 +5,7 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 
 import platformCoverage from "./eslint-rules/platform-coverage.js";
+import versionSync from "./eslint-rules/version-sync.js";
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -14,10 +15,11 @@ export default tseslint.config(
     plugins: {
       jsdoc,
       "simple-import-sort": simpleImportSort,
-      "custom-rn": { rules: { "platform-coverage": platformCoverage } },
+      "custom-rn": { rules: { "platform-coverage": platformCoverage, "version-sync": versionSync } },
     },
     rules: {
       "custom-rn/platform-coverage": "warn",
+      "custom-rn/version-sync": "error",
       curly: "error",
       "jsdoc/require-jsdoc": [
         "error",

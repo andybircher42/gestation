@@ -11,3 +11,4 @@ fi
 npx lint-staged
 npx expo-doctor
 npm test
+sh scripts/check-native-version-bump.sh

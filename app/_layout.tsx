@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Image, ImageBackground, StyleSheet } from "react-native";
+import { Image, ImageBackground, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
+import { identifyDevice, vexo } from "vexo-analytics";
 
 import { HipaaAgreementModal, OnboardingOverlay } from "@/components";
 import { useThemePreference } from "@/hooks";
@@ -23,9 +24,7 @@ import splashLogoDark from "../assets/splash-icon-dark.png";
 const SPLASH_DURATION_MS = 2000;
 
 if (!__DEV__) {
-  void import("vexo-analytics")
-    .then(({ vexo }) => vexo("0c9372e4-1c7e-4051-a9aa-48801f7cef4b"))
-    .catch((e) => Alert.alert("Vexo Init Failed", String(e?.message ?? e)));
+  vexo("0c9372e4-1c7e-4051-a9aa-48801f7cef4b");
 }
 
 /** Root layout that wraps all routes with providers. */
@@ -118,9 +117,7 @@ function RootGate({ loadThemePreference }: RootGateProps) {
 
       if (!__DEV__) {
         if (deviceId) {
-          void import("vexo-analytics").then(({ identifyDevice }) =>
-            identifyDevice(deviceId),
-          );
+          identifyDevice(deviceId);
         }
         Updates.checkForUpdateAsync()
           .then(async (update) => {
