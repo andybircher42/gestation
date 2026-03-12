@@ -175,7 +175,6 @@ export default function EntryList({
     setShowForm((prev) => {
       if (!prev) {
         formKey.current += 1;
-        setBatchMode(false);
       }
       return !prev;
     });
