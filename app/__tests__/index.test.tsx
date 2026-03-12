@@ -29,8 +29,10 @@ afterEach(() => {
 
 async function renderHome() {
   renderWithTheme(<HomeScreen />);
-  // Flush entry loading
-  await act(async () => {});
+  // Wait for async init (entry loading, etc.) to settle
+  await waitFor(() => {
+    expect(screen.getByText("in due time")).toBeTruthy();
+  });
 }
 
 async function renderHomeWithTheme(
