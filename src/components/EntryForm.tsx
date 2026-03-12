@@ -291,14 +291,14 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
           >
             <Text style={styles.helpTitle}>Separate entries with commas</Text>
             <Text style={styles.helpCode}>
-              Alice 6/14, Bob 35w5d, Carol 6-14-26
+              Alice 6/14, Bob 35w5d, Carol 6-14-26, Debby 22w 3d
             </Text>
           </View>
         )}
 
         <TextInput
           style={styles.batchInput}
-          placeholder="Alice 6/14, Bob 35w5d, Carol 6-14-26"
+          placeholder="Alice 6/14, Bob 35w5d, Carol 6-14-26, Debby 22w 3d"
           placeholderTextColor={colors.textTertiary}
           accessibilityLabel="Batch entries"
           value={batchText}
