@@ -25,8 +25,9 @@
       },
       "ios": {
         "ascApiKeyPath": "./auth.p8",
-        "ascApiKeyIssuerId": "${{ env.ASC_API_KEY_ISSUER_ID }}",
-        "ascApiKeyId": "${{ env.ASC_API_KEY_ID }}"
+        "ascApiKeyIssuerId": "9b33df09-100d-47da-974a-afb8189b34a5",
+        "ascApiKeyId": "M3XVTS842D",
+        "ascAppId": "6760419708"
       }
     }
   }

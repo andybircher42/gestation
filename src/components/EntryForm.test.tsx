@@ -600,6 +600,27 @@ describe("EntryForm — typed date input", () => {
     fireEvent.changeText(input, "1");
     expect(screen.queryByLabelText("Date error")).toBeNull();
   });
+
+  it("shows error immediately when typed date is too far in the future", () => {
+    renderFormWithName();
+    const input = screen.getByLabelText("Due date");
+
+    // 2 years from now is well beyond 42 weeks
+    fireEvent.changeText(input, "03-02-2028");
+
+    // Error should show without needing blur
+    expect(screen.getByText(/within the next 42 weeks/)).toBeTruthy();
+  });
+
+  it("shows error immediately when typed date is too far in the past", () => {
+    renderFormWithName();
+    const input = screen.getByLabelText("Due date");
+
+    fireEvent.changeText(input, "01-01-2025");
+
+    // Error should show without needing blur
+    expect(screen.getByText(/within the last month/)).toBeTruthy();
+  });
 });
 
 describe("EntryForm — dueDate in onAdd callback", () => {

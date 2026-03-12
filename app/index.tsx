@@ -10,77 +10,33 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { StatusBar } from "expo-status-bar";
-import * as Updates from "expo-updates";
 
 import {
   AppInfoModal,
   CalendarView,
   DevToolbar,
   EntryList,
-  HipaaAgreementModal,
   InfoToast,
-  OnboardingOverlay,
   ThemePickerModal,
   UndoToast,
 } from "@/components";
-import { useEntries, useThemePreference } from "@/hooks";
-import {
-  acceptAgreement,
-  checkAgreement,
-  checkOnboardingComplete,
-  getOrCreateDeviceId,
-  resetAgreement,
-  resetOnboarding,
-} from "@/storage";
-import { ColorTokens, ThemeProvider, useTheme } from "@/theme";
+import { useEntries } from "@/hooks";
+import { resetAgreement, resetOnboarding } from "@/storage";
+import { ColorTokens, useTheme } from "@/theme";
 
-import headerLogoLight from "./assets/icon.png";
-import headerLogoDark from "./assets/icon-dark.png";
-import splashBgDark from "./assets/splash-bg-dark.png";
-import splashBgLight from "./assets/splash-bg-light.png";
-import splashLogoLight from "./assets/splash-icon.png";
-import splashLogoDark from "./assets/splash-icon-dark.png";
+import headerLogoLight from "../assets/icon.png";
+import headerLogoDark from "../assets/icon-dark.png";
+import splashBgDark from "../assets/splash-bg-dark.png";
+import splashBgLight from "../assets/splash-bg-light.png";
 
-const SPLASH_DURATION_MS = 2000;
 const APP_LABEL = (Constants.expoConfig?.extra?.appLabel as string) ?? "";
 
-if (!__DEV__) {
-  void import("vexo-analytics").then(({ vexo }) =>
-    vexo("5febe5d7-f01f-4716-ba33-d3c0b33794c8"),
-  );
-}
-
-/** Root component that wraps AppContent with ThemeProvider. */
-export default function App() {
-  const {
-    personality,
-    brightness,
-    setPersonality,
-    setBrightness,
-    loadThemePreference,
-  } = useThemePreference();
-
-  return (
-    <ThemeProvider
-      personality={personality}
-      brightness={brightness}
-      setPersonality={setPersonality}
-      setBrightness={setBrightness}
-    >
-      <AppContent loadThemePreference={loadThemePreference} />
-    </ThemeProvider>
-  );
-}
-
-interface AppContentProps {
-  loadThemePreference: () => Promise<void>;
-}
-
-/** Main app content that consumes theme context. */
-function AppContent({ loadThemePreference }: AppContentProps) {
+/** Main home screen with entry list/calendar and all modals. */
+export default function HomeScreen() {
   const {
     colors,
     resolvedTheme,
@@ -89,23 +45,15 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     setPersonality,
     setBrightness,
   } = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
-  const [showAgreement, setShowAgreement] = useState(false);
-  const [agreementLoaded, setAgreementLoaded] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const onboardingDoneRef = useRef(false);
+  const insets = useSafeAreaInsets();
+
   const [view, setView] = useState<"list" | "calendar">("list");
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showAppInfo, setShowAppInfo] = useState(false);
   const [pickerAnchor, setPickerAnchor] = useState({ top: 0, right: 0 });
   const settingsRef = useRef<View>(null);
-  const isLoadingRef = useRef(true);
-  useEffect(() => {
-    isLoadingRef.current = isLoading;
-  }, [isLoading]);
 
   const isDark = resolvedTheme === "dark";
-  const splashLogo = isDark ? splashLogoDark : splashLogoLight;
   const splashBg = isDark ? splashBgDark : splashBgLight;
   const headerLogo = isDark ? headerLogoDark : headerLogoLight;
 
@@ -134,133 +82,19 @@ function AppContent({ loadThemePreference }: AppContentProps) {
 
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  const startSplashTimer = useCallback(() => {
-    setTimeout(() => setIsLoading(false), SPLASH_DURATION_MS);
-  }, []);
-
   useEffect(() => {
-    let mounted = true;
-
-    async function init() {
-      const [accepted, , , deviceId, onboardingDone] = await Promise.all([
-        checkAgreement().catch((e) => {
-          console.error("Failed to check agreement", e);
-          return false;
-        }),
-        load().catch((e) => console.error("Failed to load entries", e)),
-        loadThemePreference().catch((e) =>
-          console.error("Failed to load theme preference", e),
-        ),
-        getOrCreateDeviceId().catch((e) => {
-          console.error("Failed to get device ID", e);
-          return undefined;
-        }),
-        checkOnboardingComplete().catch((e) => {
-          console.error("Failed to check onboarding", e);
-          return false;
-        }),
-      ]);
-      if (!mounted) {
-        return;
-      }
-      onboardingDoneRef.current = !!onboardingDone;
-      if (!accepted) {
-        // HIPAA needed — splash timer will start after acceptance
-        setShowAgreement(true);
-      } else if (!onboardingDone) {
-        setShowOnboarding(true);
-        startSplashTimer();
-      } else {
-        // Returning user — start splash timer immediately
-        startSplashTimer();
-      }
-      setAgreementLoaded(true);
-
-      if (!__DEV__) {
-        if (deviceId) {
-          void import("vexo-analytics").then(({ identifyDevice }) =>
-            identifyDevice(deviceId),
-          );
-        }
-        Updates.checkForUpdateAsync()
-          .then(async (update) => {
-            if (update.isAvailable) {
-              await Updates.fetchUpdateAsync();
-              if (isLoadingRef.current) {
-                await Updates.reloadAsync();
-              }
-            }
-          })
-          .catch((e) => console.error("Failed to check for updates", e));
-      }
-    }
-    void init();
-
-    return () => {
-      mounted = false;
-    };
-  }, [load, loadThemePreference]);
-
-  const handleAcceptAgreement = () => {
-    acceptAgreement()
-      .then(() => {
-        setShowAgreement(false);
-        if (!onboardingDoneRef.current) {
-          // Brief splash pause before onboarding begins
-          setTimeout(() => setShowOnboarding(true), SPLASH_DURATION_MS);
-        } else {
-          startSplashTimer();
-        }
-      })
-      .catch((e) => console.error("Failed to save agreement", e));
-  };
-
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-    setIsLoading(false);
-  };
+    load().catch((e) => console.error("Failed to load entries", e));
+  }, [load]);
 
   const handleResetAgreement = () => {
     Promise.all([resetAgreement(), resetOnboarding()])
       .then(() => {
-        setShowAgreement(true);
-        setShowOnboarding(false);
         if (__DEV__) {
           DevSettings.reload();
         }
       })
       .catch((e) => console.error("Failed to reset agreement", e));
   };
-
-  // Stay on splash until HIPAA + onboarding are both resolved
-  const showSplash = isLoading || showAgreement || showOnboarding;
-
-  if (showSplash) {
-    return (
-      <ImageBackground
-        source={splashBg}
-        resizeMode="cover"
-        style={styles.splashContainer}
-        testID="splash-bg"
-      >
-        <Image
-          source={splashLogo}
-          style={styles.splashLogo}
-          resizeMode="contain"
-          testID="splash-logo"
-        />
-        <HipaaAgreementModal
-          visible={showAgreement && agreementLoaded}
-          onAccept={handleAcceptAgreement}
-        />
-        <OnboardingOverlay
-          visible={showOnboarding && !showAgreement}
-          onComplete={handleOnboardingComplete}
-        />
-        <StatusBar style="auto" />
-      </ImageBackground>
-    );
-  }
 
   return (
     <ImageBackground
@@ -271,9 +105,12 @@ function AppContent({ loadThemePreference }: AppContentProps) {
     >
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.header}>
+        <View
+          style={[styles.header, { paddingTop: insets.top + 16 }]}
+          testID="app-header"
+        >
           <Image
             source={headerLogo}
             style={styles.headerLogo}
@@ -382,16 +219,6 @@ function AppContent({ loadThemePreference }: AppContentProps) {
 /** Creates styles based on the active color palette. */
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
-    splashContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    splashLogo: {
-      width: "70%",
-      maxWidth: 320,
-      aspectRatio: 280 / 160,
-    },
     container: {
       flex: 1,
     },
@@ -401,7 +228,7 @@ function createStyles(colors: ColorTokens) {
     header: {
       flexDirection: "row",
       alignItems: "center",
-      paddingTop: (Constants.statusBarHeight ?? 0) + 16,
+      // paddingTop is applied dynamically via useSafeAreaInsets
       paddingBottom: 16,
       paddingHorizontal: 20,
       backgroundColor: colors.contentBackground,

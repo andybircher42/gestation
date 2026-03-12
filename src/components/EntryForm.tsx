@@ -122,7 +122,6 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
   }, []);
 
   const handleDateTextChange = (text: string) => {
-    setDateTouched(false);
     let updated = text.replace(/[^\d-]/g, "-").replace(/-{2,}/g, "-");
     // Limit to DD-DD-DDDD pattern: truncate after 2nd hyphen + 4 digits
     const parts = updated.split("-");
@@ -141,7 +140,14 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
       }
     }
     setDateText(updated);
-    setDueDate(parseDateText(updated));
+    const parsed = parseDateText(updated);
+    setDueDate(parsed);
+    // Show error immediately when a complete date is out of bounds
+    if (parsed && getDateError(updated)) {
+      setDateTouched(true);
+    } else {
+      setDateTouched(false);
+    }
   };
 
   useEffect(() => {
@@ -248,8 +254,16 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
         setShowPicker(false);
       }
       if (selected) {
-        setDueDate(selected);
-        setDateText(toDisplayDateString(selected));
+        // Clamp to bounds — iOS spinner can overshoot min/max
+        const bounds = getDateBounds();
+        const clamped =
+          selected < bounds.min
+            ? bounds.min
+            : selected > bounds.max
+              ? bounds.max
+              : selected;
+        setDueDate(clamped);
+        setDateText(toDisplayDateString(clamped));
       }
     },
     [],

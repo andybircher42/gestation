@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { Animated, Pressable, StyleSheet, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
@@ -21,6 +22,7 @@ export default function UndoToast({
   onDismiss,
 }: UndoToastProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { weeks, days } = gestationalAgeFromDueDate(entry.dueDate);
   const { animatedValue: translateY, panHandlers } = useSwipeDismiss({
@@ -39,7 +41,13 @@ export default function UndoToast({
 
   return (
     <Animated.View
-      style={[styles.container, { transform: [{ translateY }] }]}
+      style={[
+        styles.container,
+        {
+          bottom: Math.max(insets.bottom, 16) + 16,
+          transform: [{ translateY }],
+        },
+      ]}
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
       accessibilityLabel={`Removed ${entry.name}, ${weeks} weeks ${days} days`}
@@ -66,7 +74,7 @@ function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: {
       position: "absolute",
-      bottom: 32,
+      // bottom is applied dynamically via useSafeAreaInsets
       left: 16,
       right: 16,
       backgroundColor: colors.toastBackground,

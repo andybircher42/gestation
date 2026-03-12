@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   Animated,
   Modal,
@@ -33,7 +33,6 @@ export default function OnboardingOverlay({
 }: OnboardingOverlayProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [showButton, setShowButton] = useState(false);
   const opacities = useRef(LINES.map(() => new Animated.Value(0))).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
 
@@ -42,7 +41,6 @@ export default function OnboardingOverlay({
       // Reset animations when hidden
       opacities.forEach((o) => o.setValue(0));
       buttonOpacity.setValue(0);
-      setShowButton(false);
       return;
     }
 
@@ -66,7 +64,6 @@ export default function OnboardingOverlay({
     timers.push(
       setTimeout(
         () => {
-          setShowButton(true);
           Animated.timing(buttonOpacity, {
             toValue: 1,
             duration: 500,
@@ -103,20 +100,18 @@ export default function OnboardingOverlay({
             </Animated.Text>
           ))}
         </View>
-        {showButton && (
-          <Animated.View
-            style={[styles.buttonContainer, { opacity: buttonOpacity }]}
+        <Animated.View
+          style={[styles.buttonContainer, { opacity: buttonOpacity }]}
+        >
+          <Pressable
+            style={styles.button}
+            onPress={handleGetStarted}
+            accessibilityRole="button"
+            accessibilityLabel="Get started"
           >
-            <Pressable
-              style={styles.button}
-              onPress={handleGetStarted}
-              accessibilityRole="button"
-              accessibilityLabel="Get started"
-            >
-              <Text style={styles.buttonText}>Get Started</Text>
-            </Pressable>
-          </Animated.View>
-        )}
+            <Text style={styles.buttonText}>Get Started</Text>
+          </Pressable>
+        </Animated.View>
       </View>
     </Modal>
   );
