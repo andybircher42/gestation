@@ -17,6 +17,7 @@ import * as Updates from "expo-updates";
 
 import {
   AppInfoModal,
+  CalendarView,
   DevToolbar,
   EntryList,
   HipaaAgreementModal,
@@ -93,6 +94,7 @@ function AppContent({ loadThemePreference }: AppContentProps) {
   const [agreementLoaded, setAgreementLoaded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const onboardingDoneRef = useRef(false);
+  const [view, setView] = useState<"list" | "calendar">("list");
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showAppInfo, setShowAppInfo] = useState(false);
   const [pickerAnchor, setPickerAnchor] = useState({ top: 0, right: 0 });
@@ -284,6 +286,22 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           </Text>
           {APP_LABEL !== "" && <Text style={styles.appLabel}>{APP_LABEL}</Text>}
           <Pressable
+            onPress={() => setView((v) => (v === "list" ? "calendar" : "list"))}
+            accessibilityLabel={
+              view === "list"
+                ? "Switch to calendar view"
+                : "Switch to list view"
+            }
+            accessibilityRole="button"
+            hitSlop={10}
+          >
+            <Ionicons
+              name={view === "list" ? "calendar-outline" : "list-outline"}
+              size={24}
+              color={colors.textPrimary}
+            />
+          </Pressable>
+          <Pressable
             ref={settingsRef}
             onPress={openThemePicker}
             accessibilityLabel="Theme settings"
@@ -304,12 +322,16 @@ function AppContent({ loadThemePreference }: AppContentProps) {
           )}
         </View>
 
-        <EntryList
-          entries={entries}
-          onDelete={remove}
-          onDeleteAll={removeAll}
-          onAdd={add}
-        />
+        {view === "list" ? (
+          <EntryList
+            entries={entries}
+            onDelete={remove}
+            onDeleteAll={removeAll}
+            onAdd={add}
+          />
+        ) : (
+          <CalendarView entries={entries} />
+        )}
         <ThemePickerModal
           visible={showThemePicker}
           currentPersonality={personality}
