@@ -90,8 +90,8 @@ describe("EntryForm — Gestational Age mode", () => {
     expect(screen.getByLabelText("Name").props.value).toBe("");
     expect(screen.queryByLabelText("Weeks")).toBeNull();
     expect(screen.queryByLabelText("Days")).toBeNull();
-    // Shows confirmation
-    expect(screen.getByLabelText("Added Baby")).toBeTruthy();
+    // Shows confirmation with gestational age
+    expect(screen.getByLabelText("Added Baby, 10w 5d")).toBeTruthy();
   });
 
   it("does not call onAdd when name is only whitespace", () => {

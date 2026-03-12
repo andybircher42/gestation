@@ -58,7 +58,10 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
   const [daysTouched, setDaysTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
   const wasRevealedRef = useRef(false);
-  const [addedName, setAddedName] = useState<string | null>(null);
+  const [addedInfo, setAddedInfo] = useState<{
+    name: string;
+    detail: string;
+  } | null>(null);
   const confirmOpacity = useRef(new Animated.Value(0)).current;
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -147,18 +150,23 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     }
 
     const trimmedName = name.trim();
+    let detail: string;
 
     if (mode === "weeksDays") {
+      detail = `${w}w ${d}d`;
       const computed_dueDate = computeDueDate(w, d);
       onAdd({
         name: trimmedName,
         dueDate: toISODateString(computed_dueDate),
       });
     } else if (dueDate) {
+      detail = toDisplayDateString(dueDate);
       onAdd({
         name: trimmedName,
         dueDate: toISODateString(dueDate),
       });
+    } else {
+      return;
     }
 
     setName("");
@@ -175,7 +183,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
     if (confirmTimer.current) {
       clearTimeout(confirmTimer.current);
     }
-    setAddedName(trimmedName);
+    setAddedInfo({ name: trimmedName, detail });
     confirmOpacity.setValue(1);
     confirmTimer.current = setTimeout(() => {
       Animated.timing(confirmOpacity, {
@@ -183,7 +191,7 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
         duration: 400,
         easing: Easing.in(Easing.quad),
         useNativeDriver: true,
-      }).start(() => setAddedName(null));
+      }).start(() => setAddedInfo(null));
     }, 1500);
   };
 
@@ -221,14 +229,16 @@ export default function EntryForm({ onAdd }: EntryFormProps) {
         autoFocus
       />
 
-      {addedName && (
+      {addedInfo && (
         <Animated.View
           style={[styles.confirmRow, { opacity: confirmOpacity }]}
-          accessibilityLabel={`Added ${addedName}`}
+          accessibilityLabel={`Added ${addedInfo.name}, ${addedInfo.detail}`}
           accessibilityRole="alert"
         >
           <Ionicons name="checkmark-circle" size={18} color={colors.primary} />
-          <Text style={styles.confirmText}>Added {addedName}</Text>
+          <Text style={styles.confirmText}>
+            Added {addedInfo.name} — {addedInfo.detail}
+          </Text>
         </Animated.View>
       )}
 

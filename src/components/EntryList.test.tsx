@@ -447,7 +447,7 @@ describe("EntryList", () => {
     expect(onAdd).toHaveBeenCalledTimes(1);
     // Form stays open for batch entry
     expect(screen.getByLabelText("Name")).toBeTruthy();
-    // Shows confirmation
-    expect(screen.getByLabelText("Added Baby")).toBeTruthy();
+    // Shows confirmation with gestational age
+    expect(screen.getByLabelText("Added Baby, 20w 3d")).toBeTruthy();
   });
 });
