@@ -270,17 +270,15 @@ export default function EntryList({
     <View style={styles.listContainer}>
       {showForm ? (
         <View style={styles.inlineFormContainer}>
-          <View style={styles.inlineFormHeader}>
-            <Text style={styles.inlineFormTitle}>Add someone</Text>
-            <Pressable
-              onPress={toggleForm}
-              accessibilityRole="button"
-              accessibilityLabel="Close form"
-              hitSlop={8}
-            >
-              <Ionicons name="close" size={24} color={colors.textTertiary} />
-            </Pressable>
-          </View>
+          <Pressable
+            style={styles.closeButton}
+            onPress={toggleForm}
+            accessibilityRole="button"
+            accessibilityLabel="Close form"
+            hitSlop={8}
+          >
+            <Ionicons name="close" size={24} color={colors.textTertiary} />
+          </Pressable>
           <EntryForm key={formKey.current} onAdd={handleAdd} />
         </View>
       ) : (
@@ -449,18 +447,11 @@ function createStyles(colors: ColorTokens) {
       borderColor: colors.border,
       overflow: "hidden",
     },
-    inlineFormHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+    closeButton: {
+      alignSelf: "flex-end",
       paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 4,
-    },
-    inlineFormTitle: {
-      fontSize: 18,
-      fontWeight: "700",
-      color: colors.textPrimary,
+      paddingTop: 12,
+      paddingBottom: 0,
     },
     sortButton: {
       flex: 1,
