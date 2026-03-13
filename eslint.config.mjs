@@ -58,6 +58,7 @@ export default tseslint.config(
         module: "readonly",
         require: "readonly",
         console: "readonly",
+        process: "readonly",
       },
     },
     rules: {
@@ -73,10 +74,24 @@ export default tseslint.config(
         require: "readonly",
         console: "readonly",
         __dirname: "readonly",
+        process: "readonly",
       },
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    files: ["eslint-rules/**/*.test.js"],
+    languageOptions: {
+      globals: {
+        describe: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        jest: "readonly",
+      },
     },
   },
   {
