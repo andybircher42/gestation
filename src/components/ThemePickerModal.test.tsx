@@ -29,7 +29,7 @@ describe("ThemePickerModal", () => {
     expect(screen.getByText("Theme")).toBeTruthy();
     expect(screen.getByText("Brightness")).toBeTruthy();
     expect(screen.getByText("Layout")).toBeTruthy();
-    expect(screen.getByText("Auto-remove")).toBeTruthy();
+    expect(screen.getByText("Delivered cleanup")).toBeTruthy();
   });
 
   it("shows current values on main menu rows", () => {
@@ -239,7 +239,9 @@ describe("ThemePickerModal", () => {
       />,
     );
 
-    fireEvent.press(screen.getByLabelText("Auto-remove delivered settings"));
+    fireEvent.press(
+      screen.getByLabelText("Delivered cleanup delivered settings"),
+    );
     fireEvent.press(screen.getByText("1 week"));
 
     expect(onSelectDeliveredTTL).toHaveBeenCalledWith(7);

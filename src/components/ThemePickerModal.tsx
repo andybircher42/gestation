@@ -137,7 +137,9 @@ export default function ThemePickerModal({
 
   // Reset to main when modal opens
   useEffect(() => {
-    if (visible) {setSubPage("main");}
+    if (visible) {
+      setSubPage("main");
+    }
   }, [visible]);
 
   const goBack = useCallback(() => setSubPage("main"), []);
@@ -257,7 +259,7 @@ export default function ThemePickerModal({
       case "ttl":
         return (
           <>
-            {renderBackRow("Auto-remove")}
+            {renderBackRow("Delivered cleanup")}
             {TTL_OPTIONS.map(({ value, label }) => (
               <Pressable
                 key={value}
@@ -382,7 +384,7 @@ export default function ThemePickerModal({
                 style={styles.row}
                 onPress={() => setSubPage("ttl")}
                 accessibilityRole="button"
-                accessibilityLabel="Auto-remove delivered settings"
+                accessibilityLabel="Delivered cleanup delivered settings"
               >
                 <Ionicons
                   name="timer-outline"
@@ -390,7 +392,7 @@ export default function ThemePickerModal({
                   color={colors.textPrimary}
                   style={styles.rowIcon}
                 />
-                <Text style={styles.rowLabel}>Auto-remove</Text>
+                <Text style={styles.rowLabel}>Delivered cleanup</Text>
                 <Text style={styles.rowValue}>{currentTTLLabel}</Text>
                 <Ionicons
                   name="chevron-forward"
