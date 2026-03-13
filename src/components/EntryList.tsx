@@ -89,9 +89,10 @@ const EntryRow = React.memo(function EntryRow({
   deleteIconColor,
 }: EntryRowProps) {
   const { weeks, days } = gestationalAgeFromDueDate(item.dueDate);
+  const SWIPE_THRESHOLD = 80;
   const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
     axis: "x",
-    threshold: 100,
+    threshold: SWIPE_THRESHOLD,
     onDismiss: () => onDelete(item.id),
     onDismissPositive: () => onDeliver(item.id),
   });
@@ -106,26 +107,64 @@ const EntryRow = React.memo(function EntryRow({
     }).start();
   }, [fadeIn]);
 
+  // Deliver side (swipe right): opacity and scale ramp up from 0→threshold
+  const deliverOpacity = translateX.interpolate({
+    inputRange: [0, SWIPE_THRESHOLD * 0.3, SWIPE_THRESHOLD],
+    outputRange: [0, 0.5, 1],
+    extrapolate: "clamp",
+  });
+  const deliverScale = translateX.interpolate({
+    inputRange: [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
+    outputRange: [0.6, 0.8, 1],
+    extrapolate: "clamp",
+  });
+
+  // Delete side (swipe left): same but inverted
+  const deleteOpacity = translateX.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, -SWIPE_THRESHOLD * 0.3, 0],
+    outputRange: [1, 0.5, 0],
+    extrapolate: "clamp",
+  });
+  const deleteScale = translateX.interpolate({
+    inputRange: [-SWIPE_THRESHOLD, -SWIPE_THRESHOLD * 0.5, 0],
+    outputRange: [1, 0.8, 0.6],
+    extrapolate: "clamp",
+  });
+
   return (
     <Animated.View style={[styles.entryWrapper, { opacity: fadeIn }]}>
       <View style={styles.swipeBackground} testID="delete-background">
         <View style={styles.swipeDeliverSide}>
-          <Ionicons
-            name="heart"
-            size={22}
-            color={deleteIconColor}
-            accessible={false}
-          />
-          <Text style={styles.swipeLabel}>Delivered</Text>
+          <Animated.View
+            style={[
+              styles.swipeIconGroup,
+              { opacity: deliverOpacity, transform: [{ scale: deliverScale }] },
+            ]}
+          >
+            <Ionicons
+              name="heart"
+              size={22}
+              color={deleteIconColor}
+              accessible={false}
+            />
+            <Text style={styles.swipeLabel}>Delivered</Text>
+          </Animated.View>
         </View>
         <View style={styles.swipeDeleteSide}>
-          <Text style={styles.swipeLabel}>Delete</Text>
-          <Ionicons
-            name="trash-outline"
-            size={22}
-            color={deleteIconColor}
-            accessible={false}
-          />
+          <Animated.View
+            style={[
+              styles.swipeIconGroup,
+              { opacity: deleteOpacity, transform: [{ scale: deleteScale }] },
+            ]}
+          >
+            <Text style={styles.swipeLabel}>Delete</Text>
+            <Ionicons
+              name="trash-outline"
+              size={22}
+              color={deleteIconColor}
+              accessible={false}
+            />
+          </Animated.View>
         </View>
       </View>
       <Animated.View
@@ -566,7 +605,6 @@ function createStyles(colors: ColorTokens) {
       flexDirection: "row",
       alignItems: "center",
       paddingLeft: 20,
-      gap: 8,
     },
     swipeDeleteSide: {
       flex: 1,
@@ -575,6 +613,10 @@ function createStyles(colors: ColorTokens) {
       alignItems: "center",
       justifyContent: "flex-end",
       paddingRight: 20,
+    },
+    swipeIconGroup: {
+      flexDirection: "row",
+      alignItems: "center",
       gap: 8,
     },
     swipeLabel: {

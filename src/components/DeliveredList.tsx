@@ -33,6 +33,8 @@ interface DeliveredRowProps {
   styles: ReturnType<typeof createStyles>;
 }
 
+const DELIVERED_SWIPE_THRESHOLD = 80;
+
 /** Individual delivered row with swipe-to-delete support. */
 const DeliveredRow = React.memo(function DeliveredRow({
   item,
@@ -43,20 +45,70 @@ const DeliveredRow = React.memo(function DeliveredRow({
 }: DeliveredRowProps) {
   const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
     axis: "x",
-    threshold: 100,
+    threshold: DELIVERED_SWIPE_THRESHOLD,
     onDismiss: () => onDelete(item.id),
+  });
+
+  // Animate delete icons based on swipe direction & progress
+  const leftDeleteOpacity = translateX.interpolate({
+    inputRange: [
+      -DELIVERED_SWIPE_THRESHOLD,
+      -DELIVERED_SWIPE_THRESHOLD * 0.3,
+      0,
+    ],
+    outputRange: [1, 0.5, 0],
+    extrapolate: "clamp",
+  });
+  const leftDeleteScale = translateX.interpolate({
+    inputRange: [
+      -DELIVERED_SWIPE_THRESHOLD,
+      -DELIVERED_SWIPE_THRESHOLD * 0.5,
+      0,
+    ],
+    outputRange: [1, 0.8, 0.6],
+    extrapolate: "clamp",
+  });
+  const rightDeleteOpacity = translateX.interpolate({
+    inputRange: [0, DELIVERED_SWIPE_THRESHOLD * 0.3, DELIVERED_SWIPE_THRESHOLD],
+    outputRange: [0, 0.5, 1],
+    extrapolate: "clamp",
+  });
+  const rightDeleteScale = translateX.interpolate({
+    inputRange: [0, DELIVERED_SWIPE_THRESHOLD * 0.5, DELIVERED_SWIPE_THRESHOLD],
+    outputRange: [0.6, 0.8, 1],
+    extrapolate: "clamp",
   });
 
   return (
     <View style={styles.rowWrapper}>
       <View style={styles.swipeBackground}>
         <View style={styles.swipeDeleteSide}>
-          <Text style={styles.swipeLabel}>Delete</Text>
-          <Ionicons name="trash-outline" size={22} color={colors.white} />
+          <Animated.View
+            style={[
+              styles.swipeIconGroup,
+              {
+                opacity: rightDeleteOpacity,
+                transform: [{ scale: rightDeleteScale }],
+              },
+            ]}
+          >
+            <Ionicons name="trash-outline" size={22} color={colors.white} />
+            <Text style={styles.swipeLabel}>Delete</Text>
+          </Animated.View>
         </View>
         <View style={styles.swipeDeleteSide}>
-          <Text style={styles.swipeLabel}>Delete</Text>
-          <Ionicons name="trash-outline" size={22} color={colors.white} />
+          <Animated.View
+            style={[
+              styles.swipeIconGroup,
+              {
+                opacity: leftDeleteOpacity,
+                transform: [{ scale: leftDeleteScale }],
+              },
+            ]}
+          >
+            <Text style={styles.swipeLabel}>Delete</Text>
+            <Ionicons name="trash-outline" size={22} color={colors.white} />
+          </Animated.View>
         </View>
       </View>
       <Animated.View
@@ -301,6 +353,10 @@ function createStyles(colors: ColorTokens) {
       alignItems: "center",
       justifyContent: "flex-end",
       paddingHorizontal: 20,
+    },
+    swipeIconGroup: {
+      flexDirection: "row",
+      alignItems: "center",
       gap: 8,
     },
     swipeLabel: {

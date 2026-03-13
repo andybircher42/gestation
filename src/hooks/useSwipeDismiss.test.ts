@@ -5,8 +5,14 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import { act, renderHook } from "@testing-library/react-native";
+import * as Haptics from "expo-haptics";
 
 import useSwipeDismiss from "./useSwipeDismiss";
+
+jest.mock("expo-haptics", () => ({
+  impactAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle: { Light: "light", Medium: "medium", Heavy: "heavy" },
+}));
 
 type PanCallbacks = Parameters<typeof PanResponder.create>[0];
 
@@ -28,9 +34,9 @@ afterEach(() => {
 
 const event = {} as GestureResponderEvent;
 
-/** Creates a minimal gesture state object. */
-function gs(dx: number, dy: number) {
-  return { dx, dy } as PanResponderGestureState;
+/** Creates a minimal gesture state object with optional velocity. */
+function gs(dx: number, dy: number, vx = 0, vy = 0) {
+  return { dx, dy, vx, vy } as PanResponderGestureState;
 }
 
 describe("useSwipeDismiss", () => {
@@ -251,6 +257,90 @@ describe("useSwipeDismiss", () => {
       });
 
       expect(onDismiss).not.toHaveBeenCalled();
+    });
+
+    it("dismisses on fast flick even below distance threshold", () => {
+      const onDismiss = jest.fn();
+      renderHook(() =>
+        useSwipeDismiss({ axis: "x", threshold: 100, onDismiss }),
+      );
+
+      act(() => {
+        // 50px distance (below 100 threshold) but fast velocity
+        captured.onPanResponderRelease!(event, gs(-50, 0, -1.5, 0));
+        jest.advanceTimersByTime(300);
+      });
+
+      expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not dismiss on slow flick below threshold", () => {
+      const onDismiss = jest.fn();
+      renderHook(() =>
+        useSwipeDismiss({ axis: "x", threshold: 100, onDismiss }),
+      );
+
+      act(() => {
+        // 50px distance, slow velocity
+        captured.onPanResponderRelease!(event, gs(50, 0, 0.1, 0));
+        jest.advanceTimersByTime(300);
+      });
+
+      expect(onDismiss).not.toHaveBeenCalled();
+    });
+
+    it("does not dismiss on fast flick with very small distance", () => {
+      const onDismiss = jest.fn();
+      renderHook(() =>
+        useSwipeDismiss({ axis: "x", threshold: 100, onDismiss }),
+      );
+
+      act(() => {
+        // Only 10px distance (below 30px minimum for flick)
+        captured.onPanResponderRelease!(event, gs(10, 0, 2, 0));
+        jest.advanceTimersByTime(300);
+      });
+
+      expect(onDismiss).not.toHaveBeenCalled();
+    });
+
+    it("calls onDismissPositive on fast right flick", () => {
+      const onDismiss = jest.fn();
+      const onDismissPositive = jest.fn();
+      renderHook(() =>
+        useSwipeDismiss({
+          axis: "x",
+          threshold: 100,
+          onDismiss,
+          onDismissPositive,
+        }),
+      );
+
+      act(() => {
+        captured.onPanResponderRelease!(event, gs(50, 0, 1.5, 0));
+        jest.advanceTimersByTime(300);
+      });
+
+      expect(onDismissPositive).toHaveBeenCalledTimes(1);
+      expect(onDismiss).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("haptic feedback", () => {
+    it("triggers haptic when crossing threshold during move", () => {
+      renderHook(() =>
+        useSwipeDismiss({ axis: "x", threshold: 100, onDismiss: jest.fn() }),
+      );
+
+      act(() => {
+        captured.onPanResponderMove!(event, gs(50, 0));
+      });
+      expect(Haptics.impactAsync).not.toHaveBeenCalled();
+
+      act(() => {
+        captured.onPanResponderMove!(event, gs(110, 0));
+      });
+      expect(Haptics.impactAsync).toHaveBeenCalledTimes(1);
     });
   });
 

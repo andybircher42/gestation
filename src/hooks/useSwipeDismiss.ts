@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Animated, PanResponder } from "react-native";
+import * as Haptics from "expo-haptics";
 
 interface UseSwipeDismissOptions {
   /** Swipe axis: "x" for horizontal, "y" for vertical. */
@@ -16,6 +17,8 @@ interface UseSwipeDismissOptions {
   overshoot?: number;
   /** Duration of the dismiss animation in milliseconds (default 200). */
   duration?: number;
+  /** Minimum velocity (px/ms) to trigger dismissal even below threshold (default 0.5). */
+  velocityThreshold?: number;
 }
 
 /**
@@ -30,15 +33,18 @@ export default function useSwipeDismiss({
   positiveOnly = false,
   overshoot = 500,
   duration = 200,
+  velocityThreshold = 0.5,
 }: UseSwipeDismissOptions) {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
   const onDismissPositiveRef = useRef(onDismissPositive);
   onDismissPositiveRef.current = onDismissPositive;
+  const pastThreshold = useRef(false);
 
   const isX = axis === "x";
   const delta = (gs: { dx: number; dy: number }) => (isX ? gs.dx : gs.dy);
+  const velocity = (gs: { vx: number; vy: number }) => (isX ? gs.vx : gs.vy);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -51,19 +57,42 @@ export default function useSwipeDismiss({
           return;
         }
         animatedValue.setValue(d);
+
+        // Haptic feedback when crossing the threshold
+        const crossed = positiveOnly ? d > threshold : Math.abs(d) > threshold;
+        if (crossed && !pastThreshold.current) {
+          pastThreshold.current = true;
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(
+            () => {},
+          );
+        } else if (!crossed && pastThreshold.current) {
+          pastThreshold.current = false;
+        }
       },
       onPanResponderTerminationRequest: () => false,
       onPanResponderTerminate: () => {
+        pastThreshold.current = false;
         Animated.spring(animatedValue, {
           toValue: 0,
           useNativeDriver: true,
         }).start();
       },
       onPanResponderRelease: (_, gs) => {
+        pastThreshold.current = false;
         const d = delta(gs);
-        const dismissed = positiveOnly
+        const v = velocity(gs);
+        const distanceDismiss = positiveOnly
           ? d > threshold
           : Math.abs(d) > threshold;
+        // Fast flick: at least 30px movement + high velocity in the same direction
+        const minFlickDistance = 30;
+        const velocityDismiss =
+          !positiveOnly || d > 0
+            ? Math.abs(d) > minFlickDistance &&
+              Math.abs(v) > velocityThreshold &&
+              Math.sign(v) === Math.sign(d)
+            : false;
+        const dismissed = distanceDismiss || velocityDismiss;
 
         if (dismissed) {
           const direction = positiveOnly ? 1 : d > 0 ? 1 : -1;
