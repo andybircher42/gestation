@@ -17,6 +17,7 @@ const STORAGE_KEY = "@gestation_entries";
 const AGREEMENT_KEY = "@hipaa_agreement_accepted";
 const DEVICE_ID_KEY = "@device_id";
 const ONBOARDING_KEY = "@onboarding_complete";
+const DELIVERED_TTL_KEY = "@delivered_ttl_days";
 
 /** Persists the full entries array to AsyncStorage. */
 export const saveEntries = async (entries: Entry[]): Promise<void> => {
@@ -69,8 +70,24 @@ export const resetOnboarding = async (): Promise<void> => {
 /** Fixed base timestamp for migrating legacy entries without createdAt. */
 const MIGRATION_BASE_DATE = 1700000000000; // 2023-11-14T22:13:20Z
 
-/** Delivered entries are auto-purged after this many milliseconds. */
-const DELIVERED_TTL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
+/** Default TTL for delivered entries in days. */
+export const DEFAULT_DELIVERED_TTL_DAYS = 3;
+
+/** Available TTL options (in days). 0 = never auto-delete. */
+export const DELIVERED_TTL_OPTIONS = [0, 1, 3, 7, 14, 30] as const;
+
+/** Loads the user's preferred TTL for delivered entries (in days). */
+export const loadDeliveredTTL = async (): Promise<number> => {
+  const value = await AsyncStorage.getItem(DELIVERED_TTL_KEY);
+  if (value == null) {return DEFAULT_DELIVERED_TTL_DAYS;}
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? DEFAULT_DELIVERED_TTL_DAYS : parsed;
+};
+
+/** Saves the user's preferred TTL for delivered entries (in days). */
+export const saveDeliveredTTL = async (days: number): Promise<void> => {
+  await AsyncStorage.setItem(DELIVERED_TTL_KEY, String(days));
+};
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}/;
 
@@ -96,8 +113,12 @@ export interface LoadResult {
   discardedCount: number;
 }
 
-/** Loads entries with validation, discarding corrupted items and re-saving if needed. */
-export const loadEntries = async (): Promise<LoadResult> => {
+/** Loads entries with validation, discarding corrupted items and re-saving if needed.
+ * @param ttlDays — auto-purge delivered entries older than this many days. 0 = never purge.
+ */
+export const loadEntries = async (
+  ttlDays: number = DEFAULT_DELIVERED_TTL_DAYS,
+): Promise<LoadResult> => {
   const json = await AsyncStorage.getItem(STORAGE_KEY);
   if (json == null) {
     return { entries: [], discardedCount: 0 };
@@ -158,12 +179,14 @@ export const loadEntries = async (): Promise<LoadResult> => {
     }
   }
 
-  // Auto-purge delivered entries older than TTL
+  // Auto-purge delivered entries older than TTL (0 = never purge)
   const now = Date.now();
   const beforePurge = entries.length;
-  const purged = entries.filter(
-    (e) => !e.deliveredAt || now - e.deliveredAt < DELIVERED_TTL_MS,
-  );
+  const ttlMs = ttlDays > 0 ? ttlDays * 24 * 60 * 60 * 1000 : 0;
+  const purged =
+    ttlMs > 0
+      ? entries.filter((e) => !e.deliveredAt || now - e.deliveredAt < ttlMs)
+      : entries;
   const purgedCount = beforePurge - purged.length;
 
   if (discardedCount > 0 || needsMigration || purgedCount > 0) {

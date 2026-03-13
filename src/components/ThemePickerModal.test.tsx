@@ -10,9 +10,11 @@ const defaultProps = {
   currentPersonality: "classic" as const,
   currentBrightness: "system" as const,
   currentLayout: "compact" as const,
+  currentDeliveredTTL: 3,
   onSelectPersonality: jest.fn(),
   onSelectBrightness: jest.fn(),
   onSelectLayout: jest.fn(),
+  onSelectDeliveredTTL: jest.fn(),
   onClose: jest.fn(),
 };
 

@@ -32,9 +32,11 @@ interface ThemePickerModalProps {
   currentPersonality: Personality;
   currentBrightness: Brightness;
   currentLayout: Layout;
+  currentDeliveredTTL: number;
   onSelectPersonality: (p: Personality) => void;
   onSelectBrightness: (b: Brightness) => void;
   onSelectLayout: (l: Layout) => void;
+  onSelectDeliveredTTL: (days: number) => void;
   onClose: () => void;
   onAppInfo?: () => void;
   anchor?: { top: number; right: number };
@@ -99,15 +101,29 @@ const BRIGHTNESS_OPTIONS: {
   { value: "dark", label: "Dark", icon: "moon-outline" },
 ];
 
+const TTL_OPTIONS: {
+  value: number;
+  label: string;
+}[] = [
+  { value: 0, label: "Never" },
+  { value: 1, label: "1 day" },
+  { value: 3, label: "3 days" },
+  { value: 7, label: "1 week" },
+  { value: 14, label: "2 weeks" },
+  { value: 30, label: "30 days" },
+];
+
 /** Dropdown modal for selecting the app theme, anchored below the settings button. */
 export default function ThemePickerModal({
   visible,
   currentPersonality,
   currentBrightness,
   currentLayout,
+  currentDeliveredTTL,
   onSelectPersonality,
   onSelectBrightness,
   onSelectLayout,
+  onSelectDeliveredTTL,
   onClose,
   onAppInfo,
   anchor,
@@ -208,6 +224,35 @@ export default function ThemePickerModal({
                   size={20}
                   color={colors.primary}
                   testID={`checkmark-layout-${value}`}
+                />
+              )}
+            </Pressable>
+          ))}
+          <View style={styles.separator} />
+          <Text style={styles.title}>Auto-remove delivered</Text>
+          {TTL_OPTIONS.map(({ value, label }) => (
+            <Pressable
+              key={value}
+              style={styles.row}
+              onPress={() => {
+                onSelectDeliveredTTL(value);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+            >
+              <Ionicons
+                name={value === 0 ? "infinite-outline" : "timer-outline"}
+                size={20}
+                color={colors.textPrimary}
+                style={styles.rowIcon}
+              />
+              <Text style={styles.rowLabel}>{label}</Text>
+              {currentDeliveredTTL === value && (
+                <Ionicons
+                  name="checkmark"
+                  size={20}
+                  color={colors.primary}
+                  testID={`checkmark-ttl-${value}`}
                 />
               )}
             </Pressable>
