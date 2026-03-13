@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
 import { toISODateString } from "@/util";
+import { getBirthstoneForDate } from "@/util/birthstones";
 
 interface DevToolbarProps {
   visible: boolean;
@@ -71,11 +72,13 @@ export function generateSeedEntries(): Entry[] {
       today.getMonth(),
       today.getDate() + i * 12 + jitter,
     );
+    const dueDateStr = toISODateString(dueDate);
     return {
       id: `${Date.now()}-seed-${i}`,
       name,
-      dueDate: toISODateString(dueDate),
+      dueDate: dueDateStr,
       createdAt: Date.now() + i,
+      birthstone: getBirthstoneForDate(dueDateStr),
     };
   });
 }
@@ -100,12 +103,14 @@ export function generateSeedDeliveries(): Entry[] {
       dueDate.getMonth(),
       dueDate.getDate() + deliveryOffset,
     );
+    const dueDateStr = toISODateString(dueDate);
     return {
       id: `${now}-seed-del-${i}`,
       name,
-      dueDate: toISODateString(dueDate),
+      dueDate: dueDateStr,
       createdAt: now + i,
       deliveredAt: deliveredDate.getTime(),
+      birthstone: getBirthstoneForDate(dueDateStr),
     };
   });
 }
