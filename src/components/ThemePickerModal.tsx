@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Linking,
   Modal,
@@ -113,6 +113,8 @@ const TTL_OPTIONS: {
   { value: 30, label: "30 days" },
 ];
 
+type SubPage = "main" | "theme" | "brightness" | "layout" | "ttl";
+
 /** Dropdown modal for selecting the app theme, anchored below the settings button. */
 export default function ThemePickerModal({
   visible,
@@ -131,6 +133,171 @@ export default function ThemePickerModal({
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const dropdownPosition = anchor ?? { top: 100, right: 12 };
+  const [subPage, setSubPage] = useState<SubPage>("main");
+
+  // Reset to main when modal opens
+  useEffect(() => {
+    if (visible) {setSubPage("main");}
+  }, [visible]);
+
+  const goBack = useCallback(() => setSubPage("main"), []);
+
+  const renderBackRow = (label: string) => (
+    <Pressable
+      style={styles.backRow}
+      onPress={goBack}
+      accessibilityRole="button"
+      accessibilityLabel={`Back to settings`}
+    >
+      <Ionicons
+        name="chevron-back"
+        size={18}
+        color={colors.primary}
+        style={styles.backIcon}
+      />
+      <Text style={styles.backLabel}>{label}</Text>
+    </Pressable>
+  );
+
+  const renderSubPage = () => {
+    switch (subPage) {
+      case "theme":
+        return (
+          <>
+            {renderBackRow("Theme")}
+            {THEME_OPTIONS.map(({ value, label, icon }) => (
+              <Pressable
+                key={value}
+                style={styles.row}
+                onPress={() => onSelectPersonality(value)}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+              >
+                <Ionicons
+                  name={icon}
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>{label}</Text>
+                {currentPersonality === value && (
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={colors.primary}
+                    testID={`checkmark-theme-${value}`}
+                  />
+                )}
+              </Pressable>
+            ))}
+          </>
+        );
+      case "brightness":
+        return (
+          <>
+            {renderBackRow("Brightness")}
+            {BRIGHTNESS_OPTIONS.map(({ value, label, icon }) => (
+              <Pressable
+                key={value}
+                style={styles.row}
+                onPress={() => onSelectBrightness(value)}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+              >
+                <Ionicons
+                  name={icon}
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>{label}</Text>
+                {currentBrightness === value && (
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={colors.primary}
+                    testID={`checkmark-brightness-${value}`}
+                  />
+                )}
+              </Pressable>
+            ))}
+          </>
+        );
+      case "layout":
+        return (
+          <>
+            {renderBackRow("Layout")}
+            {LAYOUT_OPTIONS.map(({ value, label, icon }) => (
+              <Pressable
+                key={value}
+                style={styles.row}
+                onPress={() => onSelectLayout(value)}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+              >
+                <Ionicons
+                  name={icon}
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>{label}</Text>
+                {currentLayout === value && (
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={colors.primary}
+                    testID={`checkmark-layout-${value}`}
+                  />
+                )}
+              </Pressable>
+            ))}
+          </>
+        );
+      case "ttl":
+        return (
+          <>
+            {renderBackRow("Auto-remove")}
+            {TTL_OPTIONS.map(({ value, label }) => (
+              <Pressable
+                key={value}
+                style={styles.row}
+                onPress={() => onSelectDeliveredTTL(value)}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+              >
+                <Ionicons
+                  name={value === 0 ? "infinite-outline" : "timer-outline"}
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>{label}</Text>
+                {currentDeliveredTTL === value && (
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={colors.primary}
+                    testID={`checkmark-ttl-${value}`}
+                  />
+                )}
+              </Pressable>
+            ))}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const currentThemeLabel =
+    THEME_OPTIONS.find((o) => o.value === currentPersonality)?.label ?? "";
+  const currentBrightnessLabel =
+    BRIGHTNESS_OPTIONS.find((o) => o.value === currentBrightness)?.label ?? "";
+  const currentLayoutLabel =
+    LAYOUT_OPTIONS.find((o) => o.value === currentLayout)?.label ?? "";
+  const currentTTLLabel =
+    TTL_OPTIONS.find((o) => o.value === currentDeliveredTTL)?.label ?? "";
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -139,177 +306,155 @@ export default function ThemePickerModal({
           style={StyleSheet.absoluteFill}
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel="Close theme picker"
+          accessibilityLabel="Close settings"
         />
         <View style={[styles.dropdown, dropdownPosition]}>
-          <Text style={styles.title}>Theme</Text>
-          {THEME_OPTIONS.map(({ value, label, icon }) => (
-            <Pressable
-              key={value}
-              style={styles.row}
-              onPress={() => {
-                onSelectPersonality(value);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-            >
-              <Ionicons
-                name={icon}
-                size={20}
-                color={colors.textPrimary}
-                style={styles.rowIcon}
-              />
-              <Text style={styles.rowLabel}>{label}</Text>
-              {currentPersonality === value && (
+          {subPage === "main" ? (
+            <>
+              <Text style={styles.title}>Appearance</Text>
+              <Pressable
+                style={styles.row}
+                onPress={() => setSubPage("theme")}
+                accessibilityRole="button"
+                accessibilityLabel="Theme settings"
+              >
                 <Ionicons
-                  name="checkmark"
+                  name="color-palette-outline"
                   size={20}
-                  color={colors.primary}
-                  testID={`checkmark-theme-${value}`}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
                 />
-              )}
-            </Pressable>
-          ))}
-          <View style={styles.separator} />
-          <Text style={styles.title}>Brightness</Text>
-          {BRIGHTNESS_OPTIONS.map(({ value, label, icon }) => (
-            <Pressable
-              key={value}
-              style={styles.row}
-              onPress={() => {
-                onSelectBrightness(value);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-            >
-              <Ionicons
-                name={icon}
-                size={20}
-                color={colors.textPrimary}
-                style={styles.rowIcon}
-              />
-              <Text style={styles.rowLabel}>{label}</Text>
-              {currentBrightness === value && (
+                <Text style={styles.rowLabel}>Theme</Text>
+                <Text style={styles.rowValue}>{currentThemeLabel}</Text>
                 <Ionicons
-                  name="checkmark"
-                  size={20}
-                  color={colors.primary}
-                  testID={`checkmark-brightness-${value}`}
+                  name="chevron-forward"
+                  size={18}
+                  color={colors.textTertiary}
                 />
-              )}
-            </Pressable>
-          ))}
-          <View style={styles.separator} />
-          <Text style={styles.title}>Layout</Text>
-          {LAYOUT_OPTIONS.map(({ value, label, icon }) => (
-            <Pressable
-              key={value}
-              style={styles.row}
-              onPress={() => {
-                onSelectLayout(value);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-            >
-              <Ionicons
-                name={icon}
-                size={20}
-                color={colors.textPrimary}
-                style={styles.rowIcon}
-              />
-              <Text style={styles.rowLabel}>{label}</Text>
-              {currentLayout === value && (
+              </Pressable>
+              <Pressable
+                style={styles.row}
+                onPress={() => setSubPage("brightness")}
+                accessibilityRole="button"
+                accessibilityLabel="Brightness settings"
+              >
                 <Ionicons
-                  name="checkmark"
+                  name="contrast-outline"
                   size={20}
-                  color={colors.primary}
-                  testID={`checkmark-layout-${value}`}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
                 />
-              )}
-            </Pressable>
-          ))}
-          <View style={styles.separator} />
-          <Text style={styles.title}>Auto-remove delivered</Text>
-          {TTL_OPTIONS.map(({ value, label }) => (
-            <Pressable
-              key={value}
-              style={styles.row}
-              onPress={() => {
-                onSelectDeliveredTTL(value);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-            >
-              <Ionicons
-                name={value === 0 ? "infinite-outline" : "timer-outline"}
-                size={20}
-                color={colors.textPrimary}
-                style={styles.rowIcon}
-              />
-              <Text style={styles.rowLabel}>{label}</Text>
-              {currentDeliveredTTL === value && (
+                <Text style={styles.rowLabel}>Brightness</Text>
+                <Text style={styles.rowValue}>{currentBrightnessLabel}</Text>
                 <Ionicons
-                  name="checkmark"
-                  size={20}
-                  color={colors.primary}
-                  testID={`checkmark-ttl-${value}`}
+                  name="chevron-forward"
+                  size={18}
+                  color={colors.textTertiary}
                 />
-              )}
-            </Pressable>
-          ))}
-          <View style={styles.separator} />
-          <Pressable
-            style={styles.row}
-            onPress={() => {
-              Linking.openURL(buildBugReportUrl());
-              onClose();
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Report a Bug"
-          >
-            <Ionicons
-              name="bug-outline"
-              size={20}
-              color={colors.textPrimary}
-              style={styles.rowIcon}
-            />
-            <Text style={styles.rowLabel}>Report a Bug</Text>
-          </Pressable>
-          <Pressable
-            style={styles.row}
-            onPress={() => {
-              Linking.openURL(FEATURE_REQUEST_URL);
-              onClose();
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Request a Feature"
-          >
-            <Ionicons
-              name="bulb-outline"
-              size={20}
-              color={colors.textPrimary}
-              style={styles.rowIcon}
-            />
-            <Text style={styles.rowLabel}>Request a Feature</Text>
-          </Pressable>
-          <View style={styles.separator} />
-          <Pressable
-            style={styles.row}
-            onPress={() => {
-              onAppInfo?.();
-              onClose();
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="App Info"
-          >
-            <Ionicons
-              name="information-circle-outline"
-              size={20}
-              color={colors.textPrimary}
-              style={styles.rowIcon}
-            />
-            <Text style={styles.rowLabel}>App Info</Text>
-          </Pressable>
+              </Pressable>
+              <Pressable
+                style={styles.row}
+                onPress={() => setSubPage("layout")}
+                accessibilityRole="button"
+                accessibilityLabel="Layout settings"
+              >
+                <Ionicons
+                  name={
+                    currentLayout === "compact"
+                      ? "list-outline"
+                      : "grid-outline"
+                  }
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>Layout</Text>
+                <Text style={styles.rowValue}>{currentLayoutLabel}</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={colors.textTertiary}
+                />
+              </Pressable>
+              <View style={styles.separator} />
+              <Text style={styles.title}>Preferences</Text>
+              <Pressable
+                style={styles.row}
+                onPress={() => setSubPage("ttl")}
+                accessibilityRole="button"
+                accessibilityLabel="Auto-remove delivered settings"
+              >
+                <Ionicons
+                  name="timer-outline"
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>Auto-remove</Text>
+                <Text style={styles.rowValue}>{currentTTLLabel}</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={colors.textTertiary}
+                />
+              </Pressable>
+              <View style={styles.separator} />
+              <Pressable
+                style={styles.row}
+                onPress={() => {
+                  Linking.openURL(buildBugReportUrl());
+                  onClose();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Report a Bug"
+              >
+                <Ionicons
+                  name="bug-outline"
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>Report a Bug</Text>
+              </Pressable>
+              <Pressable
+                style={styles.row}
+                onPress={() => {
+                  Linking.openURL(FEATURE_REQUEST_URL);
+                  onClose();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Request a Feature"
+              >
+                <Ionicons
+                  name="bulb-outline"
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>Request a Feature</Text>
+              </Pressable>
+              <View style={styles.separator} />
+              <Pressable
+                style={styles.row}
+                onPress={() => {
+                  onAppInfo?.();
+                  onClose();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="App Info"
+              >
+                <Ionicons
+                  name="information-circle-outline"
+                  size={20}
+                  color={colors.textPrimary}
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowLabel}>App Info</Text>
+              </Pressable>
+            </>
+          ) : (
+            renderSubPage()
+          )}
         </View>
       </View>
     </Modal>
@@ -328,7 +473,7 @@ function createStyles(colors: ColorTokens) {
       borderRadius: 12,
       paddingVertical: 8,
       paddingHorizontal: 16,
-      minWidth: 180,
+      minWidth: 220,
       ...Platform.select({
         ios: {
           shadowColor: colors.shadow,
@@ -358,15 +503,34 @@ function createStyles(colors: ColorTokens) {
     rowIcon: {
       marginRight: 12,
     },
+    rowLabel: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.textPrimary,
+    },
+    rowValue: {
+      fontSize: 13,
+      color: colors.textTertiary,
+      marginRight: 6,
+    },
     separator: {
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.textTertiary,
       marginVertical: 4,
     },
-    rowLabel: {
-      flex: 1,
-      fontSize: 15,
-      color: colors.textPrimary,
+    backRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      minHeight: 40,
+      marginBottom: 4,
+    },
+    backIcon: {
+      marginRight: 4,
+    },
+    backLabel: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.primary,
     },
   });
 }

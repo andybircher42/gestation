@@ -23,25 +23,43 @@ beforeEach(() => {
 });
 
 describe("ThemePickerModal", () => {
-  it("renders theme, brightness, and layout sections when visible", () => {
+  it("renders main menu with category rows when visible", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} />);
 
     expect(screen.getByText("Theme")).toBeTruthy();
+    expect(screen.getByText("Brightness")).toBeTruthy();
+    expect(screen.getByText("Layout")).toBeTruthy();
+    expect(screen.getByText("Auto-remove")).toBeTruthy();
+  });
+
+  it("shows current values on main menu rows", () => {
+    renderWithTheme(
+      <ThemePickerModal
+        {...defaultProps}
+        currentPersonality="warm"
+        currentBrightness="dark"
+        currentLayout="cozy"
+        currentDeliveredTTL={7}
+      />,
+    );
+
+    expect(screen.getByText("Warm")).toBeTruthy();
+    expect(screen.getByText("Dark")).toBeTruthy();
+    expect(screen.getByText("Cozy")).toBeTruthy();
+    expect(screen.getByText("1 week")).toBeTruthy();
+  });
+
+  it("drills into theme subpage and shows options", () => {
+    renderWithTheme(<ThemePickerModal {...defaultProps} />);
+
+    fireEvent.press(screen.getByLabelText("Theme settings"));
+
     expect(screen.getByText("Classic")).toBeTruthy();
     expect(screen.getByText("Warm")).toBeTruthy();
     expect(screen.getByText("Elegant")).toBeTruthy();
     expect(screen.getByText("Playful")).toBeTruthy();
     expect(screen.getByText("Modern")).toBeTruthy();
     expect(screen.getByText("B&W")).toBeTruthy();
-
-    expect(screen.getByText("Brightness")).toBeTruthy();
-    expect(screen.getByText("System")).toBeTruthy();
-    expect(screen.getByText("Light")).toBeTruthy();
-    expect(screen.getByText("Dark")).toBeTruthy();
-
-    expect(screen.getByText("Layout")).toBeTruthy();
-    expect(screen.getByText("Compact")).toBeTruthy();
-    expect(screen.getByText("Cozy")).toBeTruthy();
   });
 
   it("shows checkmark on the active personality", () => {
@@ -49,39 +67,11 @@ describe("ThemePickerModal", () => {
       <ThemePickerModal {...defaultProps} currentPersonality="warm" />,
     );
 
+    fireEvent.press(screen.getByLabelText("Theme settings"));
+
     expect(screen.getByTestId("checkmark-theme-warm")).toBeTruthy();
     expect(screen.queryByTestId("checkmark-theme-classic")).toBeNull();
     expect(screen.queryByTestId("checkmark-theme-mono")).toBeNull();
-  });
-
-  it("shows checkmark on the active brightness", () => {
-    renderWithTheme(
-      <ThemePickerModal {...defaultProps} currentBrightness="dark" />,
-    );
-
-    expect(screen.getByTestId("checkmark-brightness-dark")).toBeTruthy();
-    expect(screen.queryByTestId("checkmark-brightness-system")).toBeNull();
-    expect(screen.queryByTestId("checkmark-brightness-light")).toBeNull();
-  });
-
-  it("shows checkmark on the active layout", () => {
-    renderWithTheme(
-      <ThemePickerModal {...defaultProps} currentLayout="cozy" />,
-    );
-
-    expect(screen.getByTestId("checkmark-layout-cozy")).toBeTruthy();
-    expect(screen.queryByTestId("checkmark-layout-compact")).toBeNull();
-  });
-
-  it("calls onSelectLayout when a layout option is pressed", () => {
-    const onSelectLayout = jest.fn();
-    renderWithTheme(
-      <ThemePickerModal {...defaultProps} onSelectLayout={onSelectLayout} />,
-    );
-
-    fireEvent.press(screen.getByText("Cozy"));
-
-    expect(onSelectLayout).toHaveBeenCalledWith("cozy");
   });
 
   it("calls onSelectPersonality when a theme option is pressed", () => {
@@ -93,9 +83,32 @@ describe("ThemePickerModal", () => {
       />,
     );
 
+    fireEvent.press(screen.getByLabelText("Theme settings"));
     fireEvent.press(screen.getByText("Warm"));
 
     expect(onSelectPersonality).toHaveBeenCalledWith("warm");
+  });
+
+  it("drills into brightness subpage and shows options", () => {
+    renderWithTheme(<ThemePickerModal {...defaultProps} />);
+
+    fireEvent.press(screen.getByLabelText("Brightness settings"));
+
+    expect(screen.getByText("System")).toBeTruthy();
+    expect(screen.getByText("Light")).toBeTruthy();
+    expect(screen.getByText("Dark")).toBeTruthy();
+  });
+
+  it("shows checkmark on the active brightness", () => {
+    renderWithTheme(
+      <ThemePickerModal {...defaultProps} currentBrightness="dark" />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Brightness settings"));
+
+    expect(screen.getByTestId("checkmark-brightness-dark")).toBeTruthy();
+    expect(screen.queryByTestId("checkmark-brightness-system")).toBeNull();
+    expect(screen.queryByTestId("checkmark-brightness-light")).toBeNull();
   });
 
   it("calls onSelectBrightness when a brightness option is pressed", () => {
@@ -107,16 +120,60 @@ describe("ThemePickerModal", () => {
       />,
     );
 
+    fireEvent.press(screen.getByLabelText("Brightness settings"));
     fireEvent.press(screen.getByText("Light"));
 
     expect(onSelectBrightness).toHaveBeenCalledWith("light");
+  });
+
+  it("drills into layout subpage and shows options", () => {
+    renderWithTheme(<ThemePickerModal {...defaultProps} />);
+
+    fireEvent.press(screen.getByLabelText("Layout settings"));
+
+    expect(screen.getByText("Compact")).toBeTruthy();
+    expect(screen.getByText("Cozy")).toBeTruthy();
+  });
+
+  it("shows checkmark on the active layout", () => {
+    renderWithTheme(
+      <ThemePickerModal {...defaultProps} currentLayout="cozy" />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Layout settings"));
+
+    expect(screen.getByTestId("checkmark-layout-cozy")).toBeTruthy();
+    expect(screen.queryByTestId("checkmark-layout-compact")).toBeNull();
+  });
+
+  it("calls onSelectLayout when a layout option is pressed", () => {
+    const onSelectLayout = jest.fn();
+    renderWithTheme(
+      <ThemePickerModal {...defaultProps} onSelectLayout={onSelectLayout} />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Layout settings"));
+    fireEvent.press(screen.getByText("Cozy"));
+
+    expect(onSelectLayout).toHaveBeenCalledWith("cozy");
+  });
+
+  it("navigates back from subpage to main menu", () => {
+    renderWithTheme(<ThemePickerModal {...defaultProps} />);
+
+    fireEvent.press(screen.getByLabelText("Theme settings"));
+    expect(screen.getByText("Elegant")).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText("Back to settings"));
+    expect(screen.getByText("Appearance")).toBeTruthy();
+    expect(screen.queryByText("Elegant")).toBeNull();
   });
 
   it("calls onClose when backdrop is pressed", () => {
     const onClose = jest.fn();
     renderWithTheme(<ThemePickerModal {...defaultProps} onClose={onClose} />);
 
-    fireEvent.press(screen.getByLabelText("Close theme picker"));
+    fireEvent.press(screen.getByLabelText("Close settings"));
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -171,5 +228,20 @@ describe("ThemePickerModal", () => {
 
     expect(onAppInfo).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("drills into TTL subpage and calls onSelectDeliveredTTL", () => {
+    const onSelectDeliveredTTL = jest.fn();
+    renderWithTheme(
+      <ThemePickerModal
+        {...defaultProps}
+        onSelectDeliveredTTL={onSelectDeliveredTTL}
+      />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Auto-remove delivered settings"));
+    fireEvent.press(screen.getByText("1 week"));
+
+    expect(onSelectDeliveredTTL).toHaveBeenCalledWith(7);
   });
 });
