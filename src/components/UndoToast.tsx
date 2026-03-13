@@ -12,6 +12,8 @@ interface UndoToastProps {
   action?: string;
   onUndo: () => void;
   onDismiss: () => void;
+  /** When true, skip absolute positioning (parent handles layout). */
+  embedded?: boolean;
 }
 
 const TOAST_DURATION_MS = 5000;
@@ -22,6 +24,7 @@ export default function UndoToast({
   action = "Removed",
   onUndo,
   onDismiss,
+  embedded = false,
 }: UndoToastProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -45,10 +48,13 @@ export default function UndoToast({
     <Animated.View
       style={[
         styles.container,
-        {
+        !embedded && {
+          position: "absolute",
           bottom: Math.max(insets.bottom, 16) + 16,
-          transform: [{ translateY }],
+          left: 16,
+          right: 16,
         },
+        { transform: [{ translateY }] },
       ]}
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
@@ -75,10 +81,6 @@ export default function UndoToast({
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: {
-      position: "absolute",
-      // bottom is applied dynamically via useSafeAreaInsets
-      left: 16,
-      right: 16,
       backgroundColor: colors.toastBackground,
       borderRadius: 10,
       flexDirection: "row",

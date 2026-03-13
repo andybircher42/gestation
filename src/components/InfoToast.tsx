@@ -8,12 +8,18 @@ import { ColorTokens, useTheme } from "@/theme";
 interface InfoToastProps {
   message: string;
   onDismiss: () => void;
+  /** When true, skip absolute positioning (parent handles layout). */
+  embedded?: boolean;
 }
 
 const TOAST_DURATION_MS = 5000;
 
 /** Simple informational toast with auto-dismiss and swipe-to-dismiss. */
-export default function InfoToast({ message, onDismiss }: InfoToastProps) {
+export default function InfoToast({
+  message,
+  onDismiss,
+  embedded = false,
+}: InfoToastProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -35,10 +41,13 @@ export default function InfoToast({ message, onDismiss }: InfoToastProps) {
     <Animated.View
       style={[
         styles.container,
-        {
+        !embedded && {
+          position: "absolute",
           bottom: Math.max(insets.bottom, 16) + 16,
-          transform: [{ translateY }],
+          left: 16,
+          right: 16,
         },
+        { transform: [{ translateY }] },
       ]}
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive"
@@ -54,10 +63,6 @@ export default function InfoToast({ message, onDismiss }: InfoToastProps) {
 function createStyles(colors: ColorTokens) {
   return StyleSheet.create({
     container: {
-      position: "absolute",
-      // bottom is applied dynamically via useSafeAreaInsets
-      left: 16,
-      right: 16,
       backgroundColor: colors.toastBackground,
       borderRadius: 10,
       flexDirection: "row",

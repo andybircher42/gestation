@@ -14,4 +14,5 @@ export { default as HipaaAgreementModal } from "./HipaaAgreementModal";
 export { default as InfoToast } from "./InfoToast";
 export { default as OnboardingOverlay } from "./OnboardingOverlay";
 export { default as ThemePickerModal } from "./ThemePickerModal";
+export { default as ToastStack } from "./ToastStack";
 export { default as UndoToast } from "./UndoToast";

@@ -25,6 +25,7 @@ import {
   EntryList,
   InfoToast,
   ThemePickerModal,
+  ToastStack,
   UndoToast,
 } from "@/components";
 import { useEntries } from "@/hooks";
@@ -276,43 +277,46 @@ export default function HomeScreen() {
           onClose={() => setShowAppInfo(false)}
         />
 
-        {deletedEntry && (
-          <UndoToast
-            entry={deletedEntry.entry}
-            onUndo={undo}
-            onDismiss={dismissUndo}
-          />
-        )}
+        <ToastStack>
+          {deletedEntry && (
+            <UndoToast
+              entry={deletedEntry.entry}
+              onUndo={undo}
+              onDismiss={dismissUndo}
+              embedded
+            />
+          )}
 
-        {deliveredEntry && !deletedEntry && (
-          <UndoToast
-            entry={deliveredEntry.entry}
-            action="Delivered"
-            onUndo={undoDeliver}
-            onDismiss={dismissDelivered}
-          />
-        )}
+          {deliveredEntry && (
+            <UndoToast
+              entry={deliveredEntry.entry}
+              action="Delivered"
+              onUndo={undoDeliver}
+              onDismiss={dismissDelivered}
+              embedded
+            />
+          )}
 
-        {discardedCount > 0 && !deletedEntry && !deliveredEntry && (
-          <InfoToast
-            message={
-              discardedCount === 1
-                ? "We removed someone whose data was unreadable"
-                : `We removed ${discardedCount} people whose data was unreadable`
-            }
-            onDismiss={dismissDiscarded}
-          />
-        )}
+          {discardedCount > 0 && (
+            <InfoToast
+              message={
+                discardedCount === 1
+                  ? "We removed someone whose data was unreadable"
+                  : `We removed ${discardedCount} people whose data was unreadable`
+              }
+              onDismiss={dismissDiscarded}
+              embedded
+            />
+          )}
 
-        {saveError &&
-          !deletedEntry &&
-          !deliveredEntry &&
-          discardedCount === 0 && (
+          {saveError && (
             <InfoToast
               message="Your changes might not be saved. Try again or restart the app."
               onDismiss={dismissSaveError}
+              embedded
             />
           )}
+        </ToastStack>
 
         <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
       </KeyboardAvoidingView>
