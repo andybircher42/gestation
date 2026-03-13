@@ -58,7 +58,7 @@ function buildBugReportUrl(): string {
 const FEATURE_REQUEST_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSeLS03h_8s3t0-IYXM04UjVv2fAhH37i2n56fPHB83OuHaQhw/viewform";
 
-const STYLE_OPTIONS: {
+const THEME_OPTIONS: {
   value: Personality;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
@@ -106,8 +106,8 @@ export default function ThemePickerModal({
           accessibilityLabel="Close theme picker"
         />
         <View style={[styles.dropdown, dropdownPosition]}>
-          <Text style={styles.title}>Style</Text>
-          {STYLE_OPTIONS.map(({ value, label, icon }) => (
+          <Text style={styles.title}>Theme</Text>
+          {THEME_OPTIONS.map(({ value, label, icon }) => (
             <Pressable
               key={value}
               style={styles.row}
@@ -129,7 +129,7 @@ export default function ThemePickerModal({
                   name="checkmark"
                   size={20}
                   color={colors.primary}
-                  testID={`checkmark-style-${value}`}
+                  testID={`checkmark-theme-${value}`}
                 />
               )}
             </Pressable>

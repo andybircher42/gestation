@@ -19,10 +19,10 @@ beforeEach(() => {
 });
 
 describe("ThemePickerModal", () => {
-  it("renders style and brightness sections when visible", () => {
+  it("renders theme and brightness sections when visible", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} />);
 
-    expect(screen.getByText("Style")).toBeTruthy();
+    expect(screen.getByText("Theme")).toBeTruthy();
     expect(screen.getByText("Classic")).toBeTruthy();
     expect(screen.getByText("Warm")).toBeTruthy();
     expect(screen.getByText("Elegant")).toBeTruthy();
@@ -41,9 +41,9 @@ describe("ThemePickerModal", () => {
       <ThemePickerModal {...defaultProps} currentPersonality="warm" />,
     );
 
-    expect(screen.getByTestId("checkmark-style-warm")).toBeTruthy();
-    expect(screen.queryByTestId("checkmark-style-classic")).toBeNull();
-    expect(screen.queryByTestId("checkmark-style-mono")).toBeNull();
+    expect(screen.getByTestId("checkmark-theme-warm")).toBeTruthy();
+    expect(screen.queryByTestId("checkmark-theme-classic")).toBeNull();
+    expect(screen.queryByTestId("checkmark-theme-mono")).toBeNull();
   });
 
   it("shows checkmark on the active brightness", () => {
@@ -56,7 +56,7 @@ describe("ThemePickerModal", () => {
     expect(screen.queryByTestId("checkmark-brightness-light")).toBeNull();
   });
 
-  it("calls onSelectPersonality when a style option is pressed", () => {
+  it("calls onSelectPersonality when a theme option is pressed", () => {
     const onSelectPersonality = jest.fn();
     renderWithTheme(
       <ThemePickerModal
@@ -125,7 +125,7 @@ describe("ThemePickerModal", () => {
   it("does not render content when visible=false", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} visible={false} />);
 
-    expect(screen.queryByText("Style")).toBeNull();
+    expect(screen.queryByText("Theme")).toBeNull();
   });
 
   it("calls onAppInfo and onClose when App Info row is pressed", () => {
