@@ -26,6 +26,7 @@ import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
 import {
+  deliveryTimingLabel,
   formatDueDate,
   gestationalAgeFromDueDate,
   getBirthstone,
@@ -485,17 +486,37 @@ export default function EntryList({
           deliveredEntries.length > 0 ? (
             <View style={styles.deliveredSection}>
               <View style={styles.deliveredHeader}>
-                <Text style={styles.deliveredIcon}>👶</Text>
+                <Text style={styles.deliveredEmoji}>🎉</Text>
                 <Text style={styles.deliveredTitle}>Delivered</Text>
+                <Text style={styles.deliveredCount}>
+                  {deliveredEntries.length}
+                </Text>
               </View>
               {deliveredEntries.map((entry) => (
                 <View key={entry.id} style={styles.deliveredRow}>
-                  <Text style={styles.deliveredName} numberOfLines={1}>
-                    {entry.name}
-                  </Text>
-                  <Text style={styles.deliveredDate}>
-                    {formatDueDate(entry.dueDate)}
-                  </Text>
+                  <Text style={styles.deliveredBaby}>👶</Text>
+                  <View style={styles.deliveredInfo}>
+                    <Text style={styles.deliveredName} numberOfLines={1}>
+                      {entry.name}
+                    </Text>
+                    <Text style={styles.deliveredTiming}>
+                      {entry.deliveredAt
+                        ? deliveryTimingLabel(entry.dueDate, entry.deliveredAt)
+                        : formatDueDate(entry.dueDate)}
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={() => onDelete(entry.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${entry.name}`}
+                    hitSlop={8}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={18}
+                      color={colors.textTertiary}
+                    />
+                  </Pressable>
                 </View>
               ))}
             </View>
@@ -646,8 +667,13 @@ function createStyles(colors: ColorTokens) {
     },
     deliveredSection: {
       marginHorizontal: 16,
-      marginTop: 16,
+      marginTop: 20,
       marginBottom: 8,
+      backgroundColor: colors.contentBackground,
+      borderRadius: 12,
+      padding: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     deliveredHeader: {
       flexDirection: "row",
@@ -655,33 +681,50 @@ function createStyles(colors: ColorTokens) {
       gap: 6,
       marginBottom: 8,
     },
-    deliveredIcon: {
-      fontSize: 16,
+    deliveredEmoji: {
+      fontSize: 18,
     },
     deliveredTitle: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: colors.textTertiary,
-    },
-    deliveredRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-      borderRadius: 8,
-      marginBottom: 4,
-      backgroundColor: colors.inputBackground,
-      opacity: 0.6,
-    },
-    deliveredName: {
-      fontSize: 14,
+      fontSize: 15,
+      fontWeight: "700",
       color: colors.textPrimary,
       flex: 1,
     },
-    deliveredDate: {
+    deliveredCount: {
       fontSize: 13,
+      fontWeight: "600",
       color: colors.textTertiary,
+      backgroundColor: colors.inputBackground,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 10,
+      overflow: "hidden",
+    },
+    deliveredRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderRadius: 10,
+      marginBottom: 4,
+      backgroundColor: colors.primaryLightBg,
+      gap: 8,
+    },
+    deliveredBaby: {
+      fontSize: 18,
+    },
+    deliveredInfo: {
+      flex: 1,
+    },
+    deliveredName: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    deliveredTiming: {
+      fontSize: 12,
+      color: colors.textTertiary,
+      marginTop: 1,
     },
     entryName: {
       fontSize: 16,

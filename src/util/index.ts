@@ -11,6 +11,7 @@ export {
   getBirthstoneImage,
 } from "./birthstones";
 export {
+  deliveryTimingLabel,
   expandTwoDigitYear,
   formatDateInput,
   formatDueDate,

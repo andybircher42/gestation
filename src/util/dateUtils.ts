@@ -179,3 +179,44 @@ export function toISODateString(date: Date): string {
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
+
+/**
+ * Returns a human-readable label describing how early or late a delivery was
+ * relative to the due date. Returns "On time" if delivered on the due date.
+ */
+export function deliveryTimingLabel(
+  dueDate: string,
+  deliveredAt: number,
+): string {
+  const due = new Date(dueDate + "T00:00:00");
+  const delivered = new Date(deliveredAt);
+  // Compare dates only (ignore time)
+  const dueDay = new Date(
+    due.getFullYear(),
+    due.getMonth(),
+    due.getDate(),
+  ).getTime();
+  const deliveredDay = new Date(
+    delivered.getFullYear(),
+    delivered.getMonth(),
+    delivered.getDate(),
+  ).getTime();
+  const diffDays = Math.round((dueDay - deliveredDay) / 86_400_000);
+
+  if (diffDays === 0) {return "On time";}
+  if (diffDays > 0) {
+    if (diffDays >= 7) {
+      const weeks = Math.floor(diffDays / 7);
+      const days = diffDays % 7;
+      return days > 0 ? `${weeks}w ${days}d early` : `${weeks}w early`;
+    }
+    return `${diffDays}d early`;
+  }
+  const absDiff = Math.abs(diffDays);
+  if (absDiff >= 7) {
+    const weeks = Math.floor(absDiff / 7);
+    const days = absDiff % 7;
+    return days > 0 ? `${weeks}w ${days}d late` : `${weeks}w late`;
+  }
+  return `${absDiff}d late`;
+}
