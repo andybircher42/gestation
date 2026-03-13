@@ -22,22 +22,25 @@ function renderList(
   entries: Entry[],
   overrides: {
     onDelete?: jest.Mock;
+    onDeliver?: jest.Mock;
     onDeleteAll?: jest.Mock;
     onAdd?: jest.Mock;
   } = {},
 ) {
   const onDelete = overrides.onDelete ?? jest.fn();
+  const onDeliver = overrides.onDeliver ?? jest.fn();
   const onDeleteAll = overrides.onDeleteAll ?? jest.fn();
   const onAdd = overrides.onAdd ?? jest.fn();
   renderWithTheme(
     <EntryList
       entries={entries}
       onDelete={onDelete}
+      onDeliver={onDeliver}
       onDeleteAll={onDeleteAll}
       onAdd={onAdd}
     />,
   );
-  return { onDelete, onDeleteAll, onAdd };
+  return { onDelete, onDeliver, onDeleteAll, onAdd };
 }
 
 /** Three entries with different due dates for sort tests. */
@@ -130,21 +133,10 @@ describe("EntryList", () => {
     expect(screen.getByText("0w 0d")).toBeTruthy();
   });
 
-  it("calls onDelete with correct id", () => {
-    const { onDelete } = renderList([
-      makeEntry({ id: "abc", name: "Baby", dueDate: "2026-10-31" }),
-    ]);
+  it("shows swipe backgrounds behind entry rows", () => {
+    renderList([makeEntry({ id: "abc", name: "Baby", dueDate: "2026-10-31" })]);
 
-    fireEvent.press(screen.getByLabelText("Remove Baby"));
-    expect(onDelete).toHaveBeenCalledWith("abc");
-  });
-
-  it("delete button has accessible role and label", () => {
-    renderList([makeEntry({ id: "1", name: "Baby A" })]);
-
-    const deleteButton = screen.getByLabelText("Remove Baby A");
-    expect(deleteButton).toBeTruthy();
-    expect(deleteButton.props.accessibilityRole).toBe("button");
+    expect(screen.getByTestId("delete-background")).toBeTruthy();
   });
 
   it("renders multiple entries", () => {

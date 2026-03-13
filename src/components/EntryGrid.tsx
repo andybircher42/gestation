@@ -24,6 +24,7 @@ import EntryForm from "./EntryForm";
 interface EntryGridProps {
   entries: Entry[];
   onDelete: (id: string) => void;
+  onDeliver: (id: string) => void;
   onDeleteAll: () => void;
   onAdd: (entry: { name: string; dueDate: string }) => void;
 }
@@ -45,6 +46,7 @@ const SORT_OPTIONS: { field: SortBy; dir: SortDir; label: string }[] = [
 export default function EntryGrid({
   entries,
   onDelete,
+  onDeliver,
   onDeleteAll,
   onAdd,
 }: EntryGridProps) {
@@ -130,16 +132,20 @@ export default function EntryGrid({
 
   const handleLongPress = useCallback(
     (entry: Entry) => {
-      Alert.alert("Remove", `Remove ${entry.name}?`, [
-        { text: "Cancel", style: "cancel" },
+      Alert.alert(entry.name, undefined, [
+        {
+          text: "Delivered",
+          onPress: () => onDeliver(entry.id),
+        },
         {
           text: "Remove",
           style: "destructive",
           onPress: () => onDelete(entry.id),
         },
+        { text: "Cancel", style: "cancel" },
       ]);
     },
-    [onDelete],
+    [onDelete, onDeliver],
   );
 
   const gridData: GridItem[] = useMemo(

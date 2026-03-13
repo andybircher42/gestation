@@ -60,6 +60,19 @@ export default function useEntries() {
     [persistEntries],
   );
 
+  const deliver = useCallback(
+    (id: string) => {
+      setEntries((prev) => {
+        const updated = prev.map((e) =>
+          e.id === id ? { ...e, deliveredAt: Date.now() } : e,
+        );
+        persistEntries(updated);
+        return updated;
+      });
+    },
+    [persistEntries],
+  );
+
   const remove = useCallback(
     (id: string) => {
       setEntries((prev) => {
@@ -121,6 +134,7 @@ export default function useEntries() {
     saveError,
     load,
     add,
+    deliver,
     remove,
     removeAll,
     seed,

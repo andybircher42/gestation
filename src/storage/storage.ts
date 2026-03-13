@@ -9,6 +9,7 @@ export interface Entry {
   name: string;
   dueDate: string;
   createdAt: number;
+  deliveredAt?: number;
   birthstone?: Birthstone;
 }
 

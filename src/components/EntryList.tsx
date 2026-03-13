@@ -59,17 +59,18 @@ interface EntryRowProps {
   backgroundColor: string;
   textColor: string;
   onDelete: (id: string) => void;
+  onDeliver: (id: string) => void;
   onPress: (entry: Entry) => void;
   nameWidth?: number;
   onNameLayout?: (id: string, width: number) => void;
   styles: EntryStyles;
   deleteIconColor: string;
-  deleteButtonColor: string;
 }
 
 interface EntryListProps {
   entries: Entry[];
   onDelete: (id: string) => void;
+  onDeliver: (id: string) => void;
   onDeleteAll: () => void;
   onAdd: (entry: { name: string; dueDate: string }) => void;
 }
@@ -80,18 +81,19 @@ const EntryRow = React.memo(function EntryRow({
   backgroundColor,
   textColor,
   onDelete,
+  onDeliver,
   onPress,
   nameWidth,
   onNameLayout,
   styles,
   deleteIconColor,
-  deleteButtonColor,
 }: EntryRowProps) {
   const { weeks, days } = gestationalAgeFromDueDate(item.dueDate);
   const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
     axis: "x",
     threshold: 100,
     onDismiss: () => onDelete(item.id),
+    onDismissPositive: () => onDeliver(item.id),
   });
 
   const fadeIn = useRef(new Animated.Value(0)).current;
@@ -106,19 +108,25 @@ const EntryRow = React.memo(function EntryRow({
 
   return (
     <Animated.View style={[styles.entryWrapper, { opacity: fadeIn }]}>
-      <View style={styles.deleteBackground} testID="delete-background">
-        <Ionicons
-          name="trash-outline"
-          size={22}
-          color={deleteIconColor}
-          accessible={false}
-        />
-        <Ionicons
-          name="trash-outline"
-          size={22}
-          color={deleteIconColor}
-          accessible={false}
-        />
+      <View style={styles.swipeBackground} testID="delete-background">
+        <View style={styles.swipeDeliverSide}>
+          <Ionicons
+            name="heart"
+            size={22}
+            color={deleteIconColor}
+            accessible={false}
+          />
+          <Text style={styles.swipeLabel}>Delivered</Text>
+        </View>
+        <View style={styles.swipeDeleteSide}>
+          <Text style={styles.swipeLabel}>Delete</Text>
+          <Ionicons
+            name="trash-outline"
+            size={22}
+            color={deleteIconColor}
+            accessible={false}
+          />
+        </View>
       </View>
       <Animated.View
         testID="entry-row"
@@ -162,15 +170,6 @@ const EntryRow = React.memo(function EntryRow({
             />
           )}
         </Pressable>
-        <Pressable
-          onPress={() => onDelete(item.id)}
-          style={styles.deleteButton}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={`Remove ${item.name}`}
-        >
-          <Ionicons name="trash-outline" size={16} color={deleteButtonColor} />
-        </Pressable>
       </Animated.View>
     </Animated.View>
   );
@@ -180,6 +179,7 @@ const EntryRow = React.memo(function EntryRow({
 export default function EntryList({
   entries,
   onDelete,
+  onDeliver,
   onDeleteAll,
   onAdd,
 }: EntryListProps) {
@@ -315,15 +315,23 @@ export default function EntryList({
         backgroundColor={rowColors[index % rowColors.length]}
         textColor={colors.textEntryRow}
         onDelete={onDelete}
+        onDeliver={onDeliver}
         onPress={setSelectedEntry}
         nameWidth={maxNameWidth}
         onNameLayout={handleNameLayout}
         styles={styles}
         deleteIconColor={colors.white}
-        deleteButtonColor={colors.textTertiary}
       />
     ),
-    [rowColors, colors, onDelete, maxNameWidth, handleNameLayout, styles],
+    [
+      rowColors,
+      colors,
+      onDelete,
+      onDeliver,
+      maxNameWidth,
+      handleNameLayout,
+      styles,
+    ],
   );
 
   const keyExtractor = useCallback((item: Entry) => item.id, []);
@@ -564,13 +572,31 @@ function createStyles(colors: ColorTokens) {
       borderRadius: 10,
       overflow: "hidden",
     },
-    deleteBackground: {
+    swipeBackground: {
       ...StyleSheet.absoluteFillObject,
+      flexDirection: "row",
+    },
+    swipeDeliverSide: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingLeft: 20,
+      gap: 8,
+    },
+    swipeDeleteSide: {
+      flex: 1,
       backgroundColor: colors.destructive,
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 20,
+      justifyContent: "flex-end",
+      paddingRight: 20,
+      gap: 8,
+    },
+    swipeLabel: {
+      color: colors.white,
+      fontSize: 13,
+      fontWeight: "600",
     },
     entry: {
       flexDirection: "row",
@@ -598,14 +624,6 @@ function createStyles(colors: ColorTokens) {
       textAlign: "right",
       fontSize: 14,
       marginRight: 12,
-    },
-    deleteButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor: colors.deleteButtonBg,
-      justifyContent: "center",
-      alignItems: "center",
     },
   });
 }

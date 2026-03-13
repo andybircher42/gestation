@@ -77,6 +77,7 @@ export default function HomeScreen() {
     saveError,
     load,
     add,
+    deliver,
     remove,
     removeAll,
     seed,
@@ -180,6 +181,7 @@ export default function HomeScreen() {
             <EntryGrid
               entries={entries}
               onDelete={remove}
+              onDeliver={deliver}
               onDeleteAll={removeAll}
               onAdd={add}
             />
@@ -187,6 +189,7 @@ export default function HomeScreen() {
             <EntryList
               entries={entries}
               onDelete={remove}
+              onDeliver={deliver}
               onDeleteAll={removeAll}
               onAdd={add}
             />

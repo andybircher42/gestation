@@ -76,52 +76,15 @@ describe("HomeScreen", () => {
     expect(screen.getByText("20w 3d")).toBeTruthy();
   });
 
-  it("deletes an entry and shows undo toast", async () => {
+  it("shows entry detail modal when entry is tapped", async () => {
     await renderHome();
     await addEntry("Baby", "10", "0");
 
-    fireEvent.press(screen.getByLabelText("Remove Baby"));
+    fireEvent.press(screen.getByLabelText("View details for Baby"));
 
     await waitFor(() => {
-      expect(screen.getByText(/Removed Baby/)).toBeTruthy();
-      expect(screen.getByText("Undo")).toBeTruthy();
-    });
-  });
-
-  it("restores entry when undo is pressed", async () => {
-    await renderHome();
-    await addEntry("Baby", "10", "0");
-
-    fireEvent.press(screen.getByLabelText("Remove Baby"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Undo")).toBeTruthy();
-    });
-
-    fireEvent.press(screen.getByText("Undo"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Baby")).toBeTruthy();
-      expect(screen.queryByTestId("undo-toast")).toBeNull();
-    });
-  });
-
-  it("undo toast auto-dismisses after 5 seconds", async () => {
-    await renderHome();
-    await addEntry("Baby", "10", "0");
-
-    fireEvent.press(screen.getByLabelText("Remove Baby"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("undo-toast")).toBeTruthy();
-    });
-
-    act(() => {
-      jest.advanceTimersByTime(5000);
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("undo-toast")).toBeNull();
+      expect(screen.getByText("Gestational age")).toBeTruthy();
+      expect(screen.getByText("Due date")).toBeTruthy();
     });
   });
 

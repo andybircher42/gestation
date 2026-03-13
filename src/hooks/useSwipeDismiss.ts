@@ -8,6 +8,8 @@ interface UseSwipeDismissOptions {
   threshold: number;
   /** Callback invoked after the dismiss animation completes. */
   onDismiss: () => void;
+  /** Optional callback for positive-direction dismiss (right for x, down for y). When set, onDismiss handles negative only. */
+  onDismissPositive?: () => void;
   /** If true, only positive-direction swipes (right for x, down for y) trigger dismissal. */
   positiveOnly?: boolean;
   /** Distance to animate past the threshold on dismissal (default 500). */
@@ -24,6 +26,7 @@ export default function useSwipeDismiss({
   axis,
   threshold,
   onDismiss,
+  onDismissPositive,
   positiveOnly = false,
   overshoot = 500,
   duration = 200,
@@ -31,6 +34,8 @@ export default function useSwipeDismiss({
   const animatedValue = useRef(new Animated.Value(0)).current;
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
+  const onDismissPositiveRef = useRef(onDismissPositive);
+  onDismissPositiveRef.current = onDismissPositive;
 
   const isX = axis === "x";
   const delta = (gs: { dx: number; dy: number }) => (isX ? gs.dx : gs.dy);
@@ -42,7 +47,9 @@ export default function useSwipeDismiss({
         positiveOnly ? delta(gs) > 5 : Math.abs(delta(gs)) > 5,
       onPanResponderMove: (_, gs) => {
         const d = delta(gs);
-        if (positiveOnly && d < 0) {return;}
+        if (positiveOnly && d < 0) {
+          return;
+        }
         animatedValue.setValue(d);
       },
       onPanResponderRelease: (_, gs) => {
@@ -57,7 +64,13 @@ export default function useSwipeDismiss({
             toValue: direction * overshoot,
             duration,
             useNativeDriver: true,
-          }).start(() => onDismissRef.current());
+          }).start(() => {
+            if (d > 0 && onDismissPositiveRef.current) {
+              onDismissPositiveRef.current();
+            } else {
+              onDismissRef.current();
+            }
+          });
         } else {
           Animated.spring(animatedValue, {
             toValue: 0,
