@@ -11,7 +11,8 @@ describe("AppInfoModal", () => {
     expect(screen.getByText("About")).toBeTruthy();
     expect(screen.getByText("in due time")).toBeTruthy();
     expect(screen.getByText(/Version/)).toBeTruthy();
-    expect(screen.queryByText(/Build/)).toBeNull();
+    expect(screen.queryByText(/Build:/)).toBeNull();
+    expect(screen.getByText("Development Build")).toBeTruthy();
     expect(screen.getByText(/Android|iOS/)).toBeTruthy();
   });
 

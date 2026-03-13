@@ -80,6 +80,7 @@ export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
           </Pressable>
           <Text style={styles.appName}>{appName}</Text>
           <Text style={styles.versionText}>Version {appVersion}</Text>
+          {__DEV__ && <Text style={styles.devBadge}>Development Build</Text>}
           {buildId !== "" && (
             <Pressable
               style={styles.copyRow}
@@ -181,6 +182,12 @@ function createStyles(colors: ColorTokens) {
     versionText: {
       fontSize: 15,
       color: colors.textModal,
+      marginBottom: 4,
+    },
+    devBadge: {
+      fontSize: 12,
+      color: colors.destructive,
+      fontWeight: "600",
       marginBottom: 4,
     },
     copyRow: {
