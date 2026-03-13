@@ -9,6 +9,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     ...appJson.expo.extra,
     appLabel: process.env.APP_LABEL ?? "",
-    easBuildId: process.env.EAS_BUILD_ID ?? `dev-${Date.now().toString(36)}`,
+    easBuildId: process.env.EAS_BUILD_ID ?? "",
   },
 });

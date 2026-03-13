@@ -49,7 +49,8 @@ function buildBugReportUrl(): string {
   const buildId = (Constants.expoConfig?.extra?.easBuildId as string) || "";
   const updateId = Updates?.updateId ?? null;
 
-  let appVersion = `${version} (${buildId.slice(0, 8)})`;
+  let appVersion =
+    buildId !== "" ? `${version} (${buildId.slice(0, 8)})` : version;
   if (updateId != null) {
     appVersion += ` update:${updateId.slice(0, 8)}`;
   }

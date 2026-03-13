@@ -47,19 +47,23 @@ export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
           <Text style={styles.modalTitle}>About</Text>
           <Text style={styles.appName}>{appName}</Text>
           <Text style={styles.versionText}>Version {appVersion}</Text>
-          <Pressable
-            style={styles.copyRow}
-            onPress={() => Clipboard.setStringAsync(buildId)}
-            accessibilityLabel="Copy build ID"
-            accessibilityRole="button"
-          >
-            <Text style={styles.detailText}>Build: {buildId.slice(0, 8)}…</Text>
-            <Ionicons
-              name="copy-outline"
-              size={12}
-              color={colors.textTertiary}
-            />
-          </Pressable>
+          {buildId !== "" && (
+            <Pressable
+              style={styles.copyRow}
+              onPress={() => Clipboard.setStringAsync(buildId)}
+              accessibilityLabel="Copy build ID"
+              accessibilityRole="button"
+            >
+              <Text style={styles.detailText}>
+                Build: {buildId.slice(0, 8)}…
+              </Text>
+              <Ionicons
+                name="copy-outline"
+                size={12}
+                color={colors.textTertiary}
+              />
+            </Pressable>
+          )}
           {Updates?.updateId != null && !Updates?.isEmbeddedLaunch && (
             <Pressable
               style={styles.copyRow}
