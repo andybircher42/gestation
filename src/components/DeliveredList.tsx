@@ -1,11 +1,19 @@
-import { useMemo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
 import { deliveryTimingLabel, formatDueDate, lineHeight } from "@/util";
 
+import DeliveredCard from "./DeliveredCard";
 import EntryDetailModal from "./EntryDetailModal";
 
 interface DeliveredListProps {
@@ -13,12 +21,14 @@ interface DeliveredListProps {
   onDelete: (id: string) => void;
 }
 
-/** Full-page view showing all delivered entries. */
+type GridItem = Entry | "spacer";
+
+/** Full-page view showing all delivered entries. Respects compact/cozy layout. */
 export default function DeliveredList({
   entries,
   onDelete,
 }: DeliveredListProps) {
-  const { colors } = useTheme();
+  const { colors, layout } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
 
@@ -28,6 +38,49 @@ export default function DeliveredList({
         .filter((e) => !!e.deliveredAt)
         .sort((a, b) => (b.deliveredAt ?? 0) - (a.deliveredAt ?? 0)),
     [entries],
+  );
+
+  const handleLongPress = useCallback(
+    (entry: Entry) => {
+      Alert.alert(entry.name, undefined, [
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: () => onDelete(entry.id),
+        },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    },
+    [onDelete],
+  );
+
+  const gridData: GridItem[] = useMemo(() => {
+    const data: GridItem[] = [...deliveredEntries];
+    if (data.length % 2 !== 0) {
+      data.push("spacer" as const);
+    }
+    return data;
+  }, [deliveredEntries]);
+
+  const renderGridItem = useCallback(
+    ({ item }: { item: GridItem }) => {
+      if (item === "spacer") {
+        return <View style={styles.spacer} />;
+      }
+      return (
+        <DeliveredCard
+          entry={item}
+          onPress={setSelectedEntry}
+          onLongPress={handleLongPress}
+        />
+      );
+    },
+    [styles, handleLongPress],
+  );
+
+  const gridKeyExtractor = useCallback(
+    (item: GridItem) => (item === "spacer" ? "spacer" : item.id),
+    [],
   );
 
   if (deliveredEntries.length === 0) {
@@ -42,9 +95,37 @@ export default function DeliveredList({
     );
   }
 
+  if (layout === "cozy") {
+    return (
+      <View style={styles.container}>
+        <FlatList
+          key="cozy"
+          data={gridData}
+          renderItem={renderGridItem}
+          keyExtractor={gridKeyExtractor}
+          numColumns={2}
+          contentContainerStyle={styles.grid}
+          columnWrapperStyle={styles.gridRow}
+          ListHeaderComponent={
+            <View style={styles.header}>
+              <Text style={styles.headerEmoji}>🎉</Text>
+              <Text style={styles.headerTitle}>Delivered</Text>
+              <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
+            </View>
+          }
+        />
+        <EntryDetailModal
+          entry={selectedEntry}
+          onClose={() => setSelectedEntry(null)}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
+        key="compact"
         data={deliveredEntries}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
@@ -124,6 +205,16 @@ function createStyles(colors: ColorTokens) {
     },
     listContent: {
       padding: 16,
+    },
+    grid: {
+      padding: 16,
+    },
+    gridRow: {
+      gap: 12,
+      marginBottom: 12,
+    },
+    spacer: {
+      flex: 1,
     },
     header: {
       flexDirection: "row",

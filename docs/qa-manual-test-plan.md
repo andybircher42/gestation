@@ -1214,6 +1214,20 @@
   - Confirm in App Info modal
   - On build, runtimeVersion matches version
 
+### Layout Switching Regressions
+- **TC-182b**: Switching layout while on Delivered tab does not crash
+  - Navigate to Delivered tab with at least 1 delivered entry
+  - Open settings → Layout → switch from Cozy to Compact
+  - App should not crash or go blank
+  - Switch back from Compact to Cozy
+  - App should not crash or go blank
+  - Repeat on Expecting tab to confirm no crash there either
+
+- **TC-182c**: Switching layout while on Expecting tab does not crash
+  - Navigate to Expecting tab with at least 1 entry
+  - Switch layout via settings
+  - Entries should re-render in the new layout without errors
+
 ### Build ID & Update ID
 - **TC-183**: Build ID present in non-Expo Go builds
   - EAS build creates build ID

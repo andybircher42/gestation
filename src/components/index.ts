@@ -1,6 +1,7 @@
 export { default as AppInfoModal } from "./AppInfoModal";
 export { default as BirthstoneIcon } from "./BirthstoneIcon";
 export { default as CalendarView } from "./CalendarView";
+export { default as DeliveredCard } from "./DeliveredCard";
 export { default as DeliveredList } from "./DeliveredList";
 export { default as DevToolbar } from "./DevToolbar";
 export { default as EntryCard } from "./EntryCard";
