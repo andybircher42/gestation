@@ -1,5 +1,5 @@
-import { Alert } from "react-native";
-import { fireEvent, screen } from "@testing-library/react-native";
+import { ActionSheetIOS, Alert } from "react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 
 import { Entry } from "@/storage";
 import renderWithTheme from "@/test/renderWithTheme";
@@ -64,6 +64,28 @@ const sameNameEntries = [
   makeEntry({ id: "2", name: "Sam", dueDate: "2026-05-11" }), // 30w0d
   makeEntry({ id: "3", name: "Sam", dueDate: "2026-07-20" }), // 20w0d
 ];
+
+const SORT_LABELS = [
+  "Due date (newest first)",
+  "Due date (oldest first)",
+  "Name (A\u2013Z)",
+  "Name (Z\u2013A)",
+];
+
+/** Presses the sort icon and selects an option by label via ActionSheetIOS. */
+function selectSort(label: string) {
+  let capturedCallback: ((index: number) => void) | undefined;
+  jest
+    .spyOn(ActionSheetIOS, "showActionSheetWithOptions")
+    .mockImplementation((_opts, callback) => {
+      capturedCallback = callback;
+    });
+  fireEvent.press(screen.getByLabelText(/Sort:/));
+  const index = SORT_LABELS.indexOf(label);
+  act(() => {
+    capturedCallback?.(index);
+  });
+}
 
 // Fixed "today" for all tests so gestationalAgeFromDueDate produces predictable values.
 beforeEach(() => {
@@ -142,10 +164,10 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Young");
   });
 
-  it("toggles due date to ascending when tapped again", () => {
+  it("sorts by due date ascending when selected from sort picker", () => {
     renderList(ageSortEntries);
 
-    fireEvent.press(screen.getByText(/Due Date/));
+    selectSort("Due date (oldest first)");
 
     const names = screen.getAllByText(/Young|Old|Middle/);
     expect(names[0]).toHaveTextContent("Young");
@@ -153,10 +175,10 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Old");
   });
 
-  it("sorts by name ascending when Name sort is selected", () => {
+  it("sorts by name ascending when selected from sort picker", () => {
     renderList(nameSortEntries);
 
-    fireEvent.press(screen.getByText("Name"));
+    selectSort("Name (A\u2013Z)");
 
     const names = screen.getAllByText(/Alice|Bob|Charlie/);
     expect(names[0]).toHaveTextContent("Alice");
@@ -164,11 +186,10 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Charlie");
   });
 
-  it("toggles name to descending when tapped again", () => {
+  it("sorts by name descending when selected from sort picker", () => {
     renderList(nameSortEntries);
 
-    fireEvent.press(screen.getByText("Name"));
-    fireEvent.press(screen.getByText(/Name/));
+    selectSort("Name (Z\u2013A)");
 
     const names = screen.getAllByText(/Alice|Bob|Charlie/);
     expect(names[0]).toHaveTextContent("Charlie");
@@ -176,65 +197,27 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Alice");
   });
 
-  it("resets to default direction when switching sort field", () => {
-    renderList(nameSortEntries);
-
-    // Toggle due date to ascending
-    fireEvent.press(screen.getByText(/Due Date/));
-    // Switch to name — should default to ascending (A-Z)
-    fireEvent.press(screen.getByText("Name"));
-
-    const names = screen.getAllByText(/Alice|Bob|Charlie/);
-    expect(names[0]).toHaveTextContent("Alice");
-    expect(names[1]).toHaveTextContent("Bob");
-    expect(names[2]).toHaveTextContent("Charlie");
-
-    // Switch back to due date — should reset to descending (oldest first)
-    fireEvent.press(screen.getByText(/Due Date/));
-
-    const names2 = screen.getAllByText(/Alice|Bob|Charlie/);
-    expect(names2[0]).toHaveTextContent("Alice");
-    expect(names2[1]).toHaveTextContent("Bob");
-    expect(names2[2]).toHaveTextContent("Charlie");
-  });
-
-  it("shows direction arrow on active sort button", () => {
+  it("opens sort picker when sort icon is pressed", () => {
+    const spy = jest
+      .spyOn(ActionSheetIOS, "showActionSheetWithOptions")
+      .mockImplementation(() => {});
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
 
-    // Default: due date descending
-    expect(screen.getByText(/Due Date ↓/)).toBeTruthy();
+    fireEvent.press(screen.getByLabelText(/Sort:/));
 
-    // Toggle to ascending
-    fireEvent.press(screen.getByText(/Due Date/));
-    expect(screen.getByText(/Due Date ↑/)).toBeTruthy();
-
-    // Switch to name — ascending by default
-    fireEvent.press(screen.getByText("Name"));
-    expect(screen.getByText(/Name ↑/)).toBeTruthy();
-
-    // Toggle name to descending
-    fireEvent.press(screen.getByText(/Name/));
-    expect(screen.getByText(/Name ↓/)).toBeTruthy();
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: expect.arrayContaining(["Cancel"]),
+      }),
+      expect.any(Function),
+    );
   });
 
-  it("sort buttons communicate selected state for accessibility", () => {
+  it("sort icon has accessible label reflecting current sort", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
 
-    const dueDateButton = screen.getByRole("button", { name: /Due Date/ });
-    const nameButton = screen.getByRole("button", { name: "Name" });
-
-    expect(dueDateButton.props.accessibilityState).toEqual({ selected: true });
-    expect(nameButton.props.accessibilityState).toEqual({ selected: false });
-
-    fireEvent.press(nameButton);
-
-    const dueDateButton2 = screen.getByRole("button", { name: /Due Date/ });
-    const nameButton2 = screen.getByRole("button", { name: /Name/ });
-
-    expect(dueDateButton2.props.accessibilityState).toEqual({
-      selected: false,
-    });
-    expect(nameButton2.props.accessibilityState).toEqual({ selected: true });
+    const sortButton = screen.getByLabelText(/Sort:/);
+    expect(sortButton.props.accessibilityLabel).toMatch(/due date.*descending/);
   });
 
   it("breaks due date ties by name ascending", () => {
@@ -246,11 +229,10 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Charlie");
   });
 
-  it("keeps name-ascending tiebreaker when toggling due date direction", () => {
+  it("keeps name-ascending tiebreaker when sorting due date ascending", () => {
     renderList(sameDateEntries);
 
-    // Toggle due date to ascending
-    fireEvent.press(screen.getByText(/Due Date/));
+    selectSort("Due date (oldest first)");
 
     const names = screen.getAllByText(/Alice|Bob|Charlie/);
     expect(names[0]).toHaveTextContent("Alice");
@@ -258,10 +240,10 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Charlie");
   });
 
-  it("breaks name ties by due date descending", () => {
+  it("breaks name ties by due date ascending", () => {
     renderList(sameNameEntries);
 
-    fireEvent.press(screen.getByText("Name"));
+    selectSort("Name (A\u2013Z)");
 
     const ages = screen.getAllByText(/\d+w \d+d/);
     expect(ages[0]).toHaveTextContent("30w 0d");
@@ -269,11 +251,10 @@ describe("EntryList", () => {
     expect(ages[2]).toHaveTextContent("10w 0d");
   });
 
-  it("keeps due-date-descending tiebreaker when toggling name direction", () => {
+  it("breaks name ties by due date ascending when sorting Z-A", () => {
     renderList(sameNameEntries);
 
-    fireEvent.press(screen.getByText("Name"));
-    fireEvent.press(screen.getByText(/Name/));
+    selectSort("Name (Z\u2013A)");
 
     const ages = screen.getAllByText(/\d+w \d+d/);
     expect(ages[0]).toHaveTextContent("30w 0d");
@@ -298,8 +279,7 @@ describe("EntryList", () => {
   it("does not show sort controls when list is empty", () => {
     renderList([]);
 
-    expect(screen.queryByText(/Due Date/)).toBeNull();
-    expect(screen.queryByText(/Name/)).toBeNull();
+    expect(screen.queryByLabelText(/Sort:/)).toBeNull();
     expect(screen.queryByText("Remove all")).toBeNull();
   });
 

@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import {
+  ActionSheetIOS,
   Alert,
   Animated,
   Easing,
@@ -230,14 +231,38 @@ export default function EntryList({
     }
   }, [entries]);
 
-  const handleSortPress = (field: SortBy) => {
-    if (field === sortBy) {
-      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+  const SORT_OPTIONS: { field: SortBy; dir: SortDir; label: string }[] = [
+    { field: "dueDate", dir: "desc", label: "Due date (newest first)" },
+    { field: "dueDate", dir: "asc", label: "Due date (oldest first)" },
+    { field: "name", dir: "asc", label: "Name (A–Z)" },
+    { field: "name", dir: "desc", label: "Name (Z–A)" },
+  ];
+
+  const openSortPicker = useCallback(() => {
+    const labels = SORT_OPTIONS.map((o) => o.label);
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options: [...labels, "Cancel"], cancelButtonIndex: labels.length },
+        (index) => {
+          if (index < SORT_OPTIONS.length) {
+            setSortBy(SORT_OPTIONS[index].field);
+            setSortDir(SORT_OPTIONS[index].dir);
+          }
+        },
+      );
     } else {
-      setSortBy(field);
-      setSortDir(DEFAULT_DIR[field]);
+      Alert.alert("Sort by", undefined, [
+        ...SORT_OPTIONS.map((o) => ({
+          text: o.label,
+          onPress: () => {
+            setSortBy(o.field);
+            setSortDir(o.dir);
+          },
+        })),
+        { text: "Cancel", style: "cancel" as const },
+      ]);
     }
-  };
+  }, []);
 
   const sorted = useMemo(() => {
     const copy = [...entries];
@@ -327,47 +352,20 @@ export default function EntryList({
       )}
       {entries.length > 0 && (
         <View style={styles.toolbarRow}>
-          <View style={styles.sortRow}>
-            <Pressable
-              style={[
-                styles.sortButton,
-                sortBy === "dueDate" && styles.sortButtonActive,
-              ]}
-              onPress={() => handleSortPress("dueDate")}
-              accessibilityRole="button"
-              accessibilityState={{ selected: sortBy === "dueDate" }}
-              accessibilityLabel={`Sort by due date${sortBy === "dueDate" ? `, ${sortDir === "asc" ? "ascending" : "descending"}` : ""}`}
-            >
-              <Text
-                style={[
-                  styles.sortText,
-                  sortBy === "dueDate" && styles.sortTextActive,
-                ]}
-              >
-                Due Date{" "}
-                {sortBy === "dueDate" && (sortDir === "asc" ? "↑" : "↓")}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.sortButton,
-                sortBy === "name" && styles.sortButtonActive,
-              ]}
-              onPress={() => handleSortPress("name")}
-              accessibilityRole="button"
-              accessibilityState={{ selected: sortBy === "name" }}
-              accessibilityLabel={`Sort by name${sortBy === "name" ? `, ${sortDir === "asc" ? "ascending" : "descending"}` : ""}`}
-            >
-              <Text
-                style={[
-                  styles.sortText,
-                  sortBy === "name" && styles.sortTextActive,
-                ]}
-              >
-                Name {sortBy === "name" && (sortDir === "asc" ? "↑" : "↓")}
-              </Text>
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={openSortPicker}
+            accessibilityRole="button"
+            accessibilityLabel={`Sort: ${sortBy === "dueDate" ? "due date" : "name"}, ${sortDir === "asc" ? "ascending" : "descending"}`}
+            hitSlop={8}
+            style={styles.sortIconButton}
+          >
+            <Ionicons
+              name="swap-vertical-outline"
+              size={20}
+              color={colors.textTertiary}
+            />
+          </Pressable>
+          <View style={styles.toolbarSpacer} />
           <Pressable
             style={styles.deleteAllButton}
             onPress={() =>
@@ -436,13 +434,15 @@ function createStyles(colors: ColorTokens) {
       marginTop: 12,
       gap: 10,
     },
-    sortRow: {
+    sortIconButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    toolbarSpacer: {
       flex: 1,
-      flexDirection: "row",
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: colors.primary,
-      overflow: "hidden",
     },
     deleteAllButton: {
       paddingHorizontal: 12,
@@ -491,23 +491,6 @@ function createStyles(colors: ColorTokens) {
       fontSize: 14,
       color: colors.primary,
       textDecorationLine: "underline",
-    },
-    sortButton: {
-      flex: 1,
-      paddingVertical: 8,
-      alignItems: "center",
-      backgroundColor: colors.contentBackground,
-    },
-    sortButtonActive: {
-      backgroundColor: colors.primary,
-    },
-    sortText: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: colors.primary,
-    },
-    sortTextActive: {
-      color: colors.white,
     },
     list: {
       flex: 1,
