@@ -157,7 +157,7 @@ describe("useEntries", () => {
 
     act(() => {
       result.current.seed([
-        { id: "s1", name: "Seeded", dueDate: "2026-11-01" },
+        { id: "s1", name: "Seeded", dueDate: "2026-11-01", createdAt: 1000 },
       ]);
     });
 

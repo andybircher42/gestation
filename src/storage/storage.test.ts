@@ -24,12 +24,14 @@ describe("saveEntries", () => {
         id: "1",
         name: "A",
         dueDate: "2026-09-01",
+        createdAt: 1000,
         birthstone: { name: "Sapphire", color: "#1565C0" },
       },
       {
         id: "2",
         name: "B",
         dueDate: "2026-06-15",
+        createdAt: 2000,
         birthstone: { name: "Pearl", color: "#B0B8E8" },
       },
     ];
@@ -108,12 +110,14 @@ describe("loadEntries", () => {
         id: "1",
         name: "A",
         dueDate: "2026-09-01",
+        createdAt: 1000,
         birthstone: { name: "Sapphire", color: "#1565C0" },
       },
       {
         id: "2",
         name: "B",
         dueDate: "2026-06-15",
+        createdAt: 2000,
         birthstone: { name: "Pearl", color: "#B0B8E8" },
       },
     ];
@@ -168,12 +172,13 @@ describe("loadEntries", () => {
     expect(stored).toBeNull();
   });
 
-  it("does not re-save when all entries are valid and have birthstone", async () => {
+  it("does not re-save when all entries are valid and have birthstone and createdAt", async () => {
     const data = [
       {
         id: "1",
         name: "Baby",
         dueDate: "2026-09-01",
+        createdAt: 1000,
         birthstone: { name: "Sapphire", color: "#1565C0" },
       },
     ];
@@ -187,12 +192,51 @@ describe("loadEntries", () => {
 
   it("strips extra properties from valid entries", async () => {
     const data = [
-      { id: "1", name: "Baby", dueDate: "2026-06-15", weeks: 10, days: 3 },
+      {
+        id: "1",
+        name: "Baby",
+        dueDate: "2026-06-15",
+        createdAt: 1000,
+        weeks: 10,
+        days: 3,
+      },
     ];
     await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
 
     const result = await loadEntries();
     expect(result.entries[0]).not.toHaveProperty("weeks");
+  });
+
+  it("backfills createdAt for entries that lack one", async () => {
+    const data = [
+      {
+        id: "1",
+        name: "First",
+        dueDate: "2026-06-15",
+        birthstone: { name: "Pearl", color: "#B0B8E8" },
+      },
+      {
+        id: "2",
+        name: "Second",
+        dueDate: "2026-07-15",
+        birthstone: { name: "Ruby", color: "#E53935" },
+      },
+    ];
+    await AsyncStorage.setItem("@gestation_entries", JSON.stringify(data));
+
+    const result = await loadEntries();
+    expect(typeof result.entries[0].createdAt).toBe("number");
+    expect(typeof result.entries[1].createdAt).toBe("number");
+    // Second entry should have a later createdAt than first
+    expect(result.entries[1].createdAt).toBeGreaterThan(
+      result.entries[0].createdAt,
+    );
+
+    // Verify re-save occurred with createdAt
+    const stored = JSON.parse(
+      (await AsyncStorage.getItem("@gestation_entries"))!,
+    );
+    expect(stored[0].createdAt).toBe(result.entries[0].createdAt);
   });
 
   it("backfills birthstone for entries that lack one", async () => {
@@ -221,6 +265,7 @@ describe("loadEntries", () => {
         id: "1",
         name: "Baby",
         dueDate: "2026-06-15",
+        createdAt: 1000,
         birthstone: { name: "Pearl", color: "#B0B8E8" },
       },
     ];
@@ -232,7 +277,7 @@ describe("loadEntries", () => {
       name: "Pearl",
       color: "#B0B8E8",
     });
-    // No re-save needed since birthstone already present
+    // No re-save needed since birthstone and createdAt already present
     expect(AsyncStorage.setItem).not.toHaveBeenCalled();
   });
 });

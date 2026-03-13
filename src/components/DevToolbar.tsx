@@ -64,6 +64,7 @@ export function generateSeedEntries(): Entry[] {
       id: `${Date.now()}-seed-${i}`,
       name,
       dueDate: toISODateString(dueDate),
+      createdAt: Date.now() + i,
     };
   });
 }

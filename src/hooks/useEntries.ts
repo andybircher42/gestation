@@ -48,6 +48,7 @@ export default function useEntries() {
         id: generateId(),
         name,
         dueDate,
+        createdAt: Date.now(),
         birthstone: getBirthstoneForDate(dueDate),
       };
       setEntries((prev) => {

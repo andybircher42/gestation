@@ -9,9 +9,12 @@ import EntryList from "./EntryList";
 
 /** Creates a test entry with a default dueDate. */
 function makeEntry(
-  fields: Omit<Entry, "dueDate"> & { dueDate?: string },
+  fields: Omit<Entry, "dueDate" | "createdAt"> & {
+    dueDate?: string;
+    createdAt?: number;
+  },
 ): Entry {
-  return { dueDate: "2026-06-15", ...fields };
+  return { dueDate: "2026-06-15", createdAt: 1000, ...fields };
 }
 
 /** Renders EntryList with defaults for onDelete/onDeleteAll/onAdd. Returns the mocks. */

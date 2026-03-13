@@ -115,17 +115,21 @@ describe("deliveryLoadForDate", () => {
   });
 
   it("returns positive for entries near due date", () => {
-    const entries = [{ id: "1", name: "A", dueDate: "2026-06-15" }];
+    const entries = [
+      { id: "1", name: "A", dueDate: "2026-06-15", createdAt: 1000 },
+    ];
     // ~2 weeks before due date, checking the due date itself
     const load = deliveryLoadForDate(entries, "2026-06-15", "2026-06-01");
     expect(load).toBeGreaterThan(0);
   });
 
   it("aggregates across multiple entries", () => {
-    const one = [{ id: "1", name: "A", dueDate: "2026-06-15" }];
+    const one = [
+      { id: "1", name: "A", dueDate: "2026-06-15", createdAt: 1000 },
+    ];
     const two = [
-      { id: "1", name: "A", dueDate: "2026-06-15" },
-      { id: "2", name: "B", dueDate: "2026-06-15" },
+      { id: "1", name: "A", dueDate: "2026-06-15", createdAt: 1000 },
+      { id: "2", name: "B", dueDate: "2026-06-15", createdAt: 2000 },
     ];
     const loadOne = deliveryLoadForDate(one, "2026-06-15", "2026-06-01");
     const loadTwo = deliveryLoadForDate(two, "2026-06-15", "2026-06-01");
@@ -174,7 +178,9 @@ describe("calendarHeatMap", () => {
   });
 
   it("includes load and color for each day", () => {
-    const entries = [{ id: "1", name: "A", dueDate: "2026-06-15" }];
+    const entries = [
+      { id: "1", name: "A", dueDate: "2026-06-15", createdAt: 1000 },
+    ];
     const result = calendarHeatMap(
       entries,
       "2026-06-10",

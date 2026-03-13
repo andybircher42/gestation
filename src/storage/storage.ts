@@ -8,6 +8,7 @@ export interface Entry {
   id: string;
   name: string;
   dueDate: string;
+  createdAt: number;
   birthstone?: Birthstone;
 }
 
@@ -63,6 +64,9 @@ export const setOnboardingComplete = async (): Promise<void> => {
 export const resetOnboarding = async (): Promise<void> => {
   await AsyncStorage.removeItem(ONBOARDING_KEY);
 };
+
+/** Fixed base timestamp for migrating legacy entries without createdAt. */
+const MIGRATION_BASE_DATE = 1700000000000; // 2023-11-14T22:13:20Z
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}/;
 
@@ -127,10 +131,18 @@ export const loadEntries = async (): Promise<LoadResult> => {
         needsMigration = true;
       }
 
+      const createdAt =
+        typeof obj.createdAt === "number" ? obj.createdAt : undefined;
+
+      if (!createdAt) {
+        needsMigration = true;
+      }
+
       entries.push({
         id: item.id,
         name: item.name,
         dueDate: item.dueDate,
+        createdAt: createdAt ?? MIGRATION_BASE_DATE + entries.length * 1000,
         birthstone: birthstone ?? getBirthstoneForDate(item.dueDate),
       });
     } else {

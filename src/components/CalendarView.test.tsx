@@ -20,6 +20,7 @@ describe("CalendarView", () => {
         id: "1",
         name: "Baby",
         dueDate: "2026-06-15",
+        createdAt: 1000,
         birthstone: { name: "Pearl", color: "#B0B8E8" },
       },
     ];
@@ -40,6 +41,7 @@ describe("CalendarView", () => {
         id: "1",
         name: "Baby",
         dueDate: "2026-06-15",
+        createdAt: 1000,
         birthstone: { name: "Pearl", color: "#B0B8E8" },
       },
     ];

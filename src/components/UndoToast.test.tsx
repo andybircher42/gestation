@@ -16,6 +16,7 @@ const mockEntry: Entry = {
   id: "1",
   name: "Sam",
   dueDate: "2026-09-11",
+  createdAt: 1000,
 };
 
 /** Renders UndoToast with defaults for onUndo/onDismiss. Returns the mocks. */

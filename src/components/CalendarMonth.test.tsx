@@ -51,6 +51,7 @@ describe("CalendarMonth", () => {
           id: "1",
           name: "Baby",
           dueDate: "2026-06-15",
+          createdAt: 1000,
           birthstone: { name: "Pearl", color: "#B0B8E8" },
         },
       ],
@@ -67,10 +68,10 @@ describe("CalendarMonth", () => {
     cells[14] = {
       ...cells[14],
       dueEntries: [
-        { id: "1", name: "A", dueDate: "2026-06-15" },
-        { id: "2", name: "B", dueDate: "2026-06-15" },
-        { id: "3", name: "C", dueDate: "2026-06-15" },
-        { id: "4", name: "D", dueDate: "2026-06-15" },
+        { id: "1", name: "A", dueDate: "2026-06-15", createdAt: 1000 },
+        { id: "2", name: "B", dueDate: "2026-06-15", createdAt: 2000 },
+        { id: "3", name: "C", dueDate: "2026-06-15", createdAt: 3000 },
+        { id: "4", name: "D", dueDate: "2026-06-15", createdAt: 4000 },
       ],
     };
     renderWithTheme(<CalendarMonth year={2026} month={5} dayCells={cells} />);
