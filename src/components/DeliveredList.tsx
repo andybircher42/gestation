@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
+  Animated,
   FlatList,
   Pressable,
   StyleSheet,
@@ -9,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import { useSwipeDismiss } from "@/hooks";
 import { Entry } from "@/storage";
 import { ColorTokens, useTheme } from "@/theme";
 import { deliveryTimingLabel, formatDueDate, lineHeight } from "@/util";
@@ -22,6 +24,67 @@ interface DeliveredListProps {
 }
 
 type GridItem = Entry | "spacer";
+
+interface DeliveredRowProps {
+  item: Entry;
+  onDelete: (id: string) => void;
+  onPress: (entry: Entry) => void;
+  colors: ColorTokens;
+  styles: ReturnType<typeof createStyles>;
+}
+
+/** Individual delivered row with swipe-to-delete support. */
+const DeliveredRow = React.memo(function DeliveredRow({
+  item,
+  onDelete,
+  onPress,
+  colors,
+  styles,
+}: DeliveredRowProps) {
+  const { animatedValue: translateX, panHandlers } = useSwipeDismiss({
+    axis: "x",
+    threshold: 100,
+    onDismiss: () => onDelete(item.id),
+  });
+
+  return (
+    <View style={styles.rowWrapper}>
+      <View style={styles.swipeBackground}>
+        <View style={styles.swipeDeleteSide}>
+          <Text style={styles.swipeLabel}>Delete</Text>
+          <Ionicons name="trash-outline" size={22} color={colors.white} />
+        </View>
+        <View style={styles.swipeDeleteSide}>
+          <Text style={styles.swipeLabel}>Delete</Text>
+          <Ionicons name="trash-outline" size={22} color={colors.white} />
+        </View>
+      </View>
+      <Animated.View
+        style={[styles.row, { transform: [{ translateX }] }]}
+        {...panHandlers}
+      >
+        <Pressable
+          style={styles.rowContent}
+          onPress={() => onPress(item)}
+          accessibilityRole="button"
+          accessibilityLabel={`View details for ${item.name}`}
+        >
+          <Text style={styles.baby}>👶</Text>
+          <View style={styles.info}>
+            <Text style={styles.name} numberOfLines={1}>
+              {item.name}
+            </Text>
+            <Text style={styles.timing}>
+              {item.deliveredAt
+                ? deliveryTimingLabel(item.dueDate, item.deliveredAt)
+                : formatDueDate(item.dueDate)}
+            </Text>
+          </View>
+        </Pressable>
+      </Animated.View>
+    </View>
+  );
+});
 
 /** Full-page view showing all delivered entries. Respects compact/cozy layout. */
 export default function DeliveredList({
@@ -83,6 +146,30 @@ export default function DeliveredList({
     [],
   );
 
+  const renderCompactItem = useCallback(
+    ({ item }: { item: Entry }) => (
+      <DeliveredRow
+        item={item}
+        onDelete={onDelete}
+        onPress={setSelectedEntry}
+        colors={colors}
+        styles={styles}
+      />
+    ),
+    [onDelete, colors, styles],
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <View style={styles.header}>
+        <Text style={styles.headerEmoji}>🎉</Text>
+        <Text style={styles.headerTitle}>Delivered</Text>
+        <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
+      </View>
+    ),
+    [styles, deliveredEntries.length],
+  );
+
   if (deliveredEntries.length === 0) {
     return (
       <View style={styles.emptyContainer}>
@@ -106,13 +193,7 @@ export default function DeliveredList({
           numColumns={2}
           contentContainerStyle={styles.grid}
           columnWrapperStyle={styles.gridRow}
-          ListHeaderComponent={
-            <View style={styles.header}>
-              <Text style={styles.headerEmoji}>🎉</Text>
-              <Text style={styles.headerTitle}>Delivered</Text>
-              <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
-            </View>
-          }
+          ListHeaderComponent={listHeader}
         />
         <EntryDetailModal
           entry={selectedEntry}
@@ -129,45 +210,8 @@ export default function DeliveredList({
         data={deliveredEntries}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.row}
-            onPress={() => setSelectedEntry(item)}
-            accessibilityRole="button"
-            accessibilityLabel={`View details for ${item.name}`}
-          >
-            <Text style={styles.baby}>👶</Text>
-            <View style={styles.info}>
-              <Text style={styles.name} numberOfLines={1}>
-                {item.name}
-              </Text>
-              <Text style={styles.timing}>
-                {item.deliveredAt
-                  ? deliveryTimingLabel(item.dueDate, item.deliveredAt)
-                  : formatDueDate(item.dueDate)}
-              </Text>
-            </View>
-            <Pressable
-              onPress={() => onDelete(item.id)}
-              accessibilityRole="button"
-              accessibilityLabel={`Remove ${item.name}`}
-              hitSlop={8}
-            >
-              <Ionicons
-                name="close-circle-outline"
-                size={18}
-                color={colors.textTertiary}
-              />
-            </Pressable>
-          </Pressable>
-        )}
-        ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.headerEmoji}>🎉</Text>
-            <Text style={styles.headerTitle}>Delivered</Text>
-            <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
-          </View>
-        }
+        renderItem={renderCompactItem}
+        ListHeaderComponent={listHeader}
       />
       <EntryDetailModal
         entry={selectedEntry}
@@ -241,14 +285,42 @@ function createStyles(colors: ColorTokens) {
       borderRadius: 10,
       overflow: "hidden",
     },
+    rowWrapper: {
+      marginBottom: 6,
+      borderRadius: 10,
+      overflow: "hidden",
+    },
+    swipeBackground: {
+      ...StyleSheet.absoluteFillObject,
+      flexDirection: "row",
+    },
+    swipeDeleteSide: {
+      flex: 1,
+      backgroundColor: colors.destructive,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      paddingHorizontal: 20,
+      gap: 8,
+    },
+    swipeLabel: {
+      color: colors.white,
+      fontSize: 13,
+      fontWeight: "600",
+    },
     row: {
       flexDirection: "row",
       alignItems: "center",
       paddingVertical: 10,
       paddingHorizontal: 12,
       borderRadius: 10,
-      marginBottom: 6,
       backgroundColor: colors.primaryLightBg,
+      gap: 10,
+    },
+    rowContent: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
       gap: 10,
     },
     baby: {
