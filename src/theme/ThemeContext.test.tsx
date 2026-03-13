@@ -25,8 +25,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="classic"
         brightness="light"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -44,8 +46,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="classic"
         brightness="dark"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -62,8 +66,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="warm"
         brightness="light"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -80,8 +86,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="warm"
         brightness="dark"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -97,8 +105,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="elegant"
         brightness="light"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -115,8 +125,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="playful"
         brightness="dark"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -133,8 +145,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="modern"
         brightness="light"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -151,8 +165,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="mono"
         brightness="light"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -170,8 +186,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="classic"
         brightness="system"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,
@@ -189,8 +207,10 @@ describe("ThemeContext", () => {
       <ThemeProvider
         personality="classic"
         brightness="system"
+        layout="compact"
         setPersonality={noopSet}
         setBrightness={noopSet}
+        setLayout={noopSet}
       >
         <TestConsumer />
       </ThemeProvider>,

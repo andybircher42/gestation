@@ -1,6 +1,7 @@
 export type {
   Brightness,
   ColorTokens,
+  Layout,
   Personality,
   PersonalityPalette,
 } from "./colors";

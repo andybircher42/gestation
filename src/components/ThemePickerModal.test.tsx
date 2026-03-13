@@ -9,8 +9,10 @@ const defaultProps = {
   visible: true,
   currentPersonality: "classic" as const,
   currentBrightness: "system" as const,
+  currentLayout: "compact" as const,
   onSelectPersonality: jest.fn(),
   onSelectBrightness: jest.fn(),
+  onSelectLayout: jest.fn(),
   onClose: jest.fn(),
 };
 
@@ -19,7 +21,7 @@ beforeEach(() => {
 });
 
 describe("ThemePickerModal", () => {
-  it("renders theme and brightness sections when visible", () => {
+  it("renders theme, brightness, and layout sections when visible", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} />);
 
     expect(screen.getByText("Theme")).toBeTruthy();
@@ -34,6 +36,10 @@ describe("ThemePickerModal", () => {
     expect(screen.getByText("System")).toBeTruthy();
     expect(screen.getByText("Light")).toBeTruthy();
     expect(screen.getByText("Dark")).toBeTruthy();
+
+    expect(screen.getByText("Layout")).toBeTruthy();
+    expect(screen.getByText("Compact")).toBeTruthy();
+    expect(screen.getByText("Cozy")).toBeTruthy();
   });
 
   it("shows checkmark on the active personality", () => {
@@ -54,6 +60,26 @@ describe("ThemePickerModal", () => {
     expect(screen.getByTestId("checkmark-brightness-dark")).toBeTruthy();
     expect(screen.queryByTestId("checkmark-brightness-system")).toBeNull();
     expect(screen.queryByTestId("checkmark-brightness-light")).toBeNull();
+  });
+
+  it("shows checkmark on the active layout", () => {
+    renderWithTheme(
+      <ThemePickerModal {...defaultProps} currentLayout="cozy" />,
+    );
+
+    expect(screen.getByTestId("checkmark-layout-cozy")).toBeTruthy();
+    expect(screen.queryByTestId("checkmark-layout-compact")).toBeNull();
+  });
+
+  it("calls onSelectLayout when a layout option is pressed", () => {
+    const onSelectLayout = jest.fn();
+    renderWithTheme(
+      <ThemePickerModal {...defaultProps} onSelectLayout={onSelectLayout} />,
+    );
+
+    fireEvent.press(screen.getByText("Cozy"));
+
+    expect(onSelectLayout).toHaveBeenCalledWith("cozy");
   });
 
   it("calls onSelectPersonality when a theme option is pressed", () => {

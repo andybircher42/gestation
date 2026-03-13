@@ -40,8 +40,10 @@ export default function RootLayout() {
   const {
     personality,
     brightness,
+    layout,
     setPersonality,
     setBrightness,
+    setLayout,
     loadThemePreference,
   } = useThemePreference();
 
@@ -50,8 +52,10 @@ export default function RootLayout() {
       <ThemeProvider
         personality={personality}
         brightness={brightness}
+        layout={layout}
         setPersonality={setPersonality}
         setBrightness={setBrightness}
+        setLayout={setLayout}
       >
         <RootGate loadThemePreference={loadThemePreference} />
       </ThemeProvider>

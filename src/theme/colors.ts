@@ -43,6 +43,9 @@ export type Personality =
 /** Available brightness modes. */
 export type Brightness = "system" | "light" | "dark";
 
+/** Available layout modes. */
+export type Layout = "compact" | "cozy";
+
 // ---------------------------------------------------------------------------
 // Classic (the original blue theme)
 // ---------------------------------------------------------------------------

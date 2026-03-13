@@ -8,10 +8,11 @@ beforeEach(() => {
 });
 
 describe("useThemePreference", () => {
-  it("defaults to classic personality and system brightness", () => {
+  it("defaults to classic personality, system brightness, and compact layout", () => {
     const { result } = renderHook(() => useThemePreference());
     expect(result.current.personality).toBe("classic");
     expect(result.current.brightness).toBe("system");
+    expect(result.current.layout).toBe("compact");
   });
 
   it("hydrates stored personality and brightness", async () => {
@@ -58,6 +59,27 @@ describe("useThemePreference", () => {
     expect(result.current.brightness).toBe("dark");
     const stored = await AsyncStorage.getItem("@theme_brightness");
     expect(stored).toBe("dark");
+  });
+
+  it("hydrates stored layout", async () => {
+    await AsyncStorage.setItem("@theme_layout", "cozy");
+    const { result } = renderHook(() => useThemePreference());
+    await act(async () => {
+      await result.current.loadThemePreference();
+    });
+    expect(result.current.layout).toBe("cozy");
+  });
+
+  it("persists layout when set", async () => {
+    const { result } = renderHook(() => useThemePreference());
+
+    act(() => {
+      result.current.setLayout("cozy");
+    });
+
+    expect(result.current.layout).toBe("cozy");
+    const stored = await AsyncStorage.getItem("@theme_layout");
+    expect(stored).toBe("cozy");
   });
 
   it("falls back to defaults on invalid stored values", async () => {

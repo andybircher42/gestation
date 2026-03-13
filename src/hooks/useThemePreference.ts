@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { Brightness, Personality } from "@/theme";
+import { Brightness, Layout, Personality } from "@/theme";
 import { reportError } from "@/util";
 
 const PERSONALITY_KEY = "@theme_personality";
 const BRIGHTNESS_KEY = "@theme_brightness";
+const LAYOUT_KEY = "@theme_layout";
 /** Legacy key from the single-axis theme system. */
 const LEGACY_MODE_KEY = "@theme_mode";
 
@@ -18,6 +19,7 @@ const VALID_PERSONALITIES: Personality[] = [
   "mono",
 ];
 const VALID_BRIGHTNESSES: Brightness[] = ["system", "light", "dark"];
+const VALID_LAYOUTS: Layout[] = ["compact", "cozy"];
 
 /**
  * Manages theme preference persistence via AsyncStorage.
@@ -29,16 +31,22 @@ const VALID_BRIGHTNESSES: Brightness[] = ["system", "light", "dark"];
 export default function useThemePreference() {
   const [personality, setPersonalityState] = useState<Personality>("classic");
   const [brightness, setBrightnessState] = useState<Brightness>("system");
+  const [layout, setLayoutState] = useState<Layout>("compact");
 
   /** Hydrates theme preferences from AsyncStorage. Call once during app initialization. */
   const loadThemePreference = useCallback(async () => {
-    const [storedPersonality, storedBrightness, legacyMode] = await Promise.all(
-      [
+    const [storedPersonality, storedBrightness, storedLayout, legacyMode] =
+      await Promise.all([
         AsyncStorage.getItem(PERSONALITY_KEY),
         AsyncStorage.getItem(BRIGHTNESS_KEY),
+        AsyncStorage.getItem(LAYOUT_KEY),
         AsyncStorage.getItem(LEGACY_MODE_KEY),
-      ],
-    );
+      ]);
+
+    // Layout is independent of personality/brightness migration
+    if (storedLayout && VALID_LAYOUTS.includes(storedLayout as Layout)) {
+      setLayoutState(storedLayout as Layout);
+    }
 
     // Already migrated — use new keys
     if (storedPersonality || storedBrightness) {
@@ -100,11 +108,21 @@ export default function useThemePreference() {
     );
   }, []);
 
+  /** Updates layout in state and persists to AsyncStorage. */
+  const setLayout = useCallback((l: Layout) => {
+    setLayoutState(l);
+    AsyncStorage.setItem(LAYOUT_KEY, l).catch((e) =>
+      reportError("Failed to save theme layout", e),
+    );
+  }, []);
+
   return {
     personality,
     brightness,
+    layout,
     setPersonality,
     setBrightness,
+    setLayout,
     loadThemePreference,
   };
 }

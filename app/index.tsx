@@ -20,6 +20,7 @@ import {
   AppInfoModal,
   CalendarView,
   DevToolbar,
+  EntryGrid,
   EntryList,
   InfoToast,
   ThemePickerModal,
@@ -44,8 +45,10 @@ export default function HomeScreen() {
     resolvedTheme,
     personality,
     brightness,
+    layout,
     setPersonality,
     setBrightness,
+    setLayout,
   } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -173,12 +176,21 @@ export default function HomeScreen() {
         </View>
 
         {view === "list" ? (
-          <EntryList
-            entries={entries}
-            onDelete={remove}
-            onDeleteAll={removeAll}
-            onAdd={add}
-          />
+          layout === "cozy" ? (
+            <EntryGrid
+              entries={entries}
+              onDelete={remove}
+              onDeleteAll={removeAll}
+              onAdd={add}
+            />
+          ) : (
+            <EntryList
+              entries={entries}
+              onDelete={remove}
+              onDeleteAll={removeAll}
+              onAdd={add}
+            />
+          )
         ) : (
           <CalendarView entries={entries} onDayPress={handleDayPress} />
         )}
@@ -186,8 +198,10 @@ export default function HomeScreen() {
           visible={showThemePicker}
           currentPersonality={personality}
           currentBrightness={brightness}
+          currentLayout={layout}
           onSelectPersonality={setPersonality}
           onSelectBrightness={setBrightness}
+          onSelectLayout={setLayout}
           onClose={() => setShowThemePicker(false)}
           onAppInfo={() => setShowAppInfo(true)}
           anchor={pickerAnchor}

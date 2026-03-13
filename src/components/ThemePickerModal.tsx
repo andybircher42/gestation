@@ -19,14 +19,22 @@ try {
   // Not available in Expo Go
 }
 
-import { Brightness, ColorTokens, Personality, useTheme } from "@/theme";
+import {
+  Brightness,
+  ColorTokens,
+  Layout,
+  Personality,
+  useTheme,
+} from "@/theme";
 
 interface ThemePickerModalProps {
   visible: boolean;
   currentPersonality: Personality;
   currentBrightness: Brightness;
+  currentLayout: Layout;
   onSelectPersonality: (p: Personality) => void;
   onSelectBrightness: (b: Brightness) => void;
+  onSelectLayout: (l: Layout) => void;
   onClose: () => void;
   onAppInfo?: () => void;
   anchor?: { top: number; right: number };
@@ -71,6 +79,15 @@ const THEME_OPTIONS: {
   { value: "mono", label: "B&W", icon: "ellipse-outline" },
 ];
 
+const LAYOUT_OPTIONS: {
+  value: Layout;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { value: "compact", label: "Compact", icon: "list-outline" },
+  { value: "cozy", label: "Cozy", icon: "grid-outline" },
+];
+
 const BRIGHTNESS_OPTIONS: {
   value: Brightness;
   label: string;
@@ -86,8 +103,10 @@ export default function ThemePickerModal({
   visible,
   currentPersonality,
   currentBrightness,
+  currentLayout,
   onSelectPersonality,
   onSelectBrightness,
+  onSelectLayout,
   onClose,
   onAppInfo,
   anchor,
@@ -159,6 +178,35 @@ export default function ThemePickerModal({
                   size={20}
                   color={colors.primary}
                   testID={`checkmark-brightness-${value}`}
+                />
+              )}
+            </Pressable>
+          ))}
+          <View style={styles.separator} />
+          <Text style={styles.title}>Layout</Text>
+          {LAYOUT_OPTIONS.map(({ value, label, icon }) => (
+            <Pressable
+              key={value}
+              style={styles.row}
+              onPress={() => {
+                onSelectLayout(value);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+            >
+              <Ionicons
+                name={icon}
+                size={20}
+                color={colors.textPrimary}
+                style={styles.rowIcon}
+              />
+              <Text style={styles.rowLabel}>{label}</Text>
+              {currentLayout === value && (
+                <Ionicons
+                  name="checkmark"
+                  size={20}
+                  color={colors.primary}
+                  testID={`checkmark-layout-${value}`}
                 />
               )}
             </Pressable>

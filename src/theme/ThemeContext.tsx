@@ -1,7 +1,13 @@
 import { createContext, ReactNode, useContext, useMemo } from "react";
 import { useColorScheme } from "react-native";
 
-import { Brightness, ColorTokens, palettes, Personality } from "./colors";
+import {
+  Brightness,
+  ColorTokens,
+  Layout,
+  palettes,
+  Personality,
+} from "./colors";
 
 /** The effective visual brightness after resolving system preference. */
 export type ResolvedTheme = "light" | "dark";
@@ -18,8 +24,10 @@ interface ThemeContextValue {
   resolvedTheme: ResolvedTheme;
   personality: Personality;
   brightness: Brightness;
+  layout: Layout;
   setPersonality: (p: Personality) => void;
   setBrightness: (b: Brightness) => void;
+  setLayout: (l: Layout) => void;
   /** @deprecated Use `brightness` + `personality` instead. */
   themeMode: Brightness;
   /** @deprecated Use `setBrightness` instead. */
@@ -31,8 +39,10 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 interface ThemeProviderProps {
   personality: Personality;
   brightness: Brightness;
+  layout: Layout;
   setPersonality: (p: Personality) => void;
   setBrightness: (b: Brightness) => void;
+  setLayout: (l: Layout) => void;
   children: ReactNode;
 }
 
@@ -40,8 +50,10 @@ interface ThemeProviderProps {
 export function ThemeProvider({
   personality,
   brightness,
+  layout,
   setPersonality,
   setBrightness,
+  setLayout,
   children,
 }: ThemeProviderProps) {
   const systemScheme = useColorScheme();
@@ -62,13 +74,23 @@ export function ThemeProvider({
       resolvedTheme,
       personality,
       brightness,
+      layout,
       setPersonality,
       setBrightness,
+      setLayout,
       // Legacy aliases
       themeMode: brightness,
       setThemeMode: setBrightness,
     };
-  }, [resolvedTheme, personality, brightness, setPersonality, setBrightness]);
+  }, [
+    resolvedTheme,
+    personality,
+    brightness,
+    layout,
+    setPersonality,
+    setBrightness,
+    setLayout,
+  ]);
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
