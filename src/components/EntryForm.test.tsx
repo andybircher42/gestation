@@ -57,7 +57,7 @@ describe("EntryForm — Gestational Age mode", () => {
   it("calls onAdd with trimmed name, parsed weeks/days, and computed dueDate", () => {
     const onAdd = renderInWeeksDaysMode();
 
-    fireEvent.changeText(screen.getByLabelText("Name"), "  Baby A  ");
+    fireEvent.changeText(screen.getByLabelText("Name"), "  Sam  ");
     fireEvent.changeText(screen.getByLabelText("Weeks"), "12");
     fireEvent.changeText(screen.getByLabelText("Days"), "3");
     fireEvent.press(screen.getByText("Add"));
@@ -65,7 +65,7 @@ describe("EntryForm — Gestational Age mode", () => {
     const expectedDueDate = computeDueDate(12, 3, new Date(2026, 2, 2));
     const expectedDateStr = `${expectedDueDate.getFullYear()}-${String(expectedDueDate.getMonth() + 1).padStart(2, "0")}-${String(expectedDueDate.getDate()).padStart(2, "0")}`;
     expect(onAdd).toHaveBeenCalledWith({
-      name: "Baby A",
+      name: "Sam",
       dueDate: expectedDateStr,
     });
   });
@@ -334,12 +334,12 @@ describe("EntryForm — Due Date mode", () => {
     mockGestationalAge(35, 2);
     const onAdd = renderFormWithName();
 
-    fireEvent.changeText(screen.getByLabelText("Name"), "Baby B");
+    fireEvent.changeText(screen.getByLabelText("Name"), "Alex");
     pickDate();
     fireEvent.press(screen.getByText("Add"));
 
     expect(onAdd).toHaveBeenCalledWith({
-      name: "Baby B",
+      name: "Alex",
       dueDate: "2026-06-15",
     });
   });
@@ -695,26 +695,26 @@ describe("EntryForm — batch mode", () => {
 
     fireEvent.changeText(
       screen.getByLabelText("Batch entries"),
-      "Alice 6/14, Bob 35w5d",
+      "Sam 6/14, Alex 35w5d",
     );
     fireEvent.press(screen.getByText("Add All"));
 
     expect(onAdd).toHaveBeenCalledTimes(2);
     expect(onAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "Alice" }),
+      expect.objectContaining({ name: "Sam" }),
     );
     expect(onAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "Bob" }),
+      expect.objectContaining({ name: "Alex" }),
     );
 
     // Confirmation message
-    expect(screen.getByLabelText("Added 2 people, Alice, Bob")).toBeTruthy();
+    expect(screen.getByLabelText("Added 2 people, Sam, Alex")).toBeTruthy();
   });
 
   it("clears text after successful batch add", () => {
     renderBatchForm();
 
-    fireEvent.changeText(screen.getByLabelText("Batch entries"), "Alice 6/14");
+    fireEvent.changeText(screen.getByLabelText("Batch entries"), "Sam 6/14");
     fireEvent.press(screen.getByText("Add All"));
 
     expect(screen.getByLabelText("Batch entries").props.value).toBe("");
@@ -725,12 +725,12 @@ describe("EntryForm — batch mode", () => {
 
     fireEvent.changeText(
       screen.getByLabelText("Batch entries"),
-      "Alice 6/14, Bob",
+      "Sam 6/14, Alex",
     );
     fireEvent.press(screen.getByText("Add All"));
 
-    // Error shown for "Bob"
-    expect(screen.getByText(/Bob/)).toBeTruthy();
+    // Error shown for "Alex"
+    expect(screen.getByText(/Alex/)).toBeTruthy();
     expect(screen.getByText(/No date or gestational age found/)).toBeTruthy();
   });
 
@@ -739,12 +739,12 @@ describe("EntryForm — batch mode", () => {
 
     fireEvent.changeText(
       screen.getByLabelText("Batch entries"),
-      "Alice 6/14, Bob",
+      "Sam 6/14, Alex",
     );
     fireEvent.press(screen.getByText("Add All"));
 
     // Text field now contains only the errored entry
-    expect(screen.getByLabelText("Batch entries").props.value).toBe("Bob");
+    expect(screen.getByLabelText("Batch entries").props.value).toBe("Alex");
   });
 
   it("disables Add All when input is empty", () => {

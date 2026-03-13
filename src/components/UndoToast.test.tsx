@@ -14,7 +14,7 @@ jest.mock("react-native-safe-area-context", () => ({
 // dueDate 2026-09-11 → 12w3d when today is 2026-03-02
 const mockEntry: Entry = {
   id: "1",
-  name: "Baby A",
+  name: "Sam",
   dueDate: "2026-09-11",
 };
 
@@ -41,7 +41,7 @@ describe("UndoToast", () => {
 
   it("displays the deleted entry details", () => {
     renderToast();
-    expect(screen.getByText("Removed Baby A (12w 3d)")).toBeTruthy();
+    expect(screen.getByText("Removed Sam (12w 3d)")).toBeTruthy();
   });
 
   it("is announced by screen readers as an alert", () => {
@@ -49,9 +49,7 @@ describe("UndoToast", () => {
     const toast = screen.getByTestId("undo-toast");
     expect(toast.props.accessibilityRole).toBe("alert");
     expect(toast.props.accessibilityLiveRegion).toBe("polite");
-    expect(toast.props.accessibilityLabel).toBe(
-      "Removed Baby A, 12 weeks 3 days",
-    );
+    expect(toast.props.accessibilityLabel).toBe("Removed Sam, 12 weeks 3 days");
   });
 
   it("shows an Undo button", () => {

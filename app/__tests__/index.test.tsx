@@ -70,7 +70,7 @@ describe("HomeScreen", () => {
 
   it("adds an entry via the form in weeks/days mode", async () => {
     await renderHome();
-    await addEntry("TestBaby", "20", "3");
+    await addEntry("Jordan", "20", "3");
 
     expect(screen.getByText("20w 3d")).toBeTruthy();
   });

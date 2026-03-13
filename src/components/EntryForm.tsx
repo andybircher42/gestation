@@ -305,14 +305,14 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
           >
             <Text style={styles.helpTitle}>Separate entries with commas</Text>
             <Text style={styles.helpCode}>
-              Alice 6/14, Bob 35w5d, Carol 6-14-26, Debby 22w 3d
+              Sam 6/14, Alex 35w5d, Jamie 6-14-26, Riley 22w 3d
             </Text>
           </View>
         )}
 
         <TextInput
           style={styles.batchInput}
-          placeholder="Alice 6/14, Bob 35w5d, Carol 6-14-26, Debby 22w 3d"
+          placeholder="Sam 6/14, Alex 35w5d, Jamie 6-14-26, Riley 22w 3d"
           placeholderTextColor={colors.textTertiary}
           accessibilityLabel="Batch entries"
           value={batchText}
@@ -361,7 +361,14 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
             accessibilityLabel="Add all"
             accessibilityState={{ disabled: !canBatchAdd }}
           >
-            <Text style={styles.addButtonText}>Add All</Text>
+            <Text
+              style={[
+                styles.addButtonText,
+                !canBatchAdd && styles.addButtonTextDisabled,
+              ]}
+            >
+              Add All
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -463,7 +470,14 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
                   accessibilityLabel="Add this person"
                   accessibilityState={{ disabled: !canAdd }}
                 >
-                  <Text style={styles.addButtonText}>Add</Text>
+                  <Text
+                    style={[
+                      styles.addButtonText,
+                      !canAdd && styles.addButtonTextDisabled,
+                    ]}
+                  >
+                    Add
+                  </Text>
                 </Pressable>
               </View>
               {weeks && days && weeksValid && daysValid && (
@@ -541,7 +555,14 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
                   accessibilityLabel="Add this person"
                   accessibilityState={{ disabled: !canAdd }}
                 >
-                  <Text style={styles.addButtonText}>Add</Text>
+                  <Text
+                    style={[
+                      styles.addButtonText,
+                      !canAdd && styles.addButtonTextDisabled,
+                    ]}
+                  >
+                    Add
+                  </Text>
                 </Pressable>
               </View>
               {computed && (
@@ -705,12 +726,16 @@ function createStyles(colors: ColorTokens) {
       alignItems: "center",
     },
     addButtonDisabled: {
-      backgroundColor: colors.primaryDisabled,
+      backgroundColor: colors.inputBorder,
+      opacity: 0.5,
     },
     addButtonText: {
       color: colors.white,
       fontSize: 16,
       fontWeight: "600",
+    },
+    addButtonTextDisabled: {
+      opacity: 0.7,
     },
     batchHeader: {
       flexDirection: "row",

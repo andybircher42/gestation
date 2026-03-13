@@ -46,16 +46,16 @@ const ageSortEntries = [
 
 /** Three entries with different names for sort tests. */
 const nameSortEntries = [
-  makeEntry({ id: "1", name: "Charlie", dueDate: "2026-09-28" }),
-  makeEntry({ id: "2", name: "Alice", dueDate: "2026-04-04" }),
-  makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-15" }),
+  makeEntry({ id: "1", name: "Jamie", dueDate: "2026-09-28" }),
+  makeEntry({ id: "2", name: "Alex", dueDate: "2026-04-04" }),
+  makeEntry({ id: "3", name: "Quinn", dueDate: "2026-07-15" }),
 ];
 
 /** Three entries with same due date for tiebreaker tests. */
 const sameDateEntries = [
-  makeEntry({ id: "1", name: "Charlie", dueDate: "2026-07-20" }),
-  makeEntry({ id: "2", name: "Alice", dueDate: "2026-07-20" }),
-  makeEntry({ id: "3", name: "Bob", dueDate: "2026-07-20" }),
+  makeEntry({ id: "1", name: "Jamie", dueDate: "2026-07-20" }),
+  makeEntry({ id: "2", name: "Alex", dueDate: "2026-07-20" }),
+  makeEntry({ id: "3", name: "Quinn", dueDate: "2026-07-20" }),
 ];
 
 /** Three entries with same name for tiebreaker tests. */
@@ -180,10 +180,10 @@ describe("EntryList", () => {
 
     selectSort("Name (A\u2013Z)");
 
-    const names = screen.getAllByText(/Alice|Bob|Charlie/);
-    expect(names[0]).toHaveTextContent("Alice");
-    expect(names[1]).toHaveTextContent("Bob");
-    expect(names[2]).toHaveTextContent("Charlie");
+    const names = screen.getAllByText(/Alex|Jamie|Quinn/);
+    expect(names[0]).toHaveTextContent("Alex");
+    expect(names[1]).toHaveTextContent("Jamie");
+    expect(names[2]).toHaveTextContent("Quinn");
   });
 
   it("sorts by name descending when selected from sort picker", () => {
@@ -191,10 +191,10 @@ describe("EntryList", () => {
 
     selectSort("Name (Z\u2013A)");
 
-    const names = screen.getAllByText(/Alice|Bob|Charlie/);
-    expect(names[0]).toHaveTextContent("Charlie");
-    expect(names[1]).toHaveTextContent("Bob");
-    expect(names[2]).toHaveTextContent("Alice");
+    const names = screen.getAllByText(/Alex|Jamie|Quinn/);
+    expect(names[0]).toHaveTextContent("Quinn");
+    expect(names[1]).toHaveTextContent("Jamie");
+    expect(names[2]).toHaveTextContent("Alex");
   });
 
   it("opens sort picker when sort icon is pressed", () => {
@@ -223,10 +223,10 @@ describe("EntryList", () => {
   it("breaks due date ties by name ascending", () => {
     renderList(sameDateEntries);
 
-    const names = screen.getAllByText(/Alice|Bob|Charlie/);
-    expect(names[0]).toHaveTextContent("Alice");
-    expect(names[1]).toHaveTextContent("Bob");
-    expect(names[2]).toHaveTextContent("Charlie");
+    const names = screen.getAllByText(/Alex|Jamie|Quinn/);
+    expect(names[0]).toHaveTextContent("Alex");
+    expect(names[1]).toHaveTextContent("Jamie");
+    expect(names[2]).toHaveTextContent("Quinn");
   });
 
   it("keeps name-ascending tiebreaker when sorting due date ascending", () => {
@@ -234,10 +234,10 @@ describe("EntryList", () => {
 
     selectSort("Due date (oldest first)");
 
-    const names = screen.getAllByText(/Alice|Bob|Charlie/);
-    expect(names[0]).toHaveTextContent("Alice");
-    expect(names[1]).toHaveTextContent("Bob");
-    expect(names[2]).toHaveTextContent("Charlie");
+    const names = screen.getAllByText(/Alex|Jamie|Quinn/);
+    expect(names[0]).toHaveTextContent("Alex");
+    expect(names[1]).toHaveTextContent("Jamie");
+    expect(names[2]).toHaveTextContent("Quinn");
   });
 
   it("breaks name ties by due date ascending", () => {
