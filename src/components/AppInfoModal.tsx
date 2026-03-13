@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Modal,
   Platform,
   Pressable,
@@ -10,6 +11,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import Constants from "expo-constants";
+
+import { checkTesterMode, toggleTesterMode } from "@/storage";
 
 let Updates: { updateId: string | null; isEmbeddedLaunch: boolean } | undefined;
 try {
@@ -30,6 +33,29 @@ interface AppInfoModalProps {
 export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [isTester, setIsTester] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      checkTesterMode()
+        .then(setIsTester)
+        .catch(() => {});
+    }
+  }, [visible]);
+
+  const handleToggleTester = useCallback(() => {
+    toggleTesterMode()
+      .then((next) => {
+        setIsTester(next);
+        Alert.alert(
+          next ? "Tester mode enabled" : "Tester mode disabled",
+          next
+            ? "Analytics registration will be skipped on next launch."
+            : "Analytics registration will resume on next launch.",
+        );
+      })
+      .catch(() => {});
+  }, []);
 
   const appName = Constants.expoConfig?.name ?? "in due time";
   const appVersion = Constants.expoConfig?.version ?? "unknown";
@@ -44,7 +70,14 @@ export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>About</Text>
+          <Pressable
+            onLongPress={handleToggleTester}
+            accessibilityLabel="About, long press to toggle tester mode"
+          >
+            <Text style={styles.modalTitle}>
+              About{isTester ? " (tester)" : ""}
+            </Text>
+          </Pressable>
           <Text style={styles.appName}>{appName}</Text>
           <Text style={styles.versionText}>Version {appVersion}</Text>
           {buildId !== "" && (

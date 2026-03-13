@@ -3,6 +3,7 @@ export {
   acceptAgreement,
   checkAgreement,
   checkOnboardingComplete,
+  checkTesterMode,
   DEFAULT_DELIVERED_TTL_DAYS,
   DELIVERED_TTL_OPTIONS,
   getOrCreateDeviceId,
@@ -14,4 +15,5 @@ export {
   saveDeliveredTTL,
   saveEntries,
   setOnboardingComplete,
+  toggleTesterMode,
 } from "./storage";

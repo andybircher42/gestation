@@ -18,6 +18,7 @@ const AGREEMENT_KEY = "@hipaa_agreement_accepted";
 const DEVICE_ID_KEY = "@device_id";
 const ONBOARDING_KEY = "@onboarding_complete";
 const DELIVERED_TTL_KEY = "@delivered_ttl_days";
+const TESTER_MODE_KEY = "@tester_mode";
 
 /** Persists the full entries array to AsyncStorage. */
 export const saveEntries = async (entries: Entry[]): Promise<void> => {
@@ -79,7 +80,9 @@ export const DELIVERED_TTL_OPTIONS = [0, 1, 3, 7, 14, 30] as const;
 /** Loads the user's preferred TTL for delivered entries (in days). */
 export const loadDeliveredTTL = async (): Promise<number> => {
   const value = await AsyncStorage.getItem(DELIVERED_TTL_KEY);
-  if (value == null) {return DEFAULT_DELIVERED_TTL_DAYS;}
+  if (value == null) {
+    return DEFAULT_DELIVERED_TTL_DAYS;
+  }
   const parsed = parseInt(value, 10);
   return isNaN(parsed) ? DEFAULT_DELIVERED_TTL_DAYS : parsed;
 };
@@ -87,6 +90,24 @@ export const loadDeliveredTTL = async (): Promise<number> => {
 /** Saves the user's preferred TTL for delivered entries (in days). */
 export const saveDeliveredTTL = async (days: number): Promise<void> => {
   await AsyncStorage.setItem(DELIVERED_TTL_KEY, String(days));
+};
+
+/** Returns whether tester mode is enabled (skips analytics registration). */
+export const checkTesterMode = async (): Promise<boolean> => {
+  const value = await AsyncStorage.getItem(TESTER_MODE_KEY);
+  return value === "true";
+};
+
+/** Toggles tester mode on or off. Returns the new value. */
+export const toggleTesterMode = async (): Promise<boolean> => {
+  const current = await checkTesterMode();
+  const next = !current;
+  if (next) {
+    await AsyncStorage.setItem(TESTER_MODE_KEY, "true");
+  } else {
+    await AsyncStorage.removeItem(TESTER_MODE_KEY);
+  }
+  return next;
 };
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}/;

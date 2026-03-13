@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Image, ImageBackground, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Constants from "expo-constants";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
@@ -10,6 +11,7 @@ import {
   acceptAgreement,
   checkAgreement,
   checkOnboardingComplete,
+  checkTesterMode,
   getOrCreateDeviceId,
 } from "@/storage";
 import { ThemeProvider, useTheme } from "@/theme";
@@ -21,10 +23,12 @@ import splashLogoLight from "../assets/splash-icon.png";
 import splashLogoDark from "../assets/splash-icon-dark.png";
 
 const SPLASH_DURATION_MS = 2000;
+const IS_INTERNAL_BUILD =
+  ((Constants.expoConfig?.extra?.appLabel as string) ?? "") !== "";
 
 let identifyDevice: ((id: string) => void) | undefined;
 
-if (!__DEV__) {
+if (!__DEV__ && !IS_INTERNAL_BUILD) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const vexoModule = require("vexo-analytics");
@@ -90,25 +94,27 @@ function RootGate({ loadThemePreference }: RootGateProps) {
     let mounted = true;
 
     async function init() {
-      const [accepted, , , deviceId, onboardingDone] = await Promise.all([
-        checkAgreement().catch((e) => {
-          reportError("Failed to check agreement", e);
-          return false;
-        }),
-        loadThemePreference().catch((e) =>
-          reportError("Failed to load theme preference", e),
-        ),
-        // Placeholder for entry loading — done in home screen
-        Promise.resolve(),
-        getOrCreateDeviceId().catch((e) => {
-          reportError("Failed to get device ID", e);
-          return undefined;
-        }),
-        checkOnboardingComplete().catch((e) => {
-          reportError("Failed to check onboarding", e);
-          return false;
-        }),
-      ]);
+      const [accepted, , , deviceId, onboardingDone, isTester] =
+        await Promise.all([
+          checkAgreement().catch((e) => {
+            reportError("Failed to check agreement", e);
+            return false;
+          }),
+          loadThemePreference().catch((e) =>
+            reportError("Failed to load theme preference", e),
+          ),
+          // Placeholder for entry loading — done in home screen
+          Promise.resolve(),
+          getOrCreateDeviceId().catch((e) => {
+            reportError("Failed to get device ID", e);
+            return undefined;
+          }),
+          checkOnboardingComplete().catch((e) => {
+            reportError("Failed to check onboarding", e);
+            return false;
+          }),
+          checkTesterMode().catch(() => false),
+        ]);
 
       if (!mounted) {
         return;
@@ -128,7 +134,7 @@ function RootGate({ loadThemePreference }: RootGateProps) {
       }
 
       if (!__DEV__) {
-        if (deviceId) {
+        if (deviceId && !isTester) {
           identifyDevice?.(deviceId);
         }
         try {
