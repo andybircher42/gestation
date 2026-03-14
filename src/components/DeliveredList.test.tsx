@@ -29,7 +29,11 @@ function renderWithLayout(
       setBrightness={noopSet}
       setLayout={noopSet}
     >
-      <DeliveredList entries={entries} onDelete={jest.fn()} />
+      <DeliveredList
+        entries={entries}
+        onDelete={jest.fn()}
+        onDeleteAll={jest.fn()}
+      />
     </ThemeProvider>,
   );
 }
@@ -59,7 +63,11 @@ describe("DeliveredList", () => {
         setBrightness={noopSet}
         setLayout={noopSet}
       >
-        <DeliveredList entries={[DELIVERED_ENTRY]} onDelete={jest.fn()} />
+        <DeliveredList
+          entries={[DELIVERED_ENTRY]}
+          onDelete={jest.fn()}
+          onDeleteAll={jest.fn()}
+        />
       </ThemeProvider>,
     );
 
@@ -78,7 +86,11 @@ describe("DeliveredList", () => {
         setBrightness={noopSet}
         setLayout={noopSet}
       >
-        <DeliveredList entries={[DELIVERED_ENTRY]} onDelete={jest.fn()} />
+        <DeliveredList
+          entries={[DELIVERED_ENTRY]}
+          onDelete={jest.fn()}
+          onDeleteAll={jest.fn()}
+        />
       </ThemeProvider>,
     );
 

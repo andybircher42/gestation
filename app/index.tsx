@@ -236,7 +236,7 @@ export default function HomeScreen() {
               entries={entries}
               onDelete={remove}
               onDeliver={deliver}
-              onDeleteAll={removeAll}
+              onDeleteAll={() => removeAll("expecting")}
               onAdd={add}
             />
           ) : (
@@ -244,7 +244,7 @@ export default function HomeScreen() {
               entries={entries}
               onDelete={remove}
               onDeliver={deliver}
-              onDeleteAll={removeAll}
+              onDeleteAll={() => removeAll("expecting")}
               onAdd={add}
             />
           )}
@@ -252,7 +252,11 @@ export default function HomeScreen() {
         <View
           style={[styles.tabContent, view !== "delivered" && styles.hidden]}
         >
-          <DeliveredList entries={entries} onDelete={remove} />
+          <DeliveredList
+            entries={entries}
+            onDelete={remove}
+            onDeleteAll={() => removeAll("delivered")}
+          />
         </View>
         <View style={[styles.tabContent, view !== "calendar" && styles.hidden]}>
           <CalendarView entries={entries} onDayPress={handleDayPress} />

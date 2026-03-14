@@ -178,39 +178,15 @@ export default function EntryGrid({
     return (
       <View style={styles.container}>
         <Pressable
-          style={[
-            styles.addButtonFull,
-            {
-              borderColor: colors.primary,
-              backgroundColor: colors.primaryLightBg,
-            },
-          ]}
+          style={styles.emptyCard}
           onPress={toggleForm}
           accessibilityRole="button"
           accessibilityLabel="Add someone new"
         >
-          <BirthstoneIcon image={currentMonthGem} size={20} />
-          <Text
-            style={[
-              styles.addButtonFullText,
-              { color: colors.primary, marginHorizontal: 8 },
-            ]}
-          >
-            Add someone
-          </Text>
-          <BirthstoneIcon image={currentMonthGem} size={20} />
+          <BirthstoneIcon image={currentMonthGem} size={64} />
+          <Text style={styles.emptyCardTitle}>Ready when you are</Text>
+          <Text style={styles.emptyCardSubtitle}>Tap here to add someone</Text>
         </Pressable>
-        <View style={styles.emptyContent}>
-          <Ionicons
-            name="calendar-outline"
-            size={48}
-            color={colors.textTertiary}
-          />
-          <Text style={styles.emptyTitle}>Ready when you are</Text>
-          <Text style={styles.emptySubtitle}>
-            Tap Add someone to get started
-          </Text>
-        </View>
       </View>
     );
   }
@@ -243,7 +219,7 @@ export default function EntryGrid({
           <EntryForm key={formKeyRef.current} onAdd={onAdd} batch={batchMode} />
         </View>
       ) : null}
-      {entries.length > 0 && (
+      {sorted.length > 0 && (
         <View style={styles.toolbarRow}>
           <Pressable
             onPress={() => setShowSortPicker(true)}
@@ -264,7 +240,7 @@ export default function EntryGrid({
             onPress={() =>
               Alert.alert(
                 "Remove everyone?",
-                `This will remove all ${entries.length} people from your list. This can\u2019t be undone.`,
+                `This will remove all ${sorted.length} people from your list. This can\u2019t be undone.`,
                 [
                   { text: "Cancel", style: "cancel" },
                   {
@@ -337,21 +313,6 @@ function createStyles(colors: ColorTokens) {
       fontWeight: "600",
       color: colors.primary,
     },
-    addButtonFull: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginHorizontal: 16,
-      marginTop: 12,
-      paddingVertical: 12,
-      borderRadius: 12,
-      borderWidth: 2,
-      gap: 10,
-    },
-    addButtonFullText: {
-      fontSize: 16,
-      fontWeight: "600",
-    },
     inlineFormContainer: {
       marginHorizontal: 16,
       marginTop: 12,
@@ -399,6 +360,26 @@ function createStyles(colors: ColorTokens) {
       color: colors.textTertiary,
       fontSize: 14,
       fontWeight: "600",
+    },
+    emptyCard: {
+      marginHorizontal: 32,
+      marginTop: 32,
+      paddingVertical: 40,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.contentBackground,
+      alignItems: "center",
+      gap: 12,
+    },
+    emptyCardTitle: {
+      color: colors.textPrimary,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    emptyCardSubtitle: {
+      color: colors.textTertiary,
+      fontSize: 14,
     },
     emptyContent: {
       flex: 1,

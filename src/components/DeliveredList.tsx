@@ -22,6 +22,7 @@ import EntryDetailModal from "./EntryDetailModal";
 interface DeliveredListProps {
   entries: Entry[];
   onDelete: (id: string) => void;
+  onDeleteAll: () => void;
 }
 
 type GridItem = Entry | "spacer";
@@ -143,6 +144,7 @@ const DeliveredRow = React.memo(function DeliveredRow({
 export default function DeliveredList({
   entries,
   onDelete,
+  onDeleteAll,
 }: DeliveredListProps) {
   const { colors, layout } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -218,9 +220,31 @@ export default function DeliveredList({
         <Text style={styles.headerEmoji}>🎉</Text>
         <Text style={styles.headerTitle}>Delivered</Text>
         <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
+        <View style={styles.headerSpacer} />
+        <Pressable
+          style={styles.removeAllButton}
+          onPress={() =>
+            Alert.alert(
+              "Remove all delivered?",
+              `This will remove all ${deliveredEntries.length} delivered people from your list. This can\u2019t be undone.`,
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Remove all",
+                  style: "destructive",
+                  onPress: onDeleteAll,
+                },
+              ],
+            )
+          }
+          accessibilityRole="button"
+          accessibilityLabel="Remove all delivered"
+        >
+          <Text style={styles.removeAllText}>Remove all</Text>
+        </Pressable>
       </View>
     ),
-    [styles, deliveredEntries.length],
+    [styles, deliveredEntries.length, onDeleteAll],
   );
 
   if (deliveredEntries.length === 0) {
@@ -328,7 +352,6 @@ function createStyles(colors: ColorTokens) {
       fontSize: 17,
       fontWeight: "700",
       color: colors.textPrimary,
-      flex: 1,
     },
     headerCount: {
       fontSize: 13,
@@ -339,6 +362,18 @@ function createStyles(colors: ColorTokens) {
       paddingVertical: 2,
       borderRadius: 10,
       overflow: "hidden",
+    },
+    headerSpacer: {
+      flex: 1,
+    },
+    removeAllButton: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    removeAllText: {
+      color: colors.textTertiary,
+      fontSize: 14,
+      fontWeight: "600",
     },
     rowWrapper: {
       marginBottom: 6,

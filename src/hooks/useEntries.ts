@@ -108,11 +108,22 @@ export default function useEntries() {
     [persistEntries],
   );
 
-  const removeAll = useCallback(() => {
-    setEntries([]);
-    persistEntries([]);
-    setDeletedEntry(null);
-  }, [persistEntries]);
+  const removeAll = useCallback(
+    (filter?: "expecting" | "delivered") => {
+      setEntries((prev) => {
+        const updated =
+          filter === "expecting"
+            ? prev.filter((e) => !!e.deliveredAt)
+            : filter === "delivered"
+              ? prev.filter((e) => !e.deliveredAt)
+              : [];
+        persistEntries(updated);
+        return updated;
+      });
+      setDeletedEntry(null);
+    },
+    [persistEntries],
+  );
 
   const seed = useCallback(
     (seeded: Entry[]) => {

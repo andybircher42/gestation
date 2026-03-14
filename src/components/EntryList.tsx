@@ -443,7 +443,7 @@ export default function EntryList({
           <BirthstoneIcon image={currentMonthGem} size={20} />
         </Pressable>
       )}
-      {entries.length > 0 && (
+      {sorted.length > 0 && (
         <View style={styles.toolbarRow}>
           <Pressable
             onPress={() => setShowSortPicker(true)}
@@ -464,7 +464,7 @@ export default function EntryList({
             onPress={() =>
               Alert.alert(
                 "Remove everyone?",
-                `This will remove all ${entries.length} people from your list. This can\u2019t be undone.`,
+                `This will remove all ${sorted.length} people from your list. This can\u2019t be undone.`,
                 [
                   { text: "Cancel", style: "cancel" },
                   {
@@ -489,7 +489,7 @@ export default function EntryList({
         style={styles.list}
         removeClippedSubviews={Platform.OS === "android"}
         contentContainerStyle={
-          entries.length === 0 ? styles.emptyList : undefined
+          sorted.length === 0 ? styles.emptyList : undefined
         }
         ListEmptyComponent={
           <Pressable
@@ -598,7 +598,7 @@ function createStyles(colors: ColorTokens) {
       flex: 1,
     },
     emptyList: {
-      flex: 1,
+      flexGrow: 1,
       justifyContent: "center",
       alignItems: "center",
     },
