@@ -34,35 +34,33 @@ export default function HipaaAgreementModal({
     >
       <View style={styles.modalOverlay} accessibilityViewIsModal>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Important Notice</Text>
+          <Text style={styles.modalTitle}>A quick note about privacy</Text>
           <ScrollView style={styles.modalScroll}>
             <Text style={styles.modalText}>
-              This app is not HIPAA compliant. By using this app, you agree that
-              you will not enter any Protected Health Information (PHI) as
-              defined by HIPAA, including but not limited to patient last names,
-              medical record numbers, or any other information that could be
-              used to identify a patient.
+              Use first names or nicknames only — no last names, medical IDs, or
+              anything that could identify a patient. Think of this as a
+              personal notebook, not a chart.
             </Text>
             <Text style={styles.modalText}>
-              This app stores data locally on your device without encryption and
-              is intended for personal, non-clinical use only.
+              Everything stays right here on your device. Nothing is sent to a
+              server or backed up to the cloud.
             </Text>
           </ScrollView>
           <Pressable
             style={styles.agreeButton}
             onPress={onAccept}
             accessibilityRole="button"
-            accessibilityLabel="I agree, continue to app"
+            accessibilityLabel="Got it, continue to app"
           >
-            <Text style={styles.agreeButtonText}>I Agree</Text>
+            <Text style={styles.agreeButtonText}>Got it</Text>
           </Pressable>
           <Pressable
             style={styles.disagreeButton}
             onPress={() => BackHandler.exitApp()}
             accessibilityRole="button"
-            accessibilityLabel="Disagree and exit app"
+            accessibilityLabel="Not now, exit app"
           >
-            <Text style={styles.disagreeButtonText}>Disagree, exit app</Text>
+            <Text style={styles.disagreeButtonText}>Not now</Text>
           </Pressable>
         </View>
       </View>

@@ -65,9 +65,9 @@ async function skipToMainUI() {
 
 async function acceptHipaa() {
   await waitFor(() => {
-    expect(screen.getByText("I Agree")).toBeTruthy();
+    expect(screen.getByText("Got it")).toBeTruthy();
   });
-  fireEvent.press(screen.getByText("I Agree"));
+  fireEvent.press(screen.getByText("Got it"));
   await act(async () => {});
 }
 
@@ -116,7 +116,7 @@ describe("RootLayout", () => {
     await act(async () => {});
 
     await waitFor(() => {
-      expect(screen.getAllByText(/HIPAA/).length).toBeGreaterThan(0);
+      expect(screen.getByText("A quick note about privacy")).toBeTruthy();
     });
 
     // Should not show splash logo during welcome phase
