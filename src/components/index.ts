@@ -10,6 +10,7 @@ export { default as EntryForm } from "./EntryForm";
 export { default as EntryGrid } from "./EntryGrid";
 export { default as EntryList } from "./EntryList";
 export { default as ErrorBoundary } from "./ErrorBoundary";
+export { default as HelpButton } from "./HelpButton";
 export { default as HipaaAgreementModal } from "./HipaaAgreementModal";
 export { default as InfoToast } from "./InfoToast";
 export { default as OnboardingOverlay } from "./OnboardingOverlay";

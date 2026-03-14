@@ -27,6 +27,8 @@ import {
   toISODateString,
 } from "@/util";
 
+import HelpButton from "./HelpButton";
+
 interface EntryFormProps {
   onAdd: (entry: { name: string; dueDate: string }) => void;
   batch: boolean;
@@ -59,7 +61,6 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
   // Batch mode state
   const [batchText, setBatchText] = useState("");
   const [batchErrors, setBatchErrors] = useState<BatchEntryError[]>([]);
-  const [showHelp, setShowHelp] = useState(false);
 
   const hasName = name.trim().length > 0;
 
@@ -194,34 +195,13 @@ export default function EntryForm({ onAdd, batch }: EntryFormProps) {
       <View style={styles.form}>
         <View style={styles.batchHeader}>
           <Text style={styles.label}>Add multiple people</Text>
-          <Pressable
-            onPress={() => setShowHelp((prev) => !prev)}
-            accessibilityRole="button"
-            accessibilityLabel="Show format help"
-            hitSlop={8}
-          >
-            <Ionicons
-              name="help-circle-outline"
-              size={20}
-              color={colors.textTertiary}
-            />
-          </Pressable>
+          <HelpButton
+            title="Batch format"
+            message={
+              "Separate entries with commas.\n\nExample:\nSam 6/14, Alex 35w5d, Jamie 6-14-26, Riley 22w 3d\n\nAll valid entries will be added right away. Any that have errors will be called out so you can fix them."
+            }
+          />
         </View>
-
-        {showHelp && (
-          <View
-            style={[
-              styles.helpBox,
-              { backgroundColor: colors.inputBackground },
-            ]}
-            accessibilityLabel="Format help"
-          >
-            <Text style={styles.helpTitle}>Separate entries with commas</Text>
-            <Text style={styles.helpCode}>
-              Sam 6/14, Alex 35w5d, Jamie 6-14-26, Riley 22w 3d
-            </Text>
-          </View>
-        )}
 
         <TextInput
           style={styles.batchInput}
@@ -535,24 +515,6 @@ function createStyles(colors: ColorTokens) {
     },
     batchErrorBox: {
       marginBottom: 8,
-    },
-    helpBox: {
-      borderRadius: 8,
-      padding: 12,
-      marginBottom: 8,
-    },
-    helpTitle: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: colors.textPrimary,
-      marginBottom: 6,
-    },
-    helpCode: {
-      fontSize: 12,
-      color: colors.textPrimary,
-      fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
-      marginTop: 2,
-      marginBottom: 2,
     },
   });
 }

@@ -82,6 +82,7 @@ One-time setup:
 - [Development Guide](docs/development.md) — setup, dev tools, how to add themes/storage
 - [Architecture Decision Records](docs/decisions/) — why things are built the way they are
 - [Changelog](CHANGELOG.md) — release notes for every version
+- [User Guide](docs/user-guide.md) — how to use the app, FAQ
 - [QA Test Plan](docs/qa-manual-test-plan.md) — 197 manual test cases
 
 ## Tech Stack

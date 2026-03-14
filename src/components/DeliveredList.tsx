@@ -23,6 +23,8 @@ interface DeliveredListProps {
   entries: Entry[];
   onDelete: (id: string) => void;
   onDeleteAll: () => void;
+  deliveredTTLDays: number;
+  onChangeDeliveredTTL: (days: number) => void;
 }
 
 type GridItem = Entry | "spacer";
@@ -141,10 +143,28 @@ const DeliveredRow = React.memo(function DeliveredRow({
 });
 
 /** Full-page view showing all delivered entries. Respects compact/cozy layout. */
+/** Human-readable TTL label for inline display. */
+const TTL_LABELS: Record<number, string> = {
+  0: "Never",
+  1: "1 day",
+  3: "3 days",
+  7: "1 week",
+  14: "2 weeks",
+  30: "30 days",
+};
+
+/** Ordered TTL options for cycling through. */
+const TTL_CYCLE = [0, 1, 3, 7, 14, 30] as const;
+
+/**
+ *
+ */
 export default function DeliveredList({
   entries,
   onDelete,
   onDeleteAll,
+  deliveredTTLDays,
+  onChangeDeliveredTTL,
 }: DeliveredListProps) {
   const { colors, layout } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -214,37 +234,74 @@ export default function DeliveredList({
     [onDelete, colors, styles],
   );
 
+  const cycleTTL = useCallback(() => {
+    const currentIndex = TTL_CYCLE.indexOf(
+      deliveredTTLDays as (typeof TTL_CYCLE)[number],
+    );
+    const nextIndex = (currentIndex + 1) % TTL_CYCLE.length;
+    onChangeDeliveredTTL(TTL_CYCLE[nextIndex]);
+  }, [deliveredTTLDays, onChangeDeliveredTTL]);
+
+  const ttlLabel = TTL_LABELS[deliveredTTLDays] ?? `${deliveredTTLDays} days`;
+  const ttlDescription =
+    deliveredTTLDays === 0
+      ? "Kept until you remove them"
+      : `Removed after ${ttlLabel}`;
+
   const listHeader = useMemo(
     () => (
-      <View style={styles.header}>
-        <Text style={styles.headerEmoji}>🎉</Text>
-        <Text style={styles.headerTitle}>Delivered</Text>
-        <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
-        <View style={styles.headerSpacer} />
+      <>
+        <View style={styles.header}>
+          <Text style={styles.headerEmoji}>🎉</Text>
+          <Text style={styles.headerTitle}>Delivered</Text>
+          <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
+          <View style={styles.headerSpacer} />
+          <Pressable
+            style={styles.removeAllButton}
+            onPress={() =>
+              Alert.alert(
+                "Remove all delivered?",
+                `This will remove all ${deliveredEntries.length} delivered people from your list. This can\u2019t be undone.`,
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Remove all",
+                    style: "destructive",
+                    onPress: onDeleteAll,
+                  },
+                ],
+              )
+            }
+            accessibilityRole="button"
+            accessibilityLabel="Remove all delivered"
+          >
+            <Text style={styles.removeAllText}>Remove all</Text>
+          </Pressable>
+        </View>
         <Pressable
-          style={styles.removeAllButton}
-          onPress={() =>
-            Alert.alert(
-              "Remove all delivered?",
-              `This will remove all ${deliveredEntries.length} delivered people from your list. This can\u2019t be undone.`,
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Remove all",
-                  style: "destructive",
-                  onPress: onDeleteAll,
-                },
-              ],
-            )
-          }
+          style={styles.ttlRow}
+          onPress={cycleTTL}
           accessibilityRole="button"
-          accessibilityLabel="Remove all delivered"
+          accessibilityLabel={`Cleanup: ${ttlDescription}. Tap to change.`}
         >
-          <Text style={styles.removeAllText}>Remove all</Text>
+          <Ionicons
+            name="timer-outline"
+            size={14}
+            color={colors.textTertiary}
+          />
+          <Text style={styles.ttlText}>{ttlDescription}</Text>
+          <Text style={styles.ttlChange}>Change</Text>
         </Pressable>
-      </View>
+      </>
     ),
-    [styles, deliveredEntries.length, onDeleteAll],
+    [
+      styles,
+      deliveredEntries.length,
+      onDeleteAll,
+      cycleTTL,
+      ttlDescription,
+      colors.textTertiary,
+    ],
   );
 
   if (deliveredEntries.length === 0) {
@@ -374,6 +431,22 @@ function createStyles(colors: ColorTokens) {
       color: colors.textTertiary,
       fontSize: 14,
       fontWeight: "600",
+    },
+    ttlRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      marginBottom: 12,
+    },
+    ttlText: {
+      fontSize: 12,
+      color: colors.textTertiary,
+    },
+    ttlChange: {
+      fontSize: 12,
+      color: colors.primary,
+      fontWeight: "600",
+      marginLeft: 4,
     },
     rowWrapper: {
       marginBottom: 6,

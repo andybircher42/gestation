@@ -256,6 +256,8 @@ export default function HomeScreen() {
             entries={entries}
             onDelete={remove}
             onDeleteAll={() => removeAll("delivered")}
+            deliveredTTLDays={deliveredTTLDays}
+            onChangeDeliveredTTL={updateDeliveredTTL}
           />
         </View>
         <View style={[styles.tabContent, view !== "calendar" && styles.hidden]}>

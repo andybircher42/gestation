@@ -473,21 +473,10 @@ describe("EntryForm — batch mode", () => {
     expect(screen.queryByLabelText("Batch entries")).toBeNull();
   });
 
-  it("shows help tooltip when help button is pressed", () => {
+  it("renders help button for batch format info", () => {
     renderBatchForm();
 
-    fireEvent.press(screen.getByLabelText("Show format help"));
-
-    expect(screen.getByLabelText("Format help")).toBeTruthy();
-  });
-
-  it("hides help tooltip when pressed again", () => {
-    renderBatchForm();
-
-    fireEvent.press(screen.getByLabelText("Show format help"));
-    fireEvent.press(screen.getByLabelText("Show format help"));
-
-    expect(screen.queryByLabelText("Format help")).toBeNull();
+    expect(screen.getByLabelText("Batch format info")).toBeTruthy();
   });
 
   it("calls onAdd for each valid entry and shows confirmation", () => {

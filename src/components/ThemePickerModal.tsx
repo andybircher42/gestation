@@ -27,6 +27,8 @@ import {
   useTheme,
 } from "@/theme";
 
+import HelpButton from "./HelpButton";
+
 interface ThemePickerModalProps {
   visible: boolean;
   currentPersonality: Personality;
@@ -144,21 +146,24 @@ export default function ThemePickerModal({
 
   const goBack = useCallback(() => setSubPage("main"), []);
 
-  const renderBackRow = (label: string) => (
-    <Pressable
-      style={styles.backRow}
-      onPress={goBack}
-      accessibilityRole="button"
-      accessibilityLabel={`Back to settings`}
-    >
-      <Ionicons
-        name="chevron-back"
-        size={18}
-        color={colors.primary}
-        style={styles.backIcon}
-      />
-      <Text style={styles.backLabel}>{label}</Text>
-    </Pressable>
+  const renderBackRow = (label: string, helpText?: string) => (
+    <View style={styles.backRow}>
+      <Pressable
+        style={styles.backButton}
+        onPress={goBack}
+        accessibilityRole="button"
+        accessibilityLabel={`Back to settings`}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={18}
+          color={colors.primary}
+          style={styles.backIcon}
+        />
+        <Text style={styles.backLabel}>{label}</Text>
+      </Pressable>
+      {helpText != null && <HelpButton title={label} message={helpText} />}
+    </View>
   );
 
   const renderSubPage = () => {
@@ -166,7 +171,10 @@ export default function ThemePickerModal({
       case "theme":
         return (
           <>
-            {renderBackRow("Theme")}
+            {renderBackRow(
+              "Theme",
+              "Sets the color personality across the app.",
+            )}
             {THEME_OPTIONS.map(({ value, label, icon }) => (
               <Pressable
                 key={value}
@@ -197,7 +205,10 @@ export default function ThemePickerModal({
       case "brightness":
         return (
           <>
-            {renderBackRow("Brightness")}
+            {renderBackRow(
+              "Brightness",
+              '"System" follows your phone\'s light/dark setting.',
+            )}
             {BRIGHTNESS_OPTIONS.map(({ value, label, icon }) => (
               <Pressable
                 key={value}
@@ -228,7 +239,10 @@ export default function ThemePickerModal({
       case "layout":
         return (
           <>
-            {renderBackRow("Layout")}
+            {renderBackRow(
+              "Layout",
+              "Compact shows a dense list. Cozy shows a two-column card grid with larger icons.",
+            )}
             {LAYOUT_OPTIONS.map(({ value, label, icon }) => (
               <Pressable
                 key={value}
@@ -259,7 +273,10 @@ export default function ThemePickerModal({
       case "ttl":
         return (
           <>
-            {renderBackRow("Delivered cleanup")}
+            {renderBackRow(
+              "Delivered cleanup",
+              'Automatically remove delivered entries after this many days. Choose "Never" to keep them until you remove them yourself.',
+            )}
             {TTL_OPTIONS.map(({ value, label }) => (
               <Pressable
                 key={value}
@@ -525,6 +542,11 @@ function createStyles(colors: ColorTokens) {
       alignItems: "center",
       minHeight: 40,
       marginBottom: 4,
+    },
+    backButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
     },
     backIcon: {
       marginRight: 4,
