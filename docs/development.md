@@ -36,21 +36,29 @@ Then scan the QR code with Expo Go, or press `a` (Android emulator) / `i` (iOS s
 ## Testing
 
 ```bash
-npm test                     # Run full Jest suite (32 files, 469 tests)
+npm test                     # Run full Jest suite (32 files, 468 tests)
 npm test -- --watch          # Watch mode
 npm test -- EntryForm        # Run a specific test file
 ```
 
-Tests use `@testing-library/react-native`. Components must be wrapped in `ThemeProvider`:
+Tests use `@testing-library/react-native`. Use the shared `renderWithTheme` helper instead of manually wrapping in `ThemeProvider`:
 
 ```typescript
-render(
-  <ThemeProvider personality="classic" brightness="light" layout="compact"
-    setPersonality={jest.fn()} setBrightness={jest.fn()} setLayout={jest.fn()}>
-    <YourComponent />
-  </ThemeProvider>
-);
+import renderWithTheme from "@/test/renderWithTheme";
+
+renderWithTheme(<YourComponent />);
+renderWithTheme(<YourComponent />, { layout: "cozy" }); // override defaults
 ```
+
+### Shared Test Utilities
+
+Located in `src/test/`:
+
+- **`renderWithTheme.tsx`** — wraps components in `ThemeProvider` with sensible defaults (classic, light, compact)
+- **`mockData.ts`** — `makeEntry()` factory for creating test entries; shared `mockEntry` constant used across toast tests
+- **`fakeTimers.ts`** — `setupFakeTimers()` / `teardownFakeTimers()` helpers with a default date of March 2, 2026
+
+Global mocks are configured in `jest.setup.ts`, including a mutable `mockInsets` export for tests that need to verify safe area behavior.
 
 ## Pre-Commit Hooks
 
@@ -154,6 +162,22 @@ After a new native build, run the **Publish Latest Build Info** GitHub Actions w
 
 - **OTA** works for: component changes, styles, logic, assets, copy
 - **New build** required for: new native modules, SDK upgrade, `app.json` native config changes, `runtimeVersion` bump
+
+## User Guide (GitHub Pages)
+
+The user guide (`docs/user-guide.md`) is auto-deployed to GitHub Pages as a styled HTML page:
+
+**URL**: `https://andybircher42.github.io/InDueTime/guide/`
+
+The build script (`scripts/build-user-guide.js`) converts markdown to HTML with no dependencies. It runs automatically via the `deploy-user-guide` GitHub Actions workflow whenever `docs/user-guide.md` changes on `main`.
+
+To build locally:
+
+```bash
+node scripts/build-user-guide.js    # Output: _site/guide/index.html
+```
+
+The in-app "Help & FAQ" link checks the hosted page with a HEAD request and falls back to the raw GitHub markdown if it 404s.
 
 ## Custom ESLint Rules
 

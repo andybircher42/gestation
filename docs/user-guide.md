@@ -52,7 +52,9 @@ Your main list of people with upcoming due dates. Each entry shows:
 
 People you've marked as delivered move here. Each entry shows timing info like "2 days early" or "right on time."
 
-Delivered entries are automatically removed after a configurable number of days (default: 3 days). You can change this in **Settings > Preferences > Delivered cleanup**.
+Delivered entries are automatically removed after a configurable number of days (default: 3 days). The current cleanup setting is shown at the top of the Delivered tab — tap **Change** to cycle through options without opening Settings. You can also change this in **Settings > Preferences > Delivered cleanup**.
+
+Changing the cleanup interval doesn't immediately remove entries — cleanup happens the next time you open the app, so you won't accidentally lose anything while browsing options.
 
 ### Calendar
 
@@ -105,6 +107,8 @@ For brightness, choose **Light**, **Dark**, or **System** (follows your phone's 
 
 Open settings with the gear icon in the header.
 
+Each settings sub-page has a **(?)** icon — tap it for a quick explanation of what that setting does.
+
 ### Appearance
 - **Theme** — personality and brightness
 - **Layout** — compact or cozy
@@ -112,9 +116,13 @@ Open settings with the gear icon in the header.
 ### Preferences
 - **Delivered cleanup** — how many days delivered entries stay before automatic removal (default: 3 days)
 
+### Support
+- **Help & FAQ** — opens this guide in your browser
+- **Report a Bug** — opens the bug report form
+- **Request a Feature** — opens the feature request form
+
 ### About
 - App version and build info
-- Links to support and privacy information
 
 ## Privacy & Data
 

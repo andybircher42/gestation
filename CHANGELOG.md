@@ -15,7 +15,7 @@ Major delivered-tab overhaul, three-tab navigation, UI polish pass, and accessib
 
 - **Three-tab navigation** — Expecting, Delivered, and Calendar are now separate tabs instead of inline sections
 - **Delivered tab overhaul** — redesigned with timing info ("2 days early", "right on time"), cuter styling, and dedicated cozy card layout
-- **Deliver toast with undo** — delivering someone shows a toast with an undo option and shake-to-undo gesture support
+- **Deliver toast with undo** — delivering someone shows a toast with an undo option
 - **Delivered entry detail** — tap a delivered entry to view full details in the modal
 - **Configurable delivery cleanup** — choose how long delivered entries stay before auto-removal (renamed from "Auto-remove" to "Delivered cleanup")
 - **Remove all (delivered tab)** — bulk-remove delivered entries without affecting the expecting list
@@ -25,7 +25,9 @@ Major delivered-tab overhaul, three-tab navigation, UI polish pass, and accessib
 - **Toast stacking** — multiple toasts (delete undo, deliver undo, errors) stack instead of replacing each other
 - **Cross-platform sort picker** — replaced native Alert-based sort picker with a custom `SortPickerModal` that works identically on iOS and Android
 - **Dev tools dropdown** — build indicator in About modal, tester mode, analytics opt-out for internal builds
-- **Settings drill-down** — settings modal broken into Appearance and Preferences subgroups
+- **Settings drill-down** — settings modal broken into Appearance and Preferences subgroups with contextual help (?) on each sub-page
+- **Help & FAQ link** — opens the hosted user guide from the settings dropdown
+- **Inline delivered cleanup info** — Delivered tab header shows current cleanup setting with tap-to-cycle
 - **Modal focus trapping** — `accessibilityViewIsModal` on all 7 modals for screen reader users
 - **Regression test suite** — DeliveredList layout-switching and filtering tests
 
@@ -62,6 +64,10 @@ Major delivered-tab overhaul, three-tab navigation, UI polish pass, and accessib
 - **Android FlatList** — `removeClippedSubviews` enabled on all FlatLists for Android
 - **Accessibility labels** — added to 5+ interactive elements missing them; decorative images marked `accessible={false}`
 
+### Changed
+
+- **Delivered cleanup timing** — changing the cleanup interval no longer immediately removes entries; cleanup applies on next app launch to prevent accidental data loss while browsing options
+
 ### Internal
 
 - Added expo-dev-client and future native dependencies
@@ -69,6 +75,10 @@ Major delivered-tab overhaul, three-tab navigation, UI polish pass, and accessib
 - Skip Vexo analytics for internal builds and tester mode
 - Added 197-case manual QA test plan (`docs/qa-manual-test-plan.md`)
 - Tabs kept mounted via `display: "none"` instead of conditional rendering
+- **Shared test utilities** — extracted `mockData.ts`, `fakeTimers.ts`, and `mockInsets` to reduce test duplication
+- **Reusable `HelpButton` component** — standardized (?) contextual help pattern across settings and batch entry
+- **Hosted user guide** — `docs/user-guide.md` auto-deploys to GitHub Pages via workflow; in-app link checks availability and falls back to GitHub
+- **ESLint config** — added `scripts/**/*.js` override for Node.js build scripts
 
 ---
 

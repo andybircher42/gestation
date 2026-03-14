@@ -38,7 +38,7 @@ Then:
 ## Testing
 
 ```bash
-npm test                     # Full suite (32 files, 469 tests)
+npm test                     # Full suite (32 files, 468 tests)
 npm test -- --watch          # Watch mode
 npm test -- EntryForm        # Specific file
 ```

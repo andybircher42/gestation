@@ -19,7 +19,7 @@ app/                        # Expo Router screens
 └── date-detail.tsx         # Calendar date drill-down
 
 src/
-├── components/             # 18 React Native components + barrel index
+├── components/             # 19 React Native components + barrel index
 ├── hooks/                  # useEntries (CRUD), useSwipeDismiss (gestures), useThemePreference
 ├── storage/                # AsyncStorage wrappers, Entry type, validation
 ├── theme/                  # 2-axis color system (personality × brightness)
@@ -30,6 +30,9 @@ src/
 eslint-rules/               # Custom ESLint plugins
 ├── version-sync.js         # app.json version === runtimeVersion
 └── platform-coverage.js    # Flags asymmetric Platform.OS checks
+
+scripts/                    # Build scripts
+└── build-user-guide.js     # Converts user-guide.md to GitHub Pages HTML
 
 docs/                       # Developer documentation
 assets/                     # Icons, splash screens, birthstone PNGs, fonts
@@ -152,13 +155,14 @@ The app has 12+ locations with iOS/Android branching. A custom ESLint rule (`pla
 
 ## Testing
 
-- **28 test files** covering components, hooks, utilities, and engine
+- **32 test files, 468 tests** covering components, hooks, utilities, and engine
 - **Jest + jest-expo** with SWC transformer for speed
+- **Shared test utilities** — `renderWithTheme`, `mockData` (entry factory), `fakeTimers`, mutable `mockInsets` in `jest.setup.ts`
 - **Pre-commit**: lint-staged → expo-doctor → full test suite
 - **Pre-push**: blocks `DO NOT` + `SUBMIT` markers
 - **No E2E tests** yet (Maestro is the planned tool)
 
-Components are tested with `@testing-library/react-native` wrapped in `ThemeProvider`.
+Components are tested with `@testing-library/react-native` using the shared `renderWithTheme` helper.
 
 ## Build & Distribution
 
@@ -171,3 +175,10 @@ Three EAS profiles:
 | `production` | store | `production` | App Store / Play Store |
 
 OTA updates push JS changes without a new binary. A GitHub Actions workflow publishes `latest-build.json` to GitHub Pages so the app can notify users of new native builds.
+
+### GitHub Pages
+
+Two workflows publish to the `gh-pages` branch:
+
+- **Publish Latest Build Info** — deploys `latest-build.json` + user guide (manual trigger)
+- **Deploy User Guide** — auto-deploys `_site/guide/index.html` when `docs/user-guide.md` changes on `main`
