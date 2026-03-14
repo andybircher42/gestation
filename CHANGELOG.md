@@ -117,7 +117,7 @@ Major feature release: unified input, delivered flow, cozy layout, calendar, bir
 
 ## [1.0.0] — 2026-03-02
 
-Initial release of **In Due Time**, a privacy-first gestational age tracker for L&D nurses.
+Initial release of **In Due Time**, a privacy-first gestational age tracker for birth workers.
 
 ### Added
 

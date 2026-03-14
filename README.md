@@ -1,72 +1,100 @@
-# Gestation Tracker
+# In Due Time
 
-A mobile app for tracking gestational ages. Built with Expo (React Native) for Android and iOS.
+A privacy-first gestational age tracker for birth workers — nurses, OBs, doulas, midwives, and anyone tracking due dates. Everything stays on your device.
+
+Built with Expo (React Native) for iOS and Android.
+
+## Features
+
+- **Track due dates** — add people with a name and due date or gestational age
+- **Unified input** — type "June 15", "6/15", "35w2d", or any common format
+- **Batch entry** — add multiple people at once, one per line
+- **Swipe gestures** — swipe left to delete, right to mark as delivered
+- **Delivered tracking** — delivered entries show timing info ("2 days early") with configurable auto-cleanup
+- **Calendar heat map** — month view with color-coded delivery probability
+- **6 theme personalities** — Classic, Warm, Elegant, Playful, Modern, Mono — each with light and dark mode
+- **Compact & cozy layouts** — list view or card grid
+- **Birthstone icons** — gem icons based on due date month
+- **Privacy first** — all data stays on-device, no server, no cloud sync
 
 ## Setup
 
-```
+```bash
 npm install
 ```
 
-## Running the App
+## Running
 
-```
+```bash
 npm start
 ```
 
 Then:
 
-- Install the **Expo Go** app on your phone ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) / [iOS](https://apps.apple.com/app/expo-go/id982107779)), then scan the QR code
-- Press `a` to open in an Android emulator
-- Press `i` to open in an iOS simulator
+- Install **Expo Go** on your phone ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) / [iOS](https://apps.apple.com/app/expo-go/id982107779)) and scan the QR code
+- Press `a` for Android emulator
+- Press `i` for iOS simulator
 
-## EAS Build & Update
+## Testing
 
-### Building
-
-Build for internal distribution (preview):
-
+```bash
+npm test                     # Full suite (32 files, 469 tests)
+npm test -- --watch          # Watch mode
+npm test -- EntryForm        # Specific file
 ```
+
+## Building
+
+```bash
+# Internal testing (TestFlight / internal distribution)
 eas build --profile preview --platform all
-```
 
-Build for production (App Store / Google Play):
-
-```
+# Production (App Store / Play Store)
 eas build --profile production --platform all
+
+# OTA update (JS-only changes)
+eas update --channel production --message "description"
 ```
 
-### Pushing OTA Updates
+See the [Development Guide](docs/development.md) for full setup details, dev tools, and common patterns.
 
-OTA (over-the-air) updates let you push JS/asset changes to users without submitting a new build to the app stores. Updates are delivered via [EAS Update](https://docs.expo.dev/eas-update/introduction/).
+## EAS Channels
 
-Push an update to a specific channel:
+| Channel | Build Profile | Use Case |
+|---------|---------------|----------|
+| `development` | `development` | Dev client testing |
+| `preview` | `preview` | Internal testers / TestFlight |
+| `production` | `production` | Live app store users |
 
-```
-eas update --channel production --message "description of changes"
-```
+### Build Notifications
 
-Available channels (defined in `eas.json`):
+After creating a new EAS build, run the **Publish Latest Build Info** GitHub Actions workflow to notify users of available updates:
 
-| Channel       | Build Profile | Use Case                      |
-|---------------|---------------|-------------------------------|
-| `development` | `development` | Dev client testing            |
-| `preview`     | `preview`     | Internal testers / TestFlight |
-| `production`  | `production`  | Live app store users          |
-
-### Updating Latest Build Info
-
-After creating a new EAS build, run the **Publish Latest Build Info** GitHub Actions workflow to notify users that a newer native build is available. The workflow queries EAS for the latest finished builds and publishes a `latest-build.json` file to GitHub Pages. The app fetches this file at launch and shows a toast if the user's build is outdated.
-
-To run: **Actions** tab → **Publish Latest Build Info** → **Run workflow**
+**Actions** tab → **Publish Latest Build Info** → **Run workflow**
 
 One-time setup:
+1. Add `EXPO_TOKEN` secret (Settings → Secrets → Actions)
+2. Enable GitHub Pages (Settings → Pages → `gh-pages` branch)
 
-1. Add an `EXPO_TOKEN` secret to the repo (Settings → Secrets and variables → Actions)
-2. Enable GitHub Pages (Settings → Pages → Source: "Deploy from a branch" → branch: `gh-pages`, folder: `/ (root)`)
+## Documentation
 
-### Important Notes
+- [Architecture](docs/architecture.md) — system design, key patterns, data flow
+- [Development Guide](docs/development.md) — setup, dev tools, how to add themes/storage
+- [Architecture Decision Records](docs/decisions/) — why things are built the way they are
+- [Changelog](CHANGELOG.md) — release notes for every version
+- [QA Test Plan](docs/qa-manual-test-plan.md) — 197 manual test cases
 
-- Updates only work when the `runtimeVersion` matches the build. If you change native code (new native modules, SDK upgrade, `app.json` native config), you must create a **new build** — an OTA update won't be enough.
-- JS-only changes (components, styles, logic, assets) can always be pushed as updates.
-- Users receive the update on next app launch (or next foregrounding, depending on the update check configuration).
+## Tech Stack
+
+- **Expo SDK 54** / React 19 / React Native 0.81.5
+- **Expo Router v6** — file-based navigation
+- **TypeScript** — strict mode
+- **AsyncStorage** — local persistence
+- **Jest** — 32 test files, pre-commit hooks
+- **EAS Build + Update** — native builds + OTA
+
+## Important Notes
+
+- OTA updates only work when `runtimeVersion` matches the build. Native changes (new modules, SDK upgrade, `app.json` native config) require a new build.
+- JS-only changes (components, styles, logic, assets) can always be pushed as OTA updates.
+- Users receive updates on next app launch.
