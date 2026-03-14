@@ -74,6 +74,7 @@ export default function DateDetailScreen() {
       source={splashBg}
       resizeMode="cover"
       style={styles.container}
+      accessible={false}
     >
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <Pressable
@@ -170,6 +171,7 @@ export default function DateDetailScreen() {
           style={[styles.doneButton, { backgroundColor: colors.primary }]}
           onPress={() => router.back()}
           accessibilityRole="button"
+          accessibilityLabel="Done"
         >
           <Text style={[styles.doneButtonText, { color: colors.white }]}>
             Done

@@ -209,6 +209,7 @@ function RootGate({ loadThemePreference }: RootGateProps) {
         resizeMode="cover"
         style={styles.splashContainer}
         testID="splash-bg"
+        accessible={false}
       >
         <HipaaAgreementModal
           visible={showAgreement}
@@ -231,11 +232,13 @@ function RootGate({ loadThemePreference }: RootGateProps) {
         resizeMode="cover"
         style={styles.splashContainer}
         testID="splash-bg"
+        accessible={false}
       >
         <Image
           source={splashLogo}
           style={styles.splashLogo}
           resizeMode="contain"
+          accessible={false}
           testID="splash-logo"
         />
         <StatusBar style="auto" />

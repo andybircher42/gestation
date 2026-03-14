@@ -140,6 +140,7 @@ export default function AppInfoModal({ visible, onClose }: AppInfoModalProps) {
             style={styles.closeButton}
             onPress={onClose}
             accessibilityRole="button"
+            accessibilityLabel="Close"
           >
             <Text style={styles.closeButtonText}>Close</Text>
           </Pressable>

@@ -26,6 +26,7 @@ export default function BirthstoneIcon({
           marginLeft: -padding,
         }}
         resizeMode="contain"
+        accessible={false}
       />
     </View>
   );

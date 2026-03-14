@@ -79,6 +79,7 @@ export default function SortPickerModal({
             style={styles.cancelButton}
             onPress={onClose}
             accessibilityRole="button"
+            accessibilityLabel="Cancel"
           >
             <Text style={styles.cancelText}>Cancel</Text>
           </Pressable>

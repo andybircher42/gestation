@@ -2,6 +2,8 @@ import React from "react";
 import { Text } from "react-native";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 
+import { ThemeProvider } from "@/theme";
+
 import ErrorBoundary from "./ErrorBoundary";
 
 /** Component that throws on render. */
@@ -10,6 +12,22 @@ function ThrowingChild({ shouldThrow }: { shouldThrow: boolean }) {
     throw new Error("Test crash");
   }
   return <Text>OK</Text>;
+}
+
+/** Wraps children with ThemeProvider for testing. */
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider
+      personality="classic"
+      brightness="light"
+      layout="compact"
+      setPersonality={jest.fn()}
+      setBrightness={jest.fn()}
+      setLayout={jest.fn()}
+    >
+      {children}
+    </ThemeProvider>
+  );
 }
 
 beforeEach(() => {
@@ -26,6 +44,7 @@ describe("ErrorBoundary", () => {
       <ErrorBoundary>
         <ThrowingChild shouldThrow={false} />
       </ErrorBoundary>,
+      { wrapper: Wrapper },
     );
 
     expect(screen.getByText("OK")).toBeTruthy();
@@ -36,6 +55,7 @@ describe("ErrorBoundary", () => {
       <ErrorBoundary>
         <ThrowingChild shouldThrow={true} />
       </ErrorBoundary>,
+      { wrapper: Wrapper },
     );
 
     expect(screen.getByTestId("error-boundary")).toBeTruthy();
@@ -48,6 +68,7 @@ describe("ErrorBoundary", () => {
       <ErrorBoundary>
         <ThrowingChild shouldThrow={true} />
       </ErrorBoundary>,
+      { wrapper: Wrapper },
     );
 
     expect(screen.getByTestId("error-boundary")).toBeTruthy();
