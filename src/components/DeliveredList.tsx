@@ -257,7 +257,7 @@ export default function DeliveredList({
           <Text style={styles.headerCount}>{deliveredEntries.length}</Text>
           <View style={styles.headerSpacer} />
           <Pressable
-            style={styles.removeAllButton}
+            style={styles.overflowButton}
             onPress={() =>
               Alert.alert(
                 "Remove all delivered?",
@@ -273,9 +273,14 @@ export default function DeliveredList({
               )
             }
             accessibilityRole="button"
-            accessibilityLabel="Remove all delivered"
+            accessibilityLabel="More options"
+            hitSlop={8}
           >
-            <Text style={styles.removeAllText}>Remove all</Text>
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={20}
+              color={colors.textTertiary}
+            />
           </Pressable>
         </View>
         <Pressable
@@ -423,14 +428,12 @@ function createStyles(colors: ColorTokens) {
     headerSpacer: {
       flex: 1,
     },
-    removeAllButton: {
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-    },
-    removeAllText: {
-      color: colors.textTertiary,
-      fontSize: 14,
-      fontWeight: "600",
+    overflowButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      justifyContent: "center",
+      alignItems: "center",
     },
     ttlRow: {
       flexDirection: "row",

@@ -478,7 +478,7 @@ export default function EntryList({
           </Pressable>
           <View style={styles.toolbarSpacer} />
           <Pressable
-            style={styles.deleteAllButton}
+            style={styles.overflowButton}
             onPress={() =>
               Alert.alert(
                 "Remove everyone?",
@@ -494,9 +494,14 @@ export default function EntryList({
               )
             }
             accessibilityRole="button"
-            accessibilityLabel="Remove all"
+            accessibilityLabel="More options"
+            hitSlop={8}
           >
-            <Text style={styles.deleteAllText}>Remove all</Text>
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={20}
+              color={colors.textTertiary}
+            />
           </Pressable>
         </View>
       )}
@@ -578,14 +583,12 @@ function createStyles(colors: ColorTokens) {
     toolbarSpacer: {
       flex: 1,
     },
-    deleteAllButton: {
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-    },
-    deleteAllText: {
-      color: colors.textTertiary,
-      fontSize: 14,
-      fontWeight: "600",
+    overflowButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      justifyContent: "center",
+      alignItems: "center",
     },
     addButton: {
       flexDirection: "row",
