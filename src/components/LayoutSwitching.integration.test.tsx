@@ -91,13 +91,13 @@ describe("Layout switching integration", () => {
       <EntryList entries={[]} {...callbacks} />,
       { layout: "compact" },
     );
-    expect(screen.getByText("Ready when you are")).toBeTruthy();
+    expect(screen.getByText("Track your first pregnancy")).toBeTruthy();
     unmount();
 
     renderWithTheme(<EntryGrid entries={[]} {...callbacks} />, {
       layout: "cozy",
     });
-    expect(screen.getByText("Ready when you are")).toBeTruthy();
+    expect(screen.getByText("Track your first pregnancy")).toBeTruthy();
   });
 
   it("both layouts filter out delivered entries from main list", () => {

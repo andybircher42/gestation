@@ -517,16 +517,16 @@ export default function EntryList({
             style={styles.emptyContent}
             onPress={toggleForm}
             accessibilityRole="button"
-            accessibilityLabel="Get started, add someone"
+            accessibilityLabel="Add your first client"
           >
             <Ionicons
               name="calendar-outline"
               size={48}
               color={colors.textTertiary}
             />
-            <Text style={styles.emptyTitle}>Ready when you are</Text>
+            <Text style={styles.emptyTitle}>Track your first pregnancy</Text>
             <Text style={styles.emptySubtitle}>
-              Tap Add someone to get started
+              Enter a name and due date to start
             </Text>
           </Pressable>
         }

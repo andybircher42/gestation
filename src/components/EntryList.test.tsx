@@ -72,13 +72,17 @@ function selectSort(label: string) {
     "Recently added": { field: "No sort" },
   };
   const target = mapping[label];
-  if (!target) {return;}
+  if (!target) {
+    return;
+  }
 
   // Cycle field until we reach the right one
   const maxPresses = 3;
   for (let i = 0; i < maxPresses; i++) {
     const btn = screen.getByLabelText(/Sort by:/);
-    if (btn.props.accessibilityLabel.includes(target.field)) {break;}
+    if (btn.props.accessibilityLabel.includes(target.field)) {
+      break;
+    }
     fireEvent.press(btn);
   }
 
@@ -100,8 +104,8 @@ afterEach(() => {
 describe("EntryList", () => {
   it("shows empty state with guidance when no entries", () => {
     renderList([]);
-    expect(screen.getByText("Ready when you are")).toBeTruthy();
-    expect(screen.getByText("Tap Add someone to get started")).toBeTruthy();
+    expect(screen.getByText("Track your first pregnancy")).toBeTruthy();
+    expect(screen.getByText("Enter a name and due date to start")).toBeTruthy();
   });
 
   it("renders entry name and formatted age", () => {

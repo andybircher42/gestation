@@ -47,14 +47,14 @@ describe("EntryGrid", () => {
   it("shows empty state when no entries", () => {
     renderGrid([]);
 
-    expect(screen.getByText("Ready when you are")).toBeTruthy();
-    expect(screen.getByText("Tap here to add someone")).toBeTruthy();
+    expect(screen.getByText("Track your first pregnancy")).toBeTruthy();
+    expect(screen.getByText("Enter a name and due date to start")).toBeTruthy();
   });
 
   it("opens form when empty state card is tapped", () => {
     renderGrid([]);
 
-    fireEvent.press(screen.getByText("Ready when you are"));
+    fireEvent.press(screen.getByText("Track your first pregnancy"));
 
     expect(screen.getByLabelText("Name")).toBeTruthy();
   });

@@ -193,8 +193,10 @@ export default function EntryGrid({
           accessibilityLabel="Add someone new"
         >
           <BirthstoneIcon image={currentMonthGem} size={64} />
-          <Text style={styles.emptyCardTitle}>Ready when you are</Text>
-          <Text style={styles.emptyCardSubtitle}>Tap here to add someone</Text>
+          <Text style={styles.emptyCardTitle}>Track your first pregnancy</Text>
+          <Text style={styles.emptyCardSubtitle}>
+            Enter a name and due date to start
+          </Text>
         </Pressable>
       </View>
     );
