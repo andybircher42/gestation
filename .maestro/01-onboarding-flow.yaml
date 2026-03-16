@@ -19,4 +19,4 @@ appId: com.andybircher42.gestation
 # Should land on the Expecting tab
 - assertVisible: "in due time"
 - assertVisible: "Expecting"
-- assertVisible: "Ready when you are"
+- assertVisible: "Track your first pregnancy"

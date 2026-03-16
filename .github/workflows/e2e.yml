@@ -1,0 +1,72 @@
+name: E2E (Maestro)
+on:
+  workflow_dispatch: # manual trigger
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "app/**"
+      - ".maestro/**"
+      - "package.json"
+
+jobs:
+  maestro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Cache Android emulator
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api-34-${{ runner.os }}
+
+      - name: Build Android dev client
+        run: npx expo export --platform android --output-dir /tmp/expo-e2e-build
+        env:
+          EXPO_NO_TELEMETRY: 1
+
+      - name: Run Maestro E2E tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            # Install and launch the app
+            npx expo run:android --no-build-cache --no-install 2>/dev/null || true
+            # Wait for emulator to stabilize
+            adb wait-for-device
+            sleep 10
+            # Run Maestro flows
+            maestro test .maestro/ --format junit --output maestro-results.xml
+
+      - name: Upload Maestro results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-results
+          path: maestro-results.xml
