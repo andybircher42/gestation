@@ -1,6 +1,6 @@
 # E2E Test: Complete onboarding flow
 # Covers: privacy note → onboarding → main screen
-appId: com.andybircher42.gestation
+appId: com.andybircher.induetime
 ---
 
 # Wait for the app to load

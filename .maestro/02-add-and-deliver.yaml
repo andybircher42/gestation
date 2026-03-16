@@ -1,6 +1,6 @@
 # E2E Test: Add a person, view detail, deliver, verify delivered tab
 # Assumes: onboarding already completed (run 01 first or use dev build)
-appId: com.andybircher42.gestation
+appId: com.andybircher.induetime
 ---
 
 # Add someone

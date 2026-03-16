@@ -1,5 +1,5 @@
 # E2E Test: Calendar navigation — view heat map, tap date detail
-appId: com.andybircher42.gestation
+appId: com.andybircher.induetime
 ---
 
 # Start on Expecting tab

@@ -12,7 +12,7 @@ on:
 jobs:
   maestro:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -34,34 +34,38 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      - name: Cache Android emulator
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --clean
+        env:
+          EXPO_NO_TELEMETRY: 1
+
+      - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-api-34-${{ runner.os }}
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: gradle-${{ runner.os }}-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/build.gradle', 'android/app/build.gradle') }}
+          restore-keys: gradle-${{ runner.os }}-
 
-      - name: Build Android dev client
-        run: npx expo export --platform android --output-dir /tmp/expo-e2e-build
-        env:
-          EXPO_NO_TELEMETRY: 1
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
 
       - name: Run Maestro E2E tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 33
           arch: x86_64
           target: google_apis
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            # Install and launch the app
-            npx expo run:android --no-build-cache --no-install 2>/dev/null || true
-            # Wait for emulator to stabilize
-            adb wait-for-device
-            sleep 10
-            # Run Maestro flows
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+            adb install android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -n com.andybircher.induetime/.MainActivity
+            sleep 5
             maestro test .maestro/ --format junit --output maestro-results.xml
 
       - name: Upload Maestro results

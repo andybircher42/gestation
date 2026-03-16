@@ -4,8 +4,8 @@
 
 # App identifiers
 appId:
-  ios: com.andybircher42.gestation
-  android: com.andybircher42.gestation
+  ios: com.andybircher.induetime
+  android: com.andybircher.induetime
 
 # Default settings
 flows:
