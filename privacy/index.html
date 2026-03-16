@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>In Due Time — Privacy Policy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #faf9f7;
+      padding: 24px 16px 64px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: #2d3a4a;
+    }
+
+    h1 + p { color: #6b7280; margin-bottom: 24px; }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-top: 40px;
+      margin-bottom: 12px;
+      color: #2d3a4a;
+      border-bottom: 2px solid #e8e4df;
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+
+    p { margin-bottom: 12px; }
+
+    strong { font-weight: 600; }
+
+    ul {
+      margin-bottom: 12px;
+      padding-left: 24px;
+    }
+
+    li { margin-bottom: 6px; }
+
+    code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: #f0ede8;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: #f0ede8;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.85em;
+      line-height: 1.5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid #e8e4df;
+    }
+
+    th {
+      font-weight: 600;
+      color: #6b7280;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid #e8e4df;
+      margin: 24px 0;
+    }
+
+    a {
+      color: #4a7c96;
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a2e; color: #e5e5e5; }
+      h1, h2 { color: #f0ede8; }
+      h3 { color: #d1d5db; }
+      h1 + p { color: #9ca3af; }
+      h2 { border-bottom-color: #374151; }
+      code { background: #2d2d44; }
+      pre { background: #2d2d44; }
+      th { color: #9ca3af; }
+      th, td { border-bottom-color: #374151; }
+      hr { border-top-color: #374151; }
+      a { color: #7bb8d0; }
+    }
+  </style>
+</head>
+<body>
+<h1 id="privacy-policy">Privacy Policy</h1>
+<p><strong>in due time</strong></p>
+<p><em>Effective date: March 16, 2026</em></p>
+<h2 id="overview">Overview</h2>
+<p>in due time is a pregnancy tracking app designed for midwives and birth workers. Your privacy is important to us. This policy explains what data the app collects, how it is used, and your choices.</p>
+<h2 id="data-we-collect">Data we collect</h2>
+<h3 id="data-you-provide">Data you provide</h3>
+<p>When you use in due time, you enter names and due dates for the pregnancies you are tracking. The app encourages you to use first names or nicknames only — no last names, medical IDs, or other identifying information.</p>
+<h3 id="data-stored-on-your-device">Data stored on your device</h3>
+<p>All pregnancy entries (names, due dates, delivery dates) and your preferences (theme, brightness, layout, auto-cleanup period) are stored locally on your device using AsyncStorage. <strong>This data is never sent to a server or backed up to the cloud.</strong></p>
+<h3 id="device-identifier">Device identifier</h3>
+<p>The app generates a random, anonymous identifier (UUID) on first launch. This identifier is not linked to your identity, device serial number, or any account. It is used solely for anonymous analytics if you have not opted out.</p>
+<h3 id="analytics-data">Analytics data</h3>
+<p>The app uses Vexo Analytics to collect basic, anonymous usage information:</p>
+<ul>
+<li>Your random device identifier</li>
+<li>App version and platform (iOS/Android)</li>
+<li>Basic session information</li>
+</ul>
+<p><strong>Analytics is optional.</strong> You can opt out at any time in the app's settings. When you opt out, the analytics service is never initialized and no data is sent.</p>
+<p>Analytics data is not collected in development builds or internal test builds.</p>
+<h3 id="update-checks">Update checks</h3>
+<p>The app uses Expo Updates to check for available updates. These checks send only app version information to Expo's servers — no personal data or pregnancy entries are transmitted.</p>
+<h2 id="data-we-do-not-collect">Data we do not collect</h2>
+<ul>
+<li>Last names or full legal names</li>
+<li>Medical records, diagnoses, or health history</li>
+<li>Location data</li>
+<li>Photos, contacts, or calendar data</li>
+<li>Email addresses or phone numbers</li>
+<li>Financial or payment information</li>
+</ul>
+<p>The app includes several device capability modules (camera, contacts, calendar, location) in its dependencies but <strong>none of these are used or activated</strong>. No device permissions for these capabilities are requested.</p>
+<h2 id="how-we-use-your-data">How we use your data</h2>
+<ul>
+<li><strong>Pregnancy entries</strong>: Displayed only within the app on your device. Never transmitted.</li>
+<li><strong>Preferences</strong>: Used to personalize your app experience. Never transmitted.</li>
+<li><strong>Device identifier and analytics</strong>: Used to understand aggregate app usage patterns (e.g., how many active users). Never linked to your identity.</li>
+<li><strong>Update checks</strong>: Used to deliver bug fixes and improvements.</li>
+</ul>
+<h2 id="data-sharing">Data sharing</h2>
+<p>We do not sell, rent, or share your personal data with third parties.</p>
+<p>The only data transmitted from the app is:</p>
+<table>
+<tr><th>Data</th><th>Recipient</th><th>Purpose</th><th>Your control</th></tr>
+<tr><td>Anonymous device ID + app version</td><td>Vexo Analytics</td><td>Aggregate usage statistics</td><td>Opt out in Settings</td></tr>
+<tr><td>App version info</td><td>Expo (update server)</td><td>Deliver app updates</td><td>Automatic</td></tr>
+</table>
+<p>When you choose to submit a bug report or feature request, you are directed to a Google Form. Any information you provide in that form is governed by <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
+<h2 id="data-retention">Data retention</h2>
+<ul>
+<li><strong>On-device data</strong>: Remains on your device until you delete it or uninstall the app. Delivered entries can be set to auto-remove after a configurable period (up to 30 days).</li>
+<li><strong>Analytics data</strong>: Retained by Vexo Analytics per their data retention policies. Since only an anonymous UUID is sent, this data cannot be linked back to you.</li>
+</ul>
+<h2 id="data-security">Data security</h2>
+<p>All data is stored locally on your device within the app's private storage sandbox. The app does not use custom encryption — it relies on the operating system's built-in app sandboxing and any device-level encryption you have enabled.</p>
+<h2 id="childrens-privacy">Children's privacy</h2>
+<p>in due time is not directed at children under 13 and does not knowingly collect data from children.</p>
+<h2 id="your-choices">Your choices</h2>
+<ul>
+<li><strong>Opt out of analytics</strong>: Toggle analytics off in the app's settings at any time.</li>
+<li><strong>Delete your data</strong>: Remove individual entries within the app, or uninstall the app to delete all stored data.</li>
+<li><strong>Auto-cleanup</strong>: Configure delivered entries to be automatically removed after a set number of days.</li>
+</ul>
+<h2 id="changes-to-this-policy">Changes to this policy</h2>
+<p>We may update this privacy policy from time to time. The effective date at the top of this page indicates when the policy was last revised.</p>
+<h2 id="contact">Contact</h2>
+<p>If you have questions about this privacy policy, you can reach us through the bug report form in the app's settings or by contacting the developer at the email address listed on the Google Play store listing.</p>
+</body>
+</html>
