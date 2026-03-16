@@ -11,7 +11,7 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- **Sort picker simplified** — replaced bottom sheet modal with inline cycling button that shows the current sort label; one tap to change
+- **Sort controls split** — sort field (Date / Name / No sort) and direction (up/down arrow) are now separate inline controls; direction toggle hidden when "No sort" is active
 - **Settings flattened** — theme, brightness, and layout are now inline pill selectors instead of drill-down sub-pages; only delivered cleanup keeps a sub-page
 - **Sort labels clarified** — renamed "Due date (newest/oldest first)" to "Due date (soonest/furthest first)"
 - **Entry card label removed** — dropped redundant "Calculated:" prefix from cozy card due dates

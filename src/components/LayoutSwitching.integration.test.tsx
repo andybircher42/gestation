@@ -77,13 +77,13 @@ describe("Layout switching integration", () => {
       <EntryList entries={entries} {...callbacks} />,
       { layout: "compact" },
     );
-    expect(screen.getByLabelText(/Sort:/)).toBeTruthy();
+    expect(screen.getByLabelText(/Sort by:/)).toBeTruthy();
     unmount();
 
     renderWithTheme(<EntryGrid entries={entries} {...callbacks} />, {
       layout: "cozy",
     });
-    expect(screen.getByLabelText(/Sort:/)).toBeTruthy();
+    expect(screen.getByLabelText(/Sort by:/)).toBeTruthy();
   });
 
   it("both layouts show empty state with no entries", () => {

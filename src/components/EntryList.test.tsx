@@ -62,18 +62,29 @@ const sameNameEntries = [
   makeEntry({ id: "3", name: "Sam", dueDate: "2026-07-20" }), // 20w0d
 ];
 
-/**
- * Cycles the sort button until the desired label is shown.
- * SORT_OPTIONS order (EntryList defaults to index 1):
- * 0: "Recently added", 1: "Due date (soonest first)",
- * 2: "Due date (furthest first)", 3: "Name (A–Z)", 4: "Name (Z–A)"
- */
+/** Cycles the sort field button until the desired field is active, then optionally flips direction. */
 function selectSort(label: string) {
-  const maxPresses = 5;
+  // Map old combined labels to field + direction
+  const mapping: Record<string, { field: string; flipDir?: boolean }> = {
+    "Due date (furthest first)": { field: "Date", flipDir: true },
+    "Name (A\u2013Z)": { field: "Name" },
+    "Name (Z\u2013A)": { field: "Name", flipDir: true },
+    "Recently added": { field: "No sort" },
+  };
+  const target = mapping[label];
+  if (!target) {return;}
+
+  // Cycle field until we reach the right one
+  const maxPresses = 3;
   for (let i = 0; i < maxPresses; i++) {
-    const btn = screen.getByLabelText(/Sort:/);
-    if (btn.props.accessibilityLabel.includes(label)) {return;}
+    const btn = screen.getByLabelText(/Sort by:/);
+    if (btn.props.accessibilityLabel.includes(target.field)) {break;}
     fireEvent.press(btn);
+  }
+
+  // Flip direction if needed
+  if (target.flipDir) {
+    fireEvent.press(screen.getByLabelText(/Direction:/));
   }
 }
 
@@ -175,24 +186,49 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Alex");
   });
 
-  it("cycles sort when sort button is pressed", () => {
+  it("cycles sort field when field button is pressed", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
 
-    // Default is "Due date (soonest first)"
-    expect(screen.getByText("Due date (soonest first)")).toBeTruthy();
+    // Default field is "Date"
+    expect(screen.getByText("Date")).toBeTruthy();
 
-    // Press to cycle to next
-    fireEvent.press(screen.getByLabelText(/Sort:/));
-    expect(screen.getByText("Due date (furthest first)")).toBeTruthy();
+    // Cycle to "Name"
+    fireEvent.press(screen.getByLabelText(/Sort by:/));
+    expect(screen.getByText("Name")).toBeTruthy();
+
+    // Cycle to "No sort"
+    fireEvent.press(screen.getByLabelText(/Sort by:/));
+    expect(screen.getByText("No sort")).toBeTruthy();
   });
 
-  it("sort button has accessible label reflecting current sort", () => {
+  it("toggles direction when direction button is pressed", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
 
-    const sortButton = screen.getByLabelText(/Sort:/);
-    expect(sortButton.props.accessibilityLabel).toContain(
-      "Due date (soonest first)",
-    );
+    // Default direction is descending (arrow-down)
+    const dirBtn = screen.getByLabelText(/Direction:/);
+    expect(dirBtn.props.accessibilityLabel).toContain("descending");
+
+    // Flip to ascending
+    fireEvent.press(dirBtn);
+    const flipped = screen.getByLabelText(/Direction:/);
+    expect(flipped.props.accessibilityLabel).toContain("ascending");
+  });
+
+  it("hides direction button when sort is 'Added'", () => {
+    renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
+
+    // Cycle to "No sort" (2 presses from "Date")
+    fireEvent.press(screen.getByLabelText(/Sort by:/));
+    fireEvent.press(screen.getByLabelText(/Sort by:/));
+
+    expect(screen.queryByLabelText(/Direction:/)).toBeNull();
+  });
+
+  it("sort field button has accessible label reflecting current field", () => {
+    renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
+
+    const sortButton = screen.getByLabelText(/Sort by:/);
+    expect(sortButton.props.accessibilityLabel).toContain("Date");
   });
 
   it("breaks due date ties by name ascending", () => {

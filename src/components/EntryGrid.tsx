@@ -19,7 +19,12 @@ import BirthstoneIcon from "./BirthstoneIcon";
 import EntryCard from "./EntryCard";
 import EntryDetailModal from "./EntryDetailModal";
 import EntryForm from "./EntryForm";
-import { SORT_OPTIONS } from "./SortPickerModal";
+import {
+  DEFAULT_DIR,
+  SORT_FIELDS,
+  type SortBy,
+  type SortDir,
+} from "./SortPickerModal";
 
 interface EntryGridProps {
   entries: Entry[];
@@ -44,10 +49,8 @@ export default function EntryGrid({
   const [showForm, setShowForm] = useState(false);
   const [batchMode, setBatchMode] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-  const [sortIndex, setSortIndex] = useState(0); // default: "Recently added"
-  const currentSort = SORT_OPTIONS[sortIndex];
-  const sortBy = currentSort.field;
-  const sortDir = currentSort.dir;
+  const [sortBy, setSortBy] = useState<SortBy>("none");
+  const [sortDir, setSortDir] = useState<SortDir>(DEFAULT_DIR.none);
   const formKeyRef = React.useRef(0);
 
   const toggleForm = useCallback(() => {
@@ -65,8 +68,17 @@ export default function EntryGrid({
     setBatchMode((prev) => !prev);
   }, []);
 
-  const cycleSort = useCallback(() => {
-    setSortIndex((prev) => (prev + 1) % SORT_OPTIONS.length);
+  const cycleSortField = useCallback(() => {
+    setSortBy((prev) => {
+      const idx = SORT_FIELDS.findIndex((f) => f.field === prev);
+      const next = SORT_FIELDS[(idx + 1) % SORT_FIELDS.length];
+      setSortDir(DEFAULT_DIR[next.field]);
+      return next.field;
+    });
+  }, []);
+
+  const toggleSortDir = useCallback(() => {
+    setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
   }, []);
 
   const currentMonthGem = useMemo(
@@ -218,19 +230,33 @@ export default function EntryGrid({
       ) : null}
       {sorted.length > 0 && (
         <View style={styles.toolbarRow}>
+          {sortBy !== "none" ? (
+            <Pressable
+              onPress={toggleSortDir}
+              accessibilityRole="button"
+              accessibilityLabel={`Direction: ${sortDir === "asc" ? "ascending" : "descending"}. Tap to flip.`}
+              hitSlop={8}
+              style={styles.sortDirButton}
+            >
+              <Ionicons
+                name={sortDir === "asc" ? "arrow-up" : "arrow-down"}
+                size={16}
+                color={colors.textTertiary}
+              />
+            </Pressable>
+          ) : (
+            <View style={styles.sortDirPlaceholder} />
+          )}
           <Pressable
-            onPress={cycleSort}
+            onPress={cycleSortField}
             accessibilityRole="button"
-            accessibilityLabel={`Sort: ${currentSort.label}. Tap to change.`}
+            accessibilityLabel={`Sort by: ${SORT_FIELDS.find((f) => f.field === sortBy)?.label}. Tap to change.`}
             hitSlop={8}
             style={styles.sortButton}
           >
-            <Ionicons
-              name="swap-vertical-outline"
-              size={16}
-              color={colors.textTertiary}
-            />
-            <Text style={styles.sortLabel}>{currentSort.label}</Text>
+            <Text style={styles.sortLabel}>
+              {SORT_FIELDS.find((f) => f.field === sortBy)?.label}
+            </Text>
           </Pressable>
           <View style={styles.toolbarSpacer} />
           <Pressable
@@ -337,11 +363,24 @@ function createStyles(colors: ColorTokens) {
       flexDirection: "row",
       alignItems: "center",
       height: 44,
-      gap: 6,
+      paddingHorizontal: 4,
     },
     sortLabel: {
       fontSize: 13,
+      fontWeight: "600",
       color: colors.textTertiary,
+      textDecorationLine: "underline",
+    },
+    sortDirButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    sortDirPlaceholder: {
+      width: 36,
+      height: 36,
     },
     toolbarSpacer: {
       flex: 1,

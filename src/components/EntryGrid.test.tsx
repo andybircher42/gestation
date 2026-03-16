@@ -104,15 +104,26 @@ describe("EntryGrid", () => {
     expect(screen.getByText("Add multiple")).toBeTruthy();
   });
 
-  it("cycles sort when sort button is pressed", () => {
+  it("cycles sort field when field button is pressed", () => {
     renderGrid([makeEntry({ id: "1", name: "Alice", dueDate: "2026-09-11" })]);
 
-    // Default is "Recently added"
-    expect(screen.getByText("Recently added")).toBeTruthy();
+    // Default is "No sort" (insertion order)
+    expect(screen.getByText("No sort")).toBeTruthy();
 
-    // Press to cycle to next sort option
-    fireEvent.press(screen.getByLabelText(/Sort:/));
-    expect(screen.getByText("Due date (soonest first)")).toBeTruthy();
+    // Cycle to "Date"
+    fireEvent.press(screen.getByLabelText(/Sort by:/));
+    expect(screen.getByText("Date")).toBeTruthy();
+  });
+
+  it("shows direction toggle for Due date and Name, hides for Added", () => {
+    renderGrid([makeEntry({ id: "1", name: "Alice", dueDate: "2026-09-11" })]);
+
+    // "No sort" — no direction button
+    expect(screen.queryByLabelText(/Direction:/)).toBeNull();
+
+    // Cycle to "Date" — direction button appears
+    fireEvent.press(screen.getByLabelText(/Sort by:/));
+    expect(screen.getByLabelText(/Direction:/)).toBeTruthy();
   });
 
   it("shows confirmation alert when Remove all is pressed", () => {

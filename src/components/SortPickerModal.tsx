@@ -4,8 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { ColorTokens, useTheme } from "@/theme";
 
-type SortBy = "dueDate" | "name" | "none";
-type SortDir = "asc" | "desc";
+export type SortBy = "dueDate" | "name" | "none";
+export type SortDir = "asc" | "desc";
 
 export interface SortOption {
   field: SortBy;
@@ -20,6 +20,20 @@ export const SORT_OPTIONS: SortOption[] = [
   { field: "name", dir: "asc", label: "Name (A\u2013Z)" },
   { field: "name", dir: "desc", label: "Name (Z\u2013A)" },
 ];
+
+/** Sort field options for the cycling field button. */
+export const SORT_FIELDS: { field: SortBy; label: string }[] = [
+  { field: "dueDate", label: "Date" },
+  { field: "name", label: "Name" },
+  { field: "none", label: "No sort" },
+];
+
+/** Default direction for each sort field. */
+export const DEFAULT_DIR: Record<SortBy, SortDir> = {
+  dueDate: "desc",
+  name: "asc",
+  none: "desc",
+};
 
 interface SortPickerModalProps {
   visible: boolean;
