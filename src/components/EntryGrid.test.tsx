@@ -104,12 +104,15 @@ describe("EntryGrid", () => {
     expect(screen.getByText("Add multiple")).toBeTruthy();
   });
 
-  it("opens sort picker when sort button is pressed", () => {
+  it("cycles sort when sort button is pressed", () => {
     renderGrid([makeEntry({ id: "1", name: "Alice", dueDate: "2026-09-11" })]);
 
-    fireEvent.press(screen.getByLabelText(/Sort:/));
+    // Default is "Recently added"
+    expect(screen.getByText("Recently added")).toBeTruthy();
 
-    expect(screen.getByText("Sort by")).toBeTruthy();
+    // Press to cycle to next sort option
+    fireEvent.press(screen.getByLabelText(/Sort:/));
+    expect(screen.getByText("Due date (soonest first)")).toBeTruthy();
   });
 
   it("shows confirmation alert when Remove all is pressed", () => {

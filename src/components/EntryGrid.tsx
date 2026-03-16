@@ -19,7 +19,7 @@ import BirthstoneIcon from "./BirthstoneIcon";
 import EntryCard from "./EntryCard";
 import EntryDetailModal from "./EntryDetailModal";
 import EntryForm from "./EntryForm";
-import SortPickerModal from "./SortPickerModal";
+import { SORT_OPTIONS } from "./SortPickerModal";
 
 interface EntryGridProps {
   entries: Entry[];
@@ -28,9 +28,6 @@ interface EntryGridProps {
   onDeleteAll: () => void;
   onAdd: (entry: { name: string; dueDate: string }) => void;
 }
-
-type SortBy = "dueDate" | "name" | "none";
-type SortDir = "asc" | "desc";
 
 type GridItem = Entry | "add" | "spacer";
 
@@ -47,9 +44,10 @@ export default function EntryGrid({
   const [showForm, setShowForm] = useState(false);
   const [batchMode, setBatchMode] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-  const [showSortPicker, setShowSortPicker] = useState(false);
-  const [sortBy, setSortBy] = useState<SortBy>("none");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortIndex, setSortIndex] = useState(0); // default: "Recently added"
+  const currentSort = SORT_OPTIONS[sortIndex];
+  const sortBy = currentSort.field;
+  const sortDir = currentSort.dir;
   const formKeyRef = React.useRef(0);
 
   const toggleForm = useCallback(() => {
@@ -67,9 +65,8 @@ export default function EntryGrid({
     setBatchMode((prev) => !prev);
   }, []);
 
-  const handleSortSelect = useCallback((field: SortBy, dir: SortDir) => {
-    setSortBy(field);
-    setSortDir(dir);
+  const cycleSort = useCallback(() => {
+    setSortIndex((prev) => (prev + 1) % SORT_OPTIONS.length);
   }, []);
 
   const currentMonthGem = useMemo(
@@ -222,17 +219,18 @@ export default function EntryGrid({
       {sorted.length > 0 && (
         <View style={styles.toolbarRow}>
           <Pressable
-            onPress={() => setShowSortPicker(true)}
+            onPress={cycleSort}
             accessibilityRole="button"
-            accessibilityLabel={`Sort: ${sortBy === "none" ? "insertion order" : sortBy === "dueDate" ? "due date" : "name"}, ${sortDir === "asc" ? "ascending" : "descending"}`}
+            accessibilityLabel={`Sort: ${currentSort.label}. Tap to change.`}
             hitSlop={8}
-            style={styles.sortIconButton}
+            style={styles.sortButton}
           >
             <Ionicons
               name="swap-vertical-outline"
-              size={20}
+              size={16}
               color={colors.textTertiary}
             />
+            <Text style={styles.sortLabel}>{currentSort.label}</Text>
           </Pressable>
           <View style={styles.toolbarSpacer} />
           <Pressable
@@ -270,13 +268,6 @@ export default function EntryGrid({
       <EntryDetailModal
         entry={selectedEntry}
         onClose={() => setSelectedEntry(null)}
-      />
-      <SortPickerModal
-        visible={showSortPicker}
-        sortBy={sortBy}
-        sortDir={sortDir}
-        onSelect={handleSortSelect}
-        onClose={() => setShowSortPicker(false)}
       />
     </View>
   );
@@ -342,12 +333,15 @@ function createStyles(colors: ColorTokens) {
       marginTop: 12,
       gap: 10,
     },
-    sortIconButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      justifyContent: "center",
+    sortButton: {
+      flexDirection: "row",
       alignItems: "center",
+      height: 44,
+      gap: 6,
+    },
+    sortLabel: {
+      fontSize: 13,
+      color: colors.textTertiary,
     },
     toolbarSpacer: {
       flex: 1,

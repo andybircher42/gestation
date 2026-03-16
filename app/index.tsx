@@ -323,8 +323,8 @@ export default function HomeScreen() {
             <InfoToast
               message={
                 discardedCount === 1
-                  ? "One entry had corrupted data and was removed"
-                  : `${discardedCount} entries had corrupted data and were removed`
+                  ? "An entry couldn\u2019t be loaded and was cleaned up"
+                  : `${discardedCount} entries couldn\u2019t be loaded and were cleaned up`
               }
               onDismiss={dismissDiscarded}
               embedded
@@ -333,7 +333,7 @@ export default function HomeScreen() {
 
           {saveError && (
             <InfoToast
-              message="Your changes might not be saved. Try again or restart the app."
+              message="Couldn\u2019t save \u2014 try again or restart the app"
               onDismiss={dismissSaveError}
               embedded
             />

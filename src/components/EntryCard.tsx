@@ -55,7 +55,6 @@ const EntryCard = React.memo(function EntryCard({
             {entry.name}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.detailLabel}>Calculated: </Text>
             {formatDueDate(entry.dueDate)}
             {"  \u2013  "}
             {weeks}w {days}d
@@ -103,10 +102,6 @@ function createStyles(colors: ColorTokens) {
       fontWeight: "700",
       color: colors.textOnColor,
       textAlign: "center",
-    },
-    detailLabel: {
-      fontSize: 10,
-      color: colors.textOnColorMuted,
     },
     detail: {
       fontSize: 12,

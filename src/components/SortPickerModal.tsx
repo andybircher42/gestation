@@ -15,8 +15,8 @@ export interface SortOption {
 
 export const SORT_OPTIONS: SortOption[] = [
   { field: "none", dir: "desc", label: "Recently added" },
-  { field: "dueDate", dir: "desc", label: "Due date (newest first)" },
-  { field: "dueDate", dir: "asc", label: "Due date (oldest first)" },
+  { field: "dueDate", dir: "desc", label: "Due date (soonest first)" },
+  { field: "dueDate", dir: "asc", label: "Due date (furthest first)" },
   { field: "name", dir: "asc", label: "Name (A\u2013Z)" },
   { field: "name", dir: "desc", label: "Name (Z\u2013A)" },
 ];

@@ -134,7 +134,7 @@ const TTL_OPTIONS: {
   { value: 30, label: "30 days" },
 ];
 
-type SubPage = "main" | "theme" | "brightness" | "layout" | "ttl";
+type SubPage = "main" | "ttl";
 
 /** Dropdown modal for selecting the app theme, anchored below the settings button. */
 export default function ThemePickerModal({
@@ -165,175 +165,6 @@ export default function ThemePickerModal({
 
   const goBack = useCallback(() => setSubPage("main"), []);
 
-  const renderBackRow = (label: string, helpText?: string) => (
-    <View style={styles.backRow}>
-      <Pressable
-        style={styles.backButton}
-        onPress={goBack}
-        accessibilityRole="button"
-        accessibilityLabel={`Back to settings`}
-      >
-        <Ionicons
-          name="chevron-back"
-          size={18}
-          color={colors.primary}
-          style={styles.backIcon}
-        />
-        <Text style={styles.backLabel}>{label}</Text>
-      </Pressable>
-      {helpText != null && <HelpButton title={label} message={helpText} />}
-    </View>
-  );
-
-  const renderSubPage = () => {
-    switch (subPage) {
-      case "theme":
-        return (
-          <>
-            {renderBackRow(
-              "Theme",
-              "Sets the color personality across the app.",
-            )}
-            {THEME_OPTIONS.map(({ value, label, icon }) => (
-              <Pressable
-                key={value}
-                style={styles.row}
-                onPress={() => onSelectPersonality(value)}
-                accessibilityRole="button"
-                accessibilityLabel={label}
-              >
-                <Ionicons
-                  name={icon}
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
-                />
-                <Text style={styles.rowLabel}>{label}</Text>
-                {currentPersonality === value && (
-                  <Ionicons
-                    name="checkmark"
-                    size={20}
-                    color={colors.primary}
-                    testID={`checkmark-theme-${value}`}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </>
-        );
-      case "brightness":
-        return (
-          <>
-            {renderBackRow(
-              "Brightness",
-              '"System" follows your phone\'s light/dark setting.',
-            )}
-            {BRIGHTNESS_OPTIONS.map(({ value, label, icon }) => (
-              <Pressable
-                key={value}
-                style={styles.row}
-                onPress={() => onSelectBrightness(value)}
-                accessibilityRole="button"
-                accessibilityLabel={label}
-              >
-                <Ionicons
-                  name={icon}
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
-                />
-                <Text style={styles.rowLabel}>{label}</Text>
-                {currentBrightness === value && (
-                  <Ionicons
-                    name="checkmark"
-                    size={20}
-                    color={colors.primary}
-                    testID={`checkmark-brightness-${value}`}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </>
-        );
-      case "layout":
-        return (
-          <>
-            {renderBackRow(
-              "Layout",
-              "Compact shows a dense list. Cozy shows a two-column card grid with larger icons.",
-            )}
-            {LAYOUT_OPTIONS.map(({ value, label, icon }) => (
-              <Pressable
-                key={value}
-                style={styles.row}
-                onPress={() => onSelectLayout(value)}
-                accessibilityRole="button"
-                accessibilityLabel={label}
-              >
-                <Ionicons
-                  name={icon}
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
-                />
-                <Text style={styles.rowLabel}>{label}</Text>
-                {currentLayout === value && (
-                  <Ionicons
-                    name="checkmark"
-                    size={20}
-                    color={colors.primary}
-                    testID={`checkmark-layout-${value}`}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </>
-        );
-      case "ttl":
-        return (
-          <>
-            {renderBackRow(
-              "Delivered cleanup",
-              'Automatically remove delivered entries after this many days. Choose "Never" to keep them until you remove them yourself.',
-            )}
-            {TTL_OPTIONS.map(({ value, label }) => (
-              <Pressable
-                key={value}
-                style={styles.row}
-                onPress={() => onSelectDeliveredTTL(value)}
-                accessibilityRole="button"
-                accessibilityLabel={label}
-              >
-                <Ionicons
-                  name={value === 0 ? "infinite-outline" : "timer-outline"}
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
-                />
-                <Text style={styles.rowLabel}>{label}</Text>
-                {currentDeliveredTTL === value && (
-                  <Ionicons
-                    name="checkmark"
-                    size={20}
-                    color={colors.primary}
-                    testID={`checkmark-ttl-${value}`}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const currentThemeLabel =
-    THEME_OPTIONS.find((o) => o.value === currentPersonality)?.label ?? "";
-  const currentBrightnessLabel =
-    BRIGHTNESS_OPTIONS.find((o) => o.value === currentBrightness)?.label ?? "";
-  const currentLayoutLabel =
-    LAYOUT_OPTIONS.find((o) => o.value === currentLayout)?.label ?? "";
   const currentTTLLabel =
     TTL_OPTIONS.find((o) => o.value === currentDeliveredTTL)?.label ?? "";
 
@@ -347,80 +178,170 @@ export default function ThemePickerModal({
           accessibilityLabel="Close settings"
         />
         <View style={[styles.dropdown, dropdownPosition]}>
-          {subPage === "main" ? (
+          {subPage === "ttl" ? (
             <>
-              <Text style={styles.title}>Appearance</Text>
-              <Pressable
-                style={styles.row}
-                onPress={() => setSubPage("theme")}
-                accessibilityRole="button"
-                accessibilityLabel="Theme settings"
-              >
-                <Ionicons
-                  name="color-palette-outline"
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
+              <View style={styles.backRow}>
+                <Pressable
+                  style={styles.backButton}
+                  onPress={goBack}
+                  accessibilityRole="button"
+                  accessibilityLabel="Back to settings"
+                >
+                  <Ionicons
+                    name="chevron-back"
+                    size={18}
+                    color={colors.primary}
+                    style={styles.backIcon}
+                  />
+                  <Text style={styles.backLabel}>Delivered cleanup</Text>
+                </Pressable>
+                <HelpButton
+                  title="Delivered cleanup"
+                  message='Automatically remove delivered entries after this many days. Choose "Never" to keep them until you remove them yourself.'
                 />
-                <Text style={styles.rowLabel}>Theme</Text>
-                <Text style={styles.rowValue}>{currentThemeLabel}</Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={colors.textTertiary}
-                />
-              </Pressable>
-              <Pressable
-                style={styles.row}
-                onPress={() => setSubPage("brightness")}
-                accessibilityRole="button"
-                accessibilityLabel="Brightness settings"
-              >
-                <Ionicons
-                  name="contrast-outline"
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
-                />
-                <Text style={styles.rowLabel}>Brightness</Text>
-                <Text style={styles.rowValue}>{currentBrightnessLabel}</Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={colors.textTertiary}
-                />
-              </Pressable>
-              <Pressable
-                style={styles.row}
-                onPress={() => setSubPage("layout")}
-                accessibilityRole="button"
-                accessibilityLabel="Layout settings"
-              >
-                <Ionicons
-                  name={
-                    currentLayout === "compact"
-                      ? "list-outline"
-                      : "grid-outline"
-                  }
-                  size={20}
-                  color={colors.textPrimary}
-                  style={styles.rowIcon}
-                />
-                <Text style={styles.rowLabel}>Layout</Text>
-                <Text style={styles.rowValue}>{currentLayoutLabel}</Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={colors.textTertiary}
-                />
-              </Pressable>
+              </View>
+              {TTL_OPTIONS.map(({ value, label }) => (
+                <Pressable
+                  key={value}
+                  style={styles.row}
+                  onPress={() => onSelectDeliveredTTL(value)}
+                  accessibilityRole="button"
+                  accessibilityLabel={label}
+                >
+                  <Ionicons
+                    name={value === 0 ? "infinite-outline" : "timer-outline"}
+                    size={20}
+                    color={colors.textPrimary}
+                    style={styles.rowIcon}
+                  />
+                  <Text style={styles.rowLabel}>{label}</Text>
+                  {currentDeliveredTTL === value && (
+                    <Ionicons
+                      name="checkmark"
+                      size={20}
+                      color={colors.primary}
+                      testID={`checkmark-ttl-${value}`}
+                    />
+                  )}
+                </Pressable>
+              ))}
+            </>
+          ) : (
+            <>
+              <Text style={styles.title}>Theme</Text>
+              <View style={styles.pillRow}>
+                {THEME_OPTIONS.map(({ value, label, icon }) => (
+                  <Pressable
+                    key={value}
+                    style={[
+                      styles.pill,
+                      currentPersonality === value && styles.pillActive,
+                    ]}
+                    onPress={() => onSelectPersonality(value)}
+                    accessibilityRole="button"
+                    accessibilityLabel={label}
+                    accessibilityState={{
+                      selected: currentPersonality === value,
+                    }}
+                  >
+                    <Ionicons
+                      name={icon}
+                      size={18}
+                      color={
+                        currentPersonality === value
+                          ? colors.primary
+                          : colors.textTertiary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.pillLabel,
+                        currentPersonality === value && styles.pillLabelActive,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
               <View style={styles.separator} />
-              <Text style={styles.title}>Preferences</Text>
+              <Text style={styles.title}>Brightness</Text>
+              <View style={styles.pillRow}>
+                {BRIGHTNESS_OPTIONS.map(({ value, label, icon }) => (
+                  <Pressable
+                    key={value}
+                    style={[
+                      styles.pill,
+                      currentBrightness === value && styles.pillActive,
+                    ]}
+                    onPress={() => onSelectBrightness(value)}
+                    accessibilityRole="button"
+                    accessibilityLabel={label}
+                    accessibilityState={{
+                      selected: currentBrightness === value,
+                    }}
+                  >
+                    <Ionicons
+                      name={icon}
+                      size={18}
+                      color={
+                        currentBrightness === value
+                          ? colors.primary
+                          : colors.textTertiary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.pillLabel,
+                        currentBrightness === value && styles.pillLabelActive,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+              <View style={styles.separator} />
+              <Text style={styles.title}>Layout</Text>
+              <View style={styles.pillRow}>
+                {LAYOUT_OPTIONS.map(({ value, label, icon }) => (
+                  <Pressable
+                    key={value}
+                    style={[
+                      styles.pill,
+                      currentLayout === value && styles.pillActive,
+                    ]}
+                    onPress={() => onSelectLayout(value)}
+                    accessibilityRole="button"
+                    accessibilityLabel={label}
+                    accessibilityState={{ selected: currentLayout === value }}
+                  >
+                    <Ionicons
+                      name={icon}
+                      size={18}
+                      color={
+                        currentLayout === value
+                          ? colors.primary
+                          : colors.textTertiary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.pillLabel,
+                        currentLayout === value && styles.pillLabelActive,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+              <View style={styles.separator} />
               <Pressable
                 style={styles.row}
                 onPress={() => setSubPage("ttl")}
                 accessibilityRole="button"
-                accessibilityLabel="Delivered cleanup delivered settings"
+                accessibilityLabel="Delivered cleanup settings"
               >
                 <Ionicons
                   name="timer-outline"
@@ -507,8 +428,6 @@ export default function ThemePickerModal({
                 <Text style={styles.rowLabel}>App Info</Text>
               </Pressable>
             </>
-          ) : (
-            renderSubPage()
           )}
         </View>
       </View>
@@ -567,6 +486,34 @@ function createStyles(colors: ColorTokens) {
       fontSize: 13,
       color: colors.textTertiary,
       marginRight: 6,
+    },
+    pillRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginBottom: 4,
+    },
+    pill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pillActive: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primaryLightBg,
+    },
+    pillLabel: {
+      fontSize: 12,
+      color: colors.textTertiary,
+    },
+    pillLabelActive: {
+      color: colors.primary,
+      fontWeight: "600",
     },
     separator: {
       borderBottomWidth: StyleSheet.hairlineWidth,

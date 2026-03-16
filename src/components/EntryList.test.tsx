@@ -62,10 +62,19 @@ const sameNameEntries = [
   makeEntry({ id: "3", name: "Sam", dueDate: "2026-07-20" }), // 20w0d
 ];
 
-/** Presses the sort icon and selects an option by label via SortPickerModal. */
+/**
+ * Cycles the sort button until the desired label is shown.
+ * SORT_OPTIONS order (EntryList defaults to index 1):
+ * 0: "Recently added", 1: "Due date (soonest first)",
+ * 2: "Due date (furthest first)", 3: "Name (A–Z)", 4: "Name (Z–A)"
+ */
 function selectSort(label: string) {
-  fireEvent.press(screen.getByLabelText(/Sort:/));
-  fireEvent.press(screen.getByLabelText(label));
+  const maxPresses = 5;
+  for (let i = 0; i < maxPresses; i++) {
+    const btn = screen.getByLabelText(/Sort:/);
+    if (btn.props.accessibilityLabel.includes(label)) {return;}
+    fireEvent.press(btn);
+  }
 }
 
 // Fixed "today" for all tests so gestationalAgeFromDueDate produces predictable values.
@@ -136,7 +145,7 @@ describe("EntryList", () => {
   it("sorts by due date ascending when selected from sort picker", () => {
     renderList(ageSortEntries);
 
-    selectSort("Due date (oldest first)");
+    selectSort("Due date (furthest first)");
 
     const names = screen.getAllByText(/Young|Old|Middle/);
     expect(names[0]).toHaveTextContent("Young");
@@ -166,36 +175,24 @@ describe("EntryList", () => {
     expect(names[2]).toHaveTextContent("Alex");
   });
 
-  it("opens sort picker modal when sort icon is pressed", () => {
+  it("cycles sort when sort button is pressed", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
 
-    fireEvent.press(screen.getByLabelText(/Sort:/));
+    // Default is "Due date (soonest first)"
+    expect(screen.getByText("Due date (soonest first)")).toBeTruthy();
 
-    expect(screen.getByText("Sort by")).toBeTruthy();
-    expect(screen.getByText("Cancel")).toBeTruthy();
+    // Press to cycle to next
+    fireEvent.press(screen.getByLabelText(/Sort:/));
+    expect(screen.getByText("Due date (furthest first)")).toBeTruthy();
   });
 
-  it("highlights current sort option with selected state", () => {
-    renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
-
-    fireEvent.press(screen.getByLabelText(/Sort:/));
-
-    // Default sort is "Due date (newest first)" — should be marked selected
-    const activeOption = screen.getByLabelText("Due date (newest first)");
-    expect(activeOption.props.accessibilityState).toEqual(
-      expect.objectContaining({ selected: true }),
-    );
-    // Other options should not be selected
-    expect(
-      screen.getByLabelText("Recently added").props.accessibilityState,
-    ).toEqual(expect.objectContaining({ selected: false }));
-  });
-
-  it("sort icon has accessible label reflecting current sort", () => {
+  it("sort button has accessible label reflecting current sort", () => {
     renderList([makeEntry({ id: "1", name: "Baby", dueDate: "2026-09-28" })]);
 
     const sortButton = screen.getByLabelText(/Sort:/);
-    expect(sortButton.props.accessibilityLabel).toMatch(/due date.*descending/);
+    expect(sortButton.props.accessibilityLabel).toContain(
+      "Due date (soonest first)",
+    );
   });
 
   it("breaks due date ties by name ascending", () => {
@@ -210,7 +207,7 @@ describe("EntryList", () => {
   it("keeps name-ascending tiebreaker when sorting due date ascending", () => {
     renderList(sameDateEntries);
 
-    selectSort("Due date (oldest first)");
+    selectSort("Due date (furthest first)");
 
     const names = screen.getAllByText(/Alex|Jamie|Quinn/);
     expect(names[0]).toHaveTextContent("Alex");

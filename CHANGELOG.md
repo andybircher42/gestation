@@ -7,6 +7,18 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **Sort picker simplified** — replaced bottom sheet modal with inline cycling button that shows the current sort label; one tap to change
+- **Settings flattened** — theme, brightness, and layout are now inline pill selectors instead of drill-down sub-pages; only delivered cleanup keeps a sub-page
+- **Sort labels clarified** — renamed "Due date (newest/oldest first)" to "Due date (soonest/furthest first)"
+- **Entry card label removed** — dropped redundant "Calculated:" prefix from cozy card due dates
+- **Toast copy humanized** — error messages now use plain language instead of developer terminology
+
+---
+
 ## [1.3.0] — 2026-03-13
 
 Major delivered-tab overhaul, three-tab navigation, UI polish pass, and accessibility improvements.
