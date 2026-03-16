@@ -15,11 +15,13 @@ import Constants from "expo-constants";
 import { checkTesterMode, toggleTesterMode } from "@/storage";
 
 let Updates: { updateId: string | null; isEmbeddedLaunch: boolean } | undefined;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  Updates = require("expo-updates");
-} catch {
-  // Not available in Expo Go
+if (!__DEV__) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    Updates = require("expo-updates");
+  } catch {
+    // Not available in Expo Go
+  }
 }
 
 import { ColorTokens, useTheme } from "@/theme";

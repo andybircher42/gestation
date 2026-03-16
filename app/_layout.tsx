@@ -155,9 +155,10 @@ function RootGate({ loadThemePreference }: RootGateProps) {
                 }
               }
             })
-            .catch((e: unknown) =>
-              reportError("Failed to check for updates", e),
-            );
+            .catch(() => {
+              // Silently ignore — update checks can fail in dev client
+              // or preview builds where expo-updates isn't fully configured.
+            });
         } catch {
           // expo-updates not available (e.g. Expo Go)
         }
