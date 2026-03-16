@@ -49,6 +49,9 @@ export function parseBatchEntry(
     if (!name) {
       return { raw: trimmed, error: "Needs a name before the date" };
     }
+    if (name.length > 50) {
+      return { raw: trimmed, error: "Name must be 50 characters or fewer" };
+    }
     const weeks = parseInt(gaMatch[1], 10);
     const days = parseInt(gaMatch[2], 10);
     if (weeks > 42) {
@@ -102,6 +105,9 @@ function parseDateEntry(
   const name = trimmed.slice(0, match.index!).trim();
   if (!name) {
     return { raw: trimmed, error: "Needs a name before the date" };
+  }
+  if (name.length > 50) {
+    return { raw: trimmed, error: "Name must be 50 characters or fewer" };
   }
 
   const month = parseInt(match[1], 10);

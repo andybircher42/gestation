@@ -127,7 +127,7 @@ const DeliveredRow = React.memo(function DeliveredRow({
         >
           <Text style={styles.baby}>👶</Text>
           <View style={styles.info}>
-            <Text style={styles.name} numberOfLines={1}>
+            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
               {item.name}
             </Text>
             <Text style={styles.timing}>

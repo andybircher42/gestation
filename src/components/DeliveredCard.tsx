@@ -51,7 +51,7 @@ const DeliveredCard = React.memo(function DeliveredCard({
       <View style={styles.inner}>
         <BirthstoneIcon image={birthstoneImage} size={56} />
         <View style={styles.textGroup}>
-          <Text style={styles.name} numberOfLines={1}>
+          <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
             {entry.name}
           </Text>
           <Text style={styles.detail}>

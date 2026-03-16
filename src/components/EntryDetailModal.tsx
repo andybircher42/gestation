@@ -81,7 +81,9 @@ export default function EntryDetailModal({
               size={48}
             />
           )}
-          <Text style={styles.name}>{entry.name}</Text>
+          <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+            {entry.name}
+          </Text>
 
           <View style={styles.details}>
             {isDelivered && (

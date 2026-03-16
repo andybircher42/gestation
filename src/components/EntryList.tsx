@@ -506,6 +506,9 @@ export default function EntryList({
         keyExtractor={keyExtractor}
         style={styles.list}
         removeClippedSubviews={Platform.OS === "android"}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        windowSize={11}
         contentContainerStyle={
           sorted.length === 0 ? styles.emptyList : undefined
         }

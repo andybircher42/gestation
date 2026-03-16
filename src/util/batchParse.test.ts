@@ -105,6 +105,28 @@ describe("parseBatchEntry", () => {
       expect("error" in result).toBe(true);
     });
 
+    it("returns error for name over 50 characters with GA", () => {
+      const longName = "A".repeat(51);
+      const result = parseBatchEntry(`${longName} 20w3d`, now);
+      expect("error" in result && result.error).toBe(
+        "Name must be 50 characters or fewer",
+      );
+    });
+
+    it("returns error for name over 50 characters with date", () => {
+      const longName = "B".repeat(51);
+      const result = parseBatchEntry(`${longName} 6/14`, now);
+      expect("error" in result && result.error).toBe(
+        "Name must be 50 characters or fewer",
+      );
+    });
+
+    it("allows name of exactly 50 characters", () => {
+      const name50 = "A".repeat(50);
+      const result = parseBatchEntry(`${name50} 20w3d`, now);
+      expect("dueDate" in result).toBe(true);
+    });
+
     it("returns error for name-only (no date)", () => {
       const result = parseBatchEntry("Alice", now);
       expect("error" in result).toBe(true);

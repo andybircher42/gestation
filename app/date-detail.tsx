@@ -117,6 +117,7 @@ export default function DateDetailScreen() {
                   <Text
                     style={[styles.cardName, { color: colors.textEntryRow }]}
                     numberOfLines={1}
+                    ellipsizeMode="tail"
                   >
                     {entry.name}
                   </Text>

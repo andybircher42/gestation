@@ -290,6 +290,9 @@ export default function EntryGrid({
         contentContainerStyle={styles.grid}
         columnWrapperStyle={styles.gridRow}
         removeClippedSubviews={Platform.OS === "android"}
+        initialNumToRender={10}
+        maxToRenderPerBatch={8}
+        windowSize={7}
       />
       <EntryDetailModal
         entry={selectedEntry}
