@@ -100,7 +100,7 @@ export default function EntryDetailModal({
                 {symbolBadgeLabel}
               </Text>
               <Text style={[styles.symbolHint, { color: mutedTextColor }]}>
-                Based on the due date
+                Assigned from the due date
               </Text>
             </View>
           )}

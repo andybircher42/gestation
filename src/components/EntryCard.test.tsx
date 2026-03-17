@@ -128,6 +128,6 @@ describe("EntryCard", () => {
     renderWithTheme(<EntryCard entry={flowerEntry} />);
     const card = screen.getByTestId("entry-card");
     expect(card.props.accessibilityLabel).toContain("Daisy");
-    expect(card.props.accessibilityLabel).toContain("flower");
+    expect(card.props.accessibilityLabel).toContain("Flower");
   });
 });

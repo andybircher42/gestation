@@ -43,7 +43,7 @@ export default function InlineFormWrapper({
           </Pressable>
           <HelpButton
             title="Birth symbols"
-            message="Each person gets a birthstone gem, birth flower, or zodiac sign based on their due date month. Tap any entry to see which one they got."
+            message="Each person gets a personal symbol based on their due date — a birthstone, birth flower, or zodiac sign. It helps you tell entries apart at a glance. Tap any entry to see theirs."
             size={14}
           />
         </View>

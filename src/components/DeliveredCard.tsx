@@ -44,7 +44,7 @@ const DeliveredCard = React.memo(function DeliveredCard({
       onPress={() => onPress?.(entry)}
       onLongPress={() => onLongPress?.(entry)}
       accessibilityRole="button"
-      accessibilityLabel={`${entry.name}, ${symbol.name} ${symbol.type}, ${timing}`}
+      accessibilityLabel={`${entry.name}, ${symbol.label} ${symbol.name}, ${timing}`}
       testID="delivered-card"
     >
       <View style={styles.inner}>

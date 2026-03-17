@@ -19,40 +19,62 @@ export interface ResolvedSymbol {
   label: string;
 }
 
+/**
+ * LRU cache for resolved symbols. Keyed by `${entry.id}:${entry.symbolType}`.
+ * Avoids re-creating Date objects and re-resolving the same entry in tight
+ * loops (CalendarMonth renders the same entries across many day cells).
+ */
+const cache = new Map<string, ResolvedSymbol>();
+const MAX_CACHE = 200;
+
 /** Resolves the display symbol (name, color, image, label) for an entry. */
 export function resolveSymbol(entry: Entry): ResolvedSymbol {
-  const month = new Date(entry.dueDate + "T00:00:00").getMonth() + 1;
-  const day = new Date(entry.dueDate + "T00:00:00").getDate();
+  const key = `${entry.id}:${entry.symbolType ?? "gem"}`;
+  const cached = cache.get(key);
+  if (cached) {return cached;}
+
+  const d = new Date(entry.dueDate + "T00:00:00");
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
   const type = entry.symbolType ?? "gem";
+
+  let result: ResolvedSymbol;
 
   if (type === "zodiac") {
     const sign = entry.zodiacSign ?? getZodiacSign(month, day);
-    return {
+    result = {
       name: sign.name,
       color: sign.color,
       image: getZodiacSignImage(sign.name),
       type: "zodiac",
       label: "Zodiac",
     };
-  }
-
-  if (type === "flower") {
+  } else if (type === "flower") {
     const flower = entry.birthFlower ?? getBirthFlower(month);
-    return {
+    result = {
       name: flower.name,
       color: flower.color,
       image: getBirthFlowerImage(flower.name),
       type: "flower",
       label: "Flower",
     };
+  } else {
+    const stone = entry.birthstone ?? getBirthstone(month);
+    result = {
+      name: stone.name,
+      color: stone.color,
+      image: getBirthstoneImage(stone.name),
+      type: "gem",
+      label: "Birthstone",
+    };
   }
 
-  const stone = entry.birthstone ?? getBirthstone(month);
-  return {
-    name: stone.name,
-    color: stone.color,
-    image: getBirthstoneImage(stone.name),
-    type: "gem",
-    label: "Birthstone",
-  };
+  // Evict oldest entries if cache is full
+  if (cache.size >= MAX_CACHE) {
+    const firstKey = cache.keys().next().value!;
+    cache.delete(firstKey);
+  }
+  cache.set(key, result);
+
+  return result;
 }

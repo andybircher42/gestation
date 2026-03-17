@@ -41,7 +41,7 @@ const EntryCard = React.memo(function EntryCard({
       onPress={() => onPress?.(entry)}
       onLongPress={() => onLongPress?.(entry)}
       accessibilityRole="button"
-      accessibilityLabel={`${entry.name}, ${symbol.name} ${symbol.type}, ${weeks} weeks ${days} days, due ${formatDueDate(entry.dueDate)}`}
+      accessibilityLabel={`${entry.name}, ${symbol.label} ${symbol.name}, ${weeks} weeks ${days} days, due ${formatDueDate(entry.dueDate)}`}
       testID="entry-card"
     >
       <View style={styles.inner}>
