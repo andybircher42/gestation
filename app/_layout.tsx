@@ -163,6 +163,9 @@ function RootGate({ loadThemePreference }: RootGateProps) {
         if (deviceId && !isTester) {
           identifyDevice?.(deviceId);
         }
+      }
+
+      if (!__DEV__) {
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const Updates = require("expo-updates");
