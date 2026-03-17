@@ -16,6 +16,7 @@ export {
   getBirthstoneForDate,
   getBirthstoneImage,
 } from "./birthstones";
+export { contrastText } from "./contrastText";
 export {
   deliveryTimingLabel,
   expandTwoDigitYear,

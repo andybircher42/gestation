@@ -11,6 +11,7 @@ import {
 import { Entry } from "@/storage";
 import { ColorTokens, RadiiTokens, useTheme } from "@/theme";
 import {
+  contrastText,
   deliveryTimingLabel,
   formatDueDate,
   gestationalAgeFromDueDate,
@@ -42,6 +43,20 @@ export default function EntryDetailModal({
   const { weeks, days } = gestationalAgeFromDueDate(entry.dueDate);
   const isDelivered = !!entry.deliveredAt;
 
+  const bgColor =
+    entry.symbolType === "zodiac" && entry.zodiacSign
+      ? entry.zodiacSign.color
+      : entry.symbolType === "flower" && entry.birthFlower
+        ? entry.birthFlower.color
+        : entry.birthstone
+          ? entry.birthstone.color
+          : colors.primary;
+  const textColor = contrastText(bgColor);
+  const mutedTextColor =
+    textColor === "#ffffff" ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)";
+  const overlayColor =
+    textColor === "#ffffff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)";
+
   const deliveredDateStr = isDelivered
     ? new Date(entry.deliveredAt!).toLocaleDateString("en-US", {
         month: "short",
@@ -69,16 +84,7 @@ export default function EntryDetailModal({
         accessibilityViewIsModal
       >
         <Pressable
-          style={[
-            styles.card,
-            entry.symbolType === "zodiac" && entry.zodiacSign
-              ? { backgroundColor: entry.zodiacSign.color }
-              : entry.symbolType === "flower" && entry.birthFlower
-                ? { backgroundColor: entry.birthFlower.color }
-                : entry.birthstone
-                  ? { backgroundColor: entry.birthstone.color }
-                  : undefined,
-          ]}
+          style={[styles.card, { backgroundColor: bgColor }]}
           onPress={() => {}}
           accessible={false}
         >
@@ -104,7 +110,11 @@ export default function EntryDetailModal({
                       size={48}
                     />
                   ))}
-          <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+          <Text
+            style={[styles.name, { color: textColor }]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             {entry.name}
           </Text>
 
@@ -112,25 +122,37 @@ export default function EntryDetailModal({
             {isDelivered && (
               <>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Delivered</Text>
-                  <Text style={styles.detailValue}>{deliveredDateStr}</Text>
+                  <Text style={[styles.detailLabel, { color: mutedTextColor }]}>
+                    Delivered
+                  </Text>
+                  <Text style={[styles.detailValue, { color: textColor }]}>
+                    {deliveredDateStr}
+                  </Text>
                 </View>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Timing</Text>
-                  <Text style={styles.detailValue}>{timingLabel}</Text>
+                  <Text style={[styles.detailLabel, { color: mutedTextColor }]}>
+                    Timing
+                  </Text>
+                  <Text style={[styles.detailValue, { color: textColor }]}>
+                    {timingLabel}
+                  </Text>
                 </View>
               </>
             )}
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Due date</Text>
-              <Text style={styles.detailValue}>
+              <Text style={[styles.detailLabel, { color: mutedTextColor }]}>
+                Due date
+              </Text>
+              <Text style={[styles.detailValue, { color: textColor }]}>
                 {formatDueDate(entry.dueDate)}
               </Text>
             </View>
             {!isDelivered && (
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Gestational age</Text>
-                <Text style={styles.detailValue}>
+                <Text style={[styles.detailLabel, { color: mutedTextColor }]}>
+                  Gestational age
+                </Text>
+                <Text style={[styles.detailValue, { color: textColor }]}>
                   {weeks}w {days}d
                 </Text>
               </View>
@@ -138,8 +160,12 @@ export default function EntryDetailModal({
             {entry.symbolType === "zodiac"
               ? entry.zodiacSign && (
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Zodiac sign</Text>
-                    <Text style={styles.detailValue}>
+                    <Text
+                      style={[styles.detailLabel, { color: mutedTextColor }]}
+                    >
+                      Zodiac sign
+                    </Text>
+                    <Text style={[styles.detailValue, { color: textColor }]}>
                       {entry.zodiacSign.name}
                     </Text>
                   </View>
@@ -147,16 +173,24 @@ export default function EntryDetailModal({
               : entry.symbolType === "flower"
                 ? entry.birthFlower && (
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Birth flower</Text>
-                      <Text style={styles.detailValue}>
+                      <Text
+                        style={[styles.detailLabel, { color: mutedTextColor }]}
+                      >
+                        Birth flower
+                      </Text>
+                      <Text style={[styles.detailValue, { color: textColor }]}>
                         {entry.birthFlower.name}
                       </Text>
                     </View>
                   )
                 : entry.birthstone && (
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Birthstone</Text>
-                      <Text style={styles.detailValue}>
+                      <Text
+                        style={[styles.detailLabel, { color: mutedTextColor }]}
+                      >
+                        Birthstone
+                      </Text>
+                      <Text style={[styles.detailValue, { color: textColor }]}>
                         {entry.birthstone.name}
                       </Text>
                     </View>
@@ -164,12 +198,12 @@ export default function EntryDetailModal({
           </View>
 
           <Pressable
-            style={styles.closeButton}
+            style={[styles.closeButton, { backgroundColor: overlayColor }]}
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel="Close"
           >
-            <Text style={styles.closeText}>Done</Text>
+            <Text style={[styles.closeText, { color: textColor }]}>Done</Text>
           </Pressable>
         </Pressable>
       </Pressable>

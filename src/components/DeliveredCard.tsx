@@ -4,6 +4,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Entry } from "@/storage";
 import { ColorTokens, RadiiTokens, useTheme } from "@/theme";
 import {
+  contrastText,
   deliveryTimingLabel,
   formatDueDate,
   getBirthFlower,
@@ -47,6 +48,7 @@ const DeliveredCard = React.memo(function DeliveredCard({
     : formatDueDate(entry.dueDate);
 
   const styles = useMemo(() => createStyles(colors, radii), [colors, radii]);
+  const textColor = contrastText(symbol.color);
   const cardStyle = useMemo(
     () => [styles.card, { backgroundColor: symbol.color }],
     [styles.card, symbol.color],
@@ -64,10 +66,14 @@ const DeliveredCard = React.memo(function DeliveredCard({
       <View style={styles.inner}>
         <BirthstoneIcon image={symbolImage} size={56} />
         <View style={styles.textGroup}>
-          <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            style={[styles.name, { color: textColor }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {entry.name}
           </Text>
-          <Text style={styles.detail}>{timing}</Text>
+          <Text style={[styles.detail, { color: textColor }]}>{timing}</Text>
         </View>
       </View>
     </Pressable>
