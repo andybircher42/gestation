@@ -11,7 +11,8 @@ export type CelebrationStyle = "confetti" | "gentle" | "none";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const PARTICLE_COUNT = 24;
-const DURATION = 2500;
+const CONFETTI_DURATION = 2500;
+const GENTLE_DURATION = 3500;
 
 const CONFETTI_EMOJIS = ["🎉", "✨", "💫", "⭐", "🌟", "🎊"];
 const GENTLE_EMOJIS = ["✨", "💛", "🤍"];
@@ -112,14 +113,15 @@ export default function CelebrationOverlay({
 
     Animated.stagger(30, particleAnimations).start();
 
-    // Auto-dismiss
+    // Auto-dismiss — gentle needs longer for slower particles
+    const duration = style === "gentle" ? GENTLE_DURATION : CONFETTI_DURATION;
     const timer = setTimeout(() => {
       Animated.timing(fadeIn, {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
       }).start(() => onComplete());
-    }, DURATION);
+    }, duration);
 
     return () => clearTimeout(timer);
   }, [entry, style, particles, fadeIn, nameScale, onComplete]);
