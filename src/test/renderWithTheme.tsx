@@ -24,9 +24,11 @@ export default function renderWithTheme(
       personality={personality}
       brightness={brightness}
       layout={layout}
+      celebrationStyle="confetti"
       setPersonality={jest.fn()}
       setBrightness={jest.fn()}
       setLayout={jest.fn()}
+      setCelebrationStyle={jest.fn()}
     >
       {ui}
     </ThemeProvider>,
