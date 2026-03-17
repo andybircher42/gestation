@@ -28,6 +28,7 @@
       "package": "com.andybircher.induetime",
       "blockedPermissions": [
         "android.permission.ACTIVITY_RECOGNITION",
+        "android.permission.CAMERA",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO"
       ]
