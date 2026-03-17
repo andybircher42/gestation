@@ -24,6 +24,7 @@ import {
   EntryGrid,
   EntryList,
   InfoToast,
+  SettingsModal,
   ThemePickerModal,
   ToastStack,
   UndoToast,
@@ -64,11 +65,14 @@ export default function HomeScreen() {
   type ViewTab = "expecting" | "delivered" | "calendar";
   const [view, setView] = useState<ViewTab>("expecting");
   const [showThemePicker, setShowThemePicker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [showDevTools, setShowDevTools] = useState(false);
   const [showAppInfo, setShowAppInfo] = useState(false);
   const [pickerAnchor, setPickerAnchor] = useState({ top: 0, right: 0 });
+  const [settingsAnchor, setSettingsAnchor] = useState({ top: 0, right: 0 });
   const [devAnchor, setDevAnchor] = useState({ top: 0, right: 0 });
   const [analyticsOptOut, setAnalyticsOptOutState] = useState(false);
+  const themeRef = useRef<View>(null);
   const settingsRef = useRef<View>(null);
   const devRef = useRef<View>(null);
 
@@ -77,9 +81,16 @@ export default function HomeScreen() {
   const headerLogo = isDark ? headerLogoDark : headerLogoLight;
 
   const openThemePicker = useCallback(() => {
-    settingsRef.current?.measureInWindow((_x, y, _width, height) => {
+    themeRef.current?.measureInWindow((_x, y, _width, height) => {
       setPickerAnchor({ top: y + height + 4, right: 12 });
       setShowThemePicker(true);
+    });
+  }, []);
+
+  const openSettings = useCallback(() => {
+    settingsRef.current?.measureInWindow((_x, y, _width, height) => {
+      setSettingsAnchor({ top: y + height + 4, right: 12 });
+      setShowSettings(true);
     });
   }, []);
 
@@ -207,19 +218,30 @@ export default function HomeScreen() {
             </Pressable>
           )}
           <Pressable
-            ref={settingsRef}
+            ref={themeRef}
             onPress={openThemePicker}
+            accessibilityLabel="Appearance"
+            accessibilityRole="button"
+            hitSlop={10}
+          >
+            <Ionicons
+              name="color-palette-outline"
+              size={22}
+              color={colors.textPrimary}
+            />
+          </Pressable>
+          <Pressable
+            ref={settingsRef}
+            onPress={openSettings}
             accessibilityLabel="Settings"
             accessibilityRole="button"
             hitSlop={10}
-            style={styles.settingsButton}
           >
             <Ionicons
               name="settings-outline"
-              size={20}
-              color={colors.textTertiary}
+              size={22}
+              color={colors.textPrimary}
             />
-            <Text style={styles.settingsLabel}>Settings</Text>
           </Pressable>
         </View>
 
@@ -296,16 +318,21 @@ export default function HomeScreen() {
           currentPersonality={personality}
           currentBrightness={brightness}
           currentLayout={layout}
-          currentDeliveredTTL={deliveredTTLDays}
-          analyticsOptOut={analyticsOptOut}
           onSelectPersonality={setPersonality}
           onSelectBrightness={setBrightness}
           onSelectLayout={setLayout}
+          onClose={() => setShowThemePicker(false)}
+          anchor={pickerAnchor}
+        />
+        <SettingsModal
+          visible={showSettings}
+          currentDeliveredTTL={deliveredTTLDays}
+          analyticsOptOut={analyticsOptOut}
           onSelectDeliveredTTL={updateDeliveredTTL}
           onToggleAnalytics={handleToggleAnalytics}
-          onClose={() => setShowThemePicker(false)}
+          onClose={() => setShowSettings(false)}
           onAppInfo={() => setShowAppInfo(true)}
-          anchor={pickerAnchor}
+          anchor={settingsAnchor}
         />
         {__DEV__ && (
           <DevToolbar
@@ -441,15 +468,6 @@ function createStyles(colors: ColorTokens) {
     },
     hidden: {
       display: "none",
-    },
-    settingsButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-    },
-    settingsLabel: {
-      fontSize: 13,
-      color: colors.textTertiary,
     },
   });
 }

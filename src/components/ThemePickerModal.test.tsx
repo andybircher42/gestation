@@ -9,13 +9,9 @@ const defaultProps = {
   currentPersonality: "classic" as const,
   currentBrightness: "system" as const,
   currentLayout: "compact" as const,
-  currentDeliveredTTL: 3,
-  analyticsOptOut: false,
   onSelectPersonality: jest.fn(),
   onSelectBrightness: jest.fn(),
   onSelectLayout: jest.fn(),
-  onSelectDeliveredTTL: jest.fn(),
-  onToggleAnalytics: jest.fn(),
   onClose: jest.fn(),
 };
 
@@ -27,39 +23,16 @@ describe("ThemePickerModal", () => {
   it("renders inline theme, brightness, and layout options when visible", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} />);
 
-    // Theme pills are visible inline
     expect(screen.getByText("Classic")).toBeTruthy();
     expect(screen.getByText("Warm")).toBeTruthy();
     expect(screen.getByText("Elegant")).toBeTruthy();
 
-    // Brightness pills are visible inline
     expect(screen.getByText("System")).toBeTruthy();
     expect(screen.getByText("Light")).toBeTruthy();
     expect(screen.getByText("Dark")).toBeTruthy();
 
-    // Layout pills are visible inline
     expect(screen.getByText("Compact")).toBeTruthy();
     expect(screen.getByText("Cozy")).toBeTruthy();
-
-    // Delivered cleanup is still a drill-down row
-    expect(screen.getByText("Delivered cleanup")).toBeTruthy();
-  });
-
-  it("shows current values on main menu rows", () => {
-    renderWithTheme(
-      <ThemePickerModal
-        {...defaultProps}
-        currentPersonality="warm"
-        currentBrightness="dark"
-        currentLayout="cozy"
-        currentDeliveredTTL={7}
-      />,
-    );
-
-    expect(screen.getByText("Warm")).toBeTruthy();
-    expect(screen.getByText("Dark")).toBeTruthy();
-    expect(screen.getByText("Cozy")).toBeTruthy();
-    expect(screen.getByText("1 week")).toBeTruthy();
   });
 
   it("calls onSelectPersonality when a theme pill is pressed", () => {
@@ -144,7 +117,7 @@ describe("ThemePickerModal", () => {
     const onClose = jest.fn();
     renderWithTheme(<ThemePickerModal {...defaultProps} onClose={onClose} />);
 
-    fireEvent.press(screen.getByLabelText("Close settings"));
+    fireEvent.press(screen.getByLabelText("Close appearance"));
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -153,37 +126,5 @@ describe("ThemePickerModal", () => {
     renderWithTheme(<ThemePickerModal {...defaultProps} visible={false} />);
 
     expect(screen.queryByText("Theme")).toBeNull();
-  });
-
-  it("calls onAppInfo and onClose when version row is pressed", () => {
-    const onAppInfo = jest.fn();
-    const onClose = jest.fn();
-    renderWithTheme(
-      <ThemePickerModal
-        {...defaultProps}
-        onAppInfo={onAppInfo}
-        onClose={onClose}
-      />,
-    );
-
-    fireEvent.press(screen.getByLabelText("About and help"));
-
-    expect(onAppInfo).toHaveBeenCalledTimes(1);
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("drills into TTL subpage and calls onSelectDeliveredTTL", () => {
-    const onSelectDeliveredTTL = jest.fn();
-    renderWithTheme(
-      <ThemePickerModal
-        {...defaultProps}
-        onSelectDeliveredTTL={onSelectDeliveredTTL}
-      />,
-    );
-
-    fireEvent.press(screen.getByLabelText("Delivered cleanup settings"));
-    fireEvent.press(screen.getByText("1 week"));
-
-    expect(onSelectDeliveredTTL).toHaveBeenCalledWith(7);
   });
 });
