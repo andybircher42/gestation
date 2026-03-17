@@ -109,15 +109,20 @@ export default function EntryDetailModal({
           accessible={false}
         >
           {entry.symbolType && symbolName && (
-            <Text
-              style={[
-                styles.symbolBadge,
-                { color: mutedTextColor, borderColor: mutedTextColor },
-              ]}
-              accessibilityLabel={`Symbol: ${symbolBadgeLabel}`}
-            >
-              {symbolBadgeLabel}
-            </Text>
+            <View style={styles.symbolHeader}>
+              <Text
+                style={[
+                  styles.symbolBadge,
+                  { color: mutedTextColor, borderColor: mutedTextColor },
+                ]}
+                accessibilityLabel={`Symbol: ${symbolBadgeLabel}`}
+              >
+                {symbolBadgeLabel}
+              </Text>
+              <Text style={[styles.symbolHint, { color: mutedTextColor }]}>
+                Based on the due date
+              </Text>
+            </View>
           )}
           {isDelivered && <Text style={styles.deliveredEmoji}>👶</Text>}
           {!isDelivered &&
@@ -232,6 +237,10 @@ function createStyles(colors: ColorTokens, radii: RadiiTokens) {
         },
       }),
     },
+    symbolHeader: {
+      alignItems: "center",
+      gap: 4,
+    },
     symbolBadge: {
       fontSize: 11,
       fontWeight: "600",
@@ -242,6 +251,9 @@ function createStyles(colors: ColorTokens, radii: RadiiTokens) {
       paddingHorizontal: 8,
       paddingVertical: 2,
       overflow: "hidden",
+    },
+    symbolHint: {
+      fontSize: 11,
     },
     deliveredEmoji: {
       fontSize: 48,

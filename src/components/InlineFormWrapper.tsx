@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { ColorTokens, RadiiTokens, useTheme } from "@/theme";
 
 import EntryForm from "./EntryForm";
+import HelpButton from "./HelpButton";
 
 interface InlineFormWrapperProps {
   formKey: number;
@@ -28,17 +29,24 @@ export default function InlineFormWrapper({
   return (
     <View style={styles.container}>
       <View style={styles.toolbar}>
-        <Pressable
-          onPress={onToggleBatchMode}
-          accessibilityRole="button"
-          accessibilityLabel={
-            batchMode ? "Switch to single entry" : "Switch to batch entry"
-          }
-        >
-          <Text style={styles.batchToggleText}>
-            {batchMode ? "Add one at a time" : "Add multiple"}
-          </Text>
-        </Pressable>
+        <View style={styles.leftGroup}>
+          <Pressable
+            onPress={onToggleBatchMode}
+            accessibilityRole="button"
+            accessibilityLabel={
+              batchMode ? "Switch to single entry" : "Switch to batch entry"
+            }
+          >
+            <Text style={styles.batchToggleText}>
+              {batchMode ? "Add one at a time" : "Add multiple"}
+            </Text>
+          </Pressable>
+          <HelpButton
+            title="Birth symbols"
+            message="Each person gets a birthstone gem, birth flower, or zodiac sign based on their due date month. Tap any entry to see which one they got."
+            size={14}
+          />
+        </View>
         <Pressable
           onPress={onClose}
           accessibilityRole="button"
@@ -71,6 +79,11 @@ function createStyles(colors: ColorTokens, radii: RadiiTokens) {
       paddingHorizontal: 12,
       paddingTop: 6,
       paddingBottom: 2,
+    },
+    leftGroup: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
     },
     batchToggleText: {
       fontSize: 12,

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -6,7 +6,6 @@ import { useConfirmAlert } from "@/hooks";
 import { ColorTokens, useTheme } from "@/theme";
 
 import { SORT_FIELDS, type SortBy, type SortDir } from "./SortPickerModal";
-
 
 interface SortToolbarProps {
   sortBy: SortBy;
@@ -19,6 +18,8 @@ interface SortToolbarProps {
   deleteAllTitle?: string;
   /** Alert body for the delete-all confirmation. */
   deleteAllMessage?: string;
+  /** Optional element rendered between the sort label and the remove-all button. */
+  trailing?: ReactNode;
 }
 
 /** Toolbar with sort field cycling, direction toggle, and overflow menu. */
@@ -31,6 +32,7 @@ export default function SortToolbar({
   onDeleteAll,
   deleteAllTitle = "Remove everyone?",
   deleteAllMessage,
+  trailing,
 }: SortToolbarProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -70,6 +72,7 @@ export default function SortToolbar({
           {SORT_FIELDS.find((f) => f.field === sortBy)?.label}
         </Text>
       </Pressable>
+      {trailing}
       <View style={styles.toolbarSpacer} />
       <Pressable
         style={styles.removeAllButton}
