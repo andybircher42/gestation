@@ -295,20 +295,20 @@ describe("EntryList", () => {
     renderList([]);
 
     expect(screen.queryByLabelText(/Sort:/)).toBeNull();
-    expect(screen.queryByLabelText("More options")).toBeNull();
+    expect(screen.queryByLabelText("Remove all")).toBeNull();
   });
 
   it("shows overflow button when entries exist", () => {
     renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    expect(screen.getByLabelText("More options")).toBeTruthy();
+    expect(screen.getByLabelText("Remove all")).toBeTruthy();
   });
 
   it("shows confirmation dialog when Remove all is pressed", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    fireEvent.press(screen.getByLabelText("More options"));
+    fireEvent.press(screen.getByLabelText("Remove all"));
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Remove everyone?",
@@ -321,7 +321,7 @@ describe("EntryList", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const { onDeleteAll } = renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    fireEvent.press(screen.getByLabelText("More options"));
+    fireEvent.press(screen.getByLabelText("Remove all"));
 
     const buttons = alertSpy.mock.calls[0][2] as Array<{
       text: string;
@@ -336,7 +336,7 @@ describe("EntryList", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     const { onDeleteAll } = renderList([makeEntry({ id: "1", name: "Baby" })]);
 
-    fireEvent.press(screen.getByLabelText("More options"));
+    fireEvent.press(screen.getByLabelText("Remove all"));
 
     const buttons = alertSpy.mock.calls[0][2] as Array<{
       text: string;

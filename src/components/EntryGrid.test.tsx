@@ -130,7 +130,7 @@ describe("EntryGrid", () => {
     const alertSpy = jest.spyOn(Alert, "alert");
     renderGrid([makeEntry({ id: "1", name: "Alice", dueDate: "2026-09-11" })]);
 
-    fireEvent.press(screen.getByLabelText("More options"));
+    fireEvent.press(screen.getByLabelText("Remove all"));
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Remove everyone?",
@@ -145,7 +145,7 @@ describe("EntryGrid", () => {
       makeEntry({ id: "1", name: "Alice", dueDate: "2026-09-11" }),
     ]);
 
-    fireEvent.press(screen.getByLabelText("More options"));
+    fireEvent.press(screen.getByLabelText("Remove all"));
 
     const buttons = alertSpy.mock.calls[0][2] as Array<{
       text: string;
