@@ -8,6 +8,7 @@ import { ColorTokens, useTheme } from "@/theme";
 import { lineHeight } from "@/util";
 
 import CalendarMonth, { DayCell } from "./CalendarMonth";
+import HelpButton from "./HelpButton";
 
 interface CalendarViewProps {
   entries: Entry[];
@@ -122,6 +123,14 @@ export default function CalendarView({
       style={styles.scrollView}
       contentContainerStyle={styles.content}
     >
+      <View style={styles.helpRow}>
+        <HelpButton
+          title="Calendar colors"
+          message="Darker colors mean a higher chance of delivery on that day — even if it's not the due date. The shading is based on how likely each day is across all the pregnancies you're tracking."
+          size={18}
+        />
+        <Text style={styles.helpText}>What do the colors mean?</Text>
+      </View>
       {months.map(({ year, month, cells }) => (
         <CalendarMonth
           key={`${year}-${month}`}
@@ -144,6 +153,16 @@ function createStyles(colors: ColorTokens) {
     content: {
       paddingVertical: 16,
       paddingHorizontal: 16,
+    },
+    helpRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 8,
+    },
+    helpText: {
+      fontSize: 13,
+      color: colors.textTertiary,
     },
     emptyContainer: {
       flex: 1,
