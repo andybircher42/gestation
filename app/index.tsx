@@ -209,15 +209,17 @@ export default function HomeScreen() {
           <Pressable
             ref={settingsRef}
             onPress={openThemePicker}
-            accessibilityLabel="Theme settings"
+            accessibilityLabel="Settings"
             accessibilityRole="button"
             hitSlop={10}
+            style={styles.settingsButton}
           >
             <Ionicons
               name="settings-outline"
-              size={24}
-              color={colors.textPrimary}
+              size={20}
+              color={colors.textTertiary}
             />
+            <Text style={styles.settingsLabel}>Settings</Text>
           </Pressable>
         </View>
 
@@ -439,6 +441,15 @@ function createStyles(colors: ColorTokens) {
     },
     hidden: {
       display: "none",
+    },
+    settingsButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    settingsLabel: {
+      fontSize: 13,
+      color: colors.textTertiary,
     },
   });
 }

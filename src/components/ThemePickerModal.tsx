@@ -180,6 +180,7 @@ export default function ThemePickerModal({
             </>
           ) : (
             <>
+              <Text style={styles.sectionHeader}>Appearance</Text>
               <Text style={styles.title}>Theme</Text>
               <View style={styles.pillRow}>
                 {THEME_OPTIONS.map(({ value, label, icon }) => (
@@ -289,6 +290,7 @@ export default function ThemePickerModal({
                 ))}
               </View>
               <View style={styles.separator} />
+              <Text style={styles.sectionHeader}>Data</Text>
               <Pressable
                 style={styles.row}
                 onPress={() => setSubPage("ttl")}
@@ -379,6 +381,15 @@ function createStyles(colors: ColorTokens, radii: RadiiTokens) {
           elevation: 8,
         },
       }),
+    },
+    sectionHeader: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: colors.textTertiary,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginTop: 8,
+      marginBottom: 2,
     },
     title: {
       fontSize: 13,
