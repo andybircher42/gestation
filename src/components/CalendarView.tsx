@@ -9,6 +9,7 @@ import { ColorTokens, useTheme } from "@/theme";
 import { lineHeight } from "@/util";
 
 import CalendarMonth, { DayCell } from "./CalendarMonth";
+import HelpButton from "./HelpButton";
 
 interface CalendarViewProps {
   entries: Entry[];
@@ -139,6 +140,11 @@ export default function CalendarView({
           style={styles.legendBar}
         />
         <Text style={styles.legendLabel}>more due</Text>
+        <HelpButton
+          title="Calendar colors"
+          message="Darker colors mean a higher chance of delivery on that day — even if it's not the due date. The shading is based on how likely each day is across all the pregnancies you're tracking."
+          size={16}
+        />
       </View>
       {months.map(({ year, month, cells }) => (
         <CalendarMonth
